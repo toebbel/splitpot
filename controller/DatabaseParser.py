@@ -5,13 +5,17 @@
 # login
     # email
     # password
-    
-# User exists?
+
+# userExists
     # email
 
 # register
     # email
     # passwort
+
+# isValidResetUrl
+    # email
+    # url-key
 
 # listEvents
 
