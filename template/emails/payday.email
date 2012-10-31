@@ -1,0 +1,7 @@
+<%inherit file="base.email"%>
+
+It's Payday!
+You know what this means: Everybody pays his debts and hopefully gets a lot of money :)
+This is the overview of you'r expenses over the last month:
+
+#TODO think about data format & finish email template

@@ -1,0 +1,4 @@
+<%inherit file="base.email"%>
+
+Hi,
+welcome to Splitpot! You have to verify your email address by clicking on this url: ${url}
