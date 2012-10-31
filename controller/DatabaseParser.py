@@ -10,6 +10,7 @@ import hashlib
 
 DB_FILE = '../resource/splitpotDB_DEV.sqlite'
 ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+SALT_LENGTH = 30
 
 # connects to a given database file
 connection = None
@@ -41,6 +42,7 @@ class DatabaseParser:
     def insertEvent(self, participants, date, owner, amount, comment):
         with connection:
             cur = connection.cursor()   
+            # TODO: split participants and create new ghost user for non registered user
             cur.execute("INSERT INTO splitpot_events VALUES (?,?,?,?,?,?)", (None, participants, date, amount, owner, comment))
             
             cur.execute("SELECT * FROM splitpot_events ORDER BY ID DESC limit 1")
@@ -60,7 +62,7 @@ class DatabaseParser:
     def registerUser(self, email, name, password):
         if not self.userExists(email):
             with connection:
-                salt = self.createSalt(30)
+                salt = self.createSalt(SALT_LENGTH)
                 print "salt: " + salt
                 hashedPassword = self.hashPassword(salt, password)
                 print "hashed Password: " + hashedPassword
