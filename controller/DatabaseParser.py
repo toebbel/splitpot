@@ -15,7 +15,7 @@ SALT_LENGTH = 30
 # connects to a given database file
 connection = None
 
-class DatabaseParser:
+class DBParser:
 
     # instantiate 'connection'
     def connectToDB(self):
