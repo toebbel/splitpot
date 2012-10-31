@@ -12,7 +12,6 @@ sys.path.append('../utils/')
 import Encryption
 
 DB_FILE = '../resource/splitpotDB_DEV.sqlite'
-ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 SALT_LENGTH = 30
 
 # connects to a given database file
