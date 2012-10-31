@@ -8,6 +8,9 @@ import sys
 import random 
 import hashlib
 
+sys.path.append('../utils/')
+import Encryption
+
 DB_FILE = '../resource/splitpotDB_DEV.sqlite'
 ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 SALT_LENGTH = 30
@@ -62,9 +65,9 @@ class DBParser:
     def registerUser(self, email, name, password):
         if not self.userExists(email):
             with connection:
-                salt = self.createSalt(SALT_LENGTH)
+                salt = Encryption.generateSalt(SALT_LENGTH)
                 print "salt: " + salt
-                hashedPassword = self.hashPassword(salt, password)
+                hashedPassword = Encryption.hashPassword(salt, password)
                 print "hashed Password: " + hashedPassword
                 
                 cur = connection.cursor()
@@ -75,17 +78,8 @@ class DBParser:
             print "User already exists"
             return False
     
-    # create a salt value with a given length 
-    def createSalt(self, length):
-        salt = ''.join(random.choice(ALPHABET) for i in range(length))
-        return salt
-
-    # create a salted hash value from password and salt
-    def hashPassword(self, salt, password):
-        return hashlib.sha256(salt + password).hexdigest()
-
 def main():
-    x = DatabaseParser()
+    x = DBParser() 
     x.connectToDB()
     x.verifyLogin()
     x.listEvents()
