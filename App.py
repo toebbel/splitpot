@@ -6,6 +6,5 @@ cherrypy.log.access_file = None
 
 root = splitpot_controller()
 root.user = login_controller()
-root.user.signup = login_controller().register_form
 
 cherrypy.quickstart(root)
