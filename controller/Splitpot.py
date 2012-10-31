@@ -10,3 +10,11 @@ class splitpot_controller(object):
   def index(self):
     tmpl = lookup.get_template("index.html")
     return tmpl.render()
+
+  def add(self):
+    tmpl = lookup.get_template("add.html")
+    return tmpl.render()
+
+#  def doAdd(self, Comment, Amount, Others):
+ #TODO continue here
+
