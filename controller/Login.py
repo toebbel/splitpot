@@ -5,6 +5,8 @@ lookup = TemplateLookup(directories=['template/login', 'template'])
 import re #gex
 import string
 
+import Email
+
 import DatabaseParser
 db = DatabaseParser
 import Splitpot
@@ -56,7 +58,8 @@ class login_controller(object):
       return tmpl.render(feedback="User already exists")
     else:
       if (db.user.register(email, pwd1)):
-        return login(email, pwd1) #TODO Send confirmation email
+        MailHelper.signupConfirm(email, "") #TODO get signup confirmation key from db
+        return login(email, pwd1)
       else:
         return tmpl.render(feedback="Something went wrong. Please try again later")
 
@@ -67,7 +70,7 @@ class login_controller(object):
     if(not db.userExists(email)):
       return tmpl.render(feedback="Email not found")
     else:
-      #TODO send email
+      MailHelper.forgotConfirmation(email, "")#TODO get forgot-key from db
       return tmpl.render(feedback="We sent you further instructions via email")
 
   @cherrypy.expose
@@ -76,7 +79,7 @@ class login_controller(object):
     tmpl = lookup.get_template("forgot.html")
     if(db.isValidResetUrl(email, resetKey)):
       new_pwd = generatePwd()
-      #TODO send pwd as email
+      MailHelper.forgotNewPwd(email, new_pwd)
       return tmpl.render(feedback="You'r password has been reset and in on it's way to your mailbox")
     else:
       return tmpl.render(feedback="You'r reset key is invalid")

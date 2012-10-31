@@ -1,0 +1,4 @@
+<%inherit file="base.email"%>
+
+Hi,
+You've requested a new password. To confirm this request, click on this url: ${url}

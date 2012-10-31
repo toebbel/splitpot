@@ -1,6 +1,7 @@
 import cherrypy
 from controller.Splitpot import *
 from controller.Login import *
+from controller.Email import *
 
 cherrypy.log.access_file = None
 
