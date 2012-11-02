@@ -1,8 +1,9 @@
-<&inherit file="base.html" />
+<%inherit file="base.html" />
+
 
 Add you expenses, that you made for others.
 
-<form name="add_event" action "doAdd">
+<form name="doAdd" action= "doAdd" method="post">
   Amount: <input type="text" name="amount" /><br />
   Comment: <input type="multiline" name="comment" /><br />
   Others: <input type="text" name="others" /><br >

@@ -11,6 +11,7 @@ class splitpot_controller(object):
     tmpl = lookup.get_template("index.html")
     return tmpl.render(debts=12.2, others_debts=0.2, entries = [])
 
+  @cherrypy.expose
   def add(self): #gives the form for entering a new event
     tmpl = lookup.get_template("add.html")
     return tmpl.render()
@@ -20,6 +21,8 @@ class splitpot_controller(object):
 
   If one of the given emails in other is not a known user, an invitation email will be sent.
   """
+  @cherrypy.expose
   def doAdd(self, comment, amount, others):
-    print "do Add"
+    print "do Add" + comment + ", " + amount + "euro" + others
+    return "danke"
 
