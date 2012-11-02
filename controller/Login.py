@@ -7,7 +7,7 @@ import string
 
 import Email
 
-sys.path.append('../utils/')
+#sys.path.append('utils/')
 import Encryption
 
 import DatabaseParser

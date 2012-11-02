@@ -1,17 +1,17 @@
 #!/usr/bin/python
 #
-# Parse database 
+# Parse database
 #
 
 import sqlite3 as lite
 import sys
-import random 
+import random
 import hashlib
 
-sys.path.append('../utils/')
+sys.path.append('utils/')
 import Encryption
 
-DB_FILE = '../resource/splitpotDB_DEV.sqlite'
+DB_FILE = 'resource/splitpotDB_DEV.sqlite'
 SALT_LENGTH = 30
 
 # connects to a given database file
@@ -43,13 +43,13 @@ class DBParser:
     # inserting a new event with the given parameters and return the event ID
     def insertEvent(self, participants, date, owner, amount, comment):
         with connection:
-            cur = connection.cursor()   
+            cur = connection.cursor()
             # TODO: split participants and create new ghost user for non registered user
             cur.execute("INSERT INTO splitpot_events VALUES (?,?,?,?,?,?)", (None, participants, date, amount, owner, comment))
-            
+
             cur.execute("SELECT * FROM splitpot_events ORDER BY ID DESC limit 1")
             eventID = cur.fetchone()[0]
-        return eventID 
+        return eventID
 
     # checks if an user already exists
     def userExists(self, email):
@@ -68,17 +68,17 @@ class DBParser:
                 print "salt: " + salt
                 hashedPassword = Encryption.hashPassword(salt, password)
                 print "hashed Password: " + hashedPassword
-                
+
                 cur = connection.cursor()
-                cur.execute("INSERT INTO splitpot_users VALUES (?, ?, ?, ?)", (email, name, salt, hashedPassword)) 
+                cur.execute("INSERT INTO splitpot_users VALUES (?, ?, ?, ?)", (email, name, salt, hashedPassword))
 
                 return True
         else:
             print "User already exists"
             return False
-    
+
 def main():
-    x = DBParser() 
+    x = DBParser()
     x.connectToDB()
     x.verifyLogin()
     x.listEvents()
