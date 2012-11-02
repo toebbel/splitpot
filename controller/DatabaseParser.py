@@ -8,13 +8,16 @@ import sys
 import random 
 import hashlib
 
+sys.path.append('../utils/')
+import Encryption
+
 DB_FILE = '../resource/splitpotDB_DEV.sqlite'
-ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+SALT_LENGTH = 30
 
 # connects to a given database file
 connection = None
 
-class DatabaseParser:
+class DBParser:
 
     # instantiate 'connection'
     def connectToDB(self):
@@ -41,6 +44,7 @@ class DatabaseParser:
     def insertEvent(self, participants, date, owner, amount, comment):
         with connection:
             cur = connection.cursor()   
+            # TODO: split participants and create new ghost user for non registered user
             cur.execute("INSERT INTO splitpot_events VALUES (?,?,?,?,?,?)", (None, participants, date, amount, owner, comment))
             
             cur.execute("SELECT * FROM splitpot_events ORDER BY ID DESC limit 1")
@@ -60,9 +64,9 @@ class DatabaseParser:
     def registerUser(self, email, name, password):
         if not self.userExists(email):
             with connection:
-                salt = self.createSalt(30)
+                salt = Encryption.generateSalt(SALT_LENGTH)
                 print "salt: " + salt
-                hashedPassword = self.hashPassword(salt, password)
+                hashedPassword = Encryption.hashPassword(salt, password)
                 print "hashed Password: " + hashedPassword
                 
                 cur = connection.cursor()
@@ -73,17 +77,8 @@ class DatabaseParser:
             print "User already exists"
             return False
     
-    # create a salt value with a given length 
-    def createSalt(self, length):
-        salt = ''.join(random.choice(ALPHABET) for i in range(length))
-        return salt
-
-    # create a salted hash value from password and salt
-    def hashPassword(self, salt, password):
-        return hashlib.sha256(salt + password).hexdigest()
-
 def main():
-    x = DatabaseParser()
+    x = DBParser() 
     x.connectToDB()
     x.verifyLogin()
     x.listEvents()

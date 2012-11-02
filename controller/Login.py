@@ -7,6 +7,9 @@ import string
 
 import Email
 
+sys.path.append('../utils/')
+import Encryption
+
 import DatabaseParser
 db = DatabaseParser
 import Splitpot
@@ -78,12 +81,8 @@ class login_controller(object):
     print "forgot " + email + ", key " + resetKey
     tmpl = lookup.get_template("forgot.html")
     if(db.isValidResetUrl(email, resetKey)):
-      new_pwd = generatePwd()
+      new_pwd = Encryption.generateSalt(8)
       MailHelper.forgotNewPwd(email, new_pwd)
       return tmpl.render(feedback="You'r password has been reset and in on it's way to your mailbox")
     else:
       return tmpl.render(feedback="You'r reset key is invalid")
-
-
-def generatePwd(size=8, chars=string.ascii_uppercase + string.digits + string.ascii_lowercase):
-  return ''.join(random.choice(chars) for x in range(size))
