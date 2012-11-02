@@ -82,20 +82,31 @@ class DBParser:
         if self.userExists(email):
             with connection:
                 cur = connection.cursor()
-                cur.execute("SELECT password FROM splitpot_users where email = ?", [email])
+                cur.execute("SELECT password FROM splitpot_users WHERE email = ?", [email])
                 pw = cur.fetchone()[0]
                 return pw
         else:
             print "User doesn't exist"
     
+    # set the event status for a given user
+    def setEventStatus(self, email, event, status):
+        with connection:
+            cur = connection.cursor()
+            cur.execute("SELECT COUNT(*) FROM splitpot_participants WHERE user = ? AND event = ?", (email, event))
+            curEvent = cur.fetchone()[0]
+            if curEvent != 0:
+                cur.execute("UPDATE splitpot_participants SET status = ? WHERE user = ? AND event = ?", (status, email, event))
+                return True
+            else:
+                print "Event and/or email doesn't exist"
+
 def main():
     x = DBParser()
     x.connectToDB()
     x.verifyLogin()
     x.listEvents()
-    x.insertEvent("blub, test, uni", "21.01.2012", "martin@dinhmail.de", 33.2, "This is another comment")
-    x.registerUser("martin@0xabc.de", "Martin Dinh", "blub")
     print x.getPassword("martin@0xabc.de")
+    print x.setEventStatus("tobstu@gmail.com", 2, "paid")
 
 # call main method
 main()
