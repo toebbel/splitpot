@@ -7,6 +7,7 @@ import sqlite3 as lite
 import sys
 import random
 import hashlib
+import logging
 
 sys.path.append('utils/')
 import Encryption
@@ -21,12 +22,12 @@ class DBParser:
 
     # instantiate 'connection'
     def connectToDB(self):
-        print "connecting to database..."
+        logging.info("connecting to database...")
         global connection
         connection = lite.connect(DB_FILE)
 
         with connection:
-            print "connection successful."
+            logging.info("database connection successful.")
 
     def verifyLogin(self):
         print "nothing"
