@@ -11,7 +11,8 @@ import hashlib
 sys.path.append('../utils/')
 import Encryption
 
-DB_FILE = '../resource/splitpotDB_DEV.sqlite'
+ENV = "DEV"
+DB_FILE = "../resource/splitpotDB_DEV.sqlite" if ENV=="DEV" else "resource/splitpotDB_DEV.sqlite"
 SALT_LENGTH = 30
 
 # connects to a given database file
@@ -19,7 +20,7 @@ connection = None
 
 class DBParser:
 
-    # instantiate 'connection'
+    # initialize 'connection'
     def connectToDB(self):
         print "connecting to database..."
         global connection
@@ -38,7 +39,7 @@ class DBParser:
             cur.execute("SELECT * FROM splitpot_events")
             events = cur.fetchall()
 
-        return events
+            return events
 
     # inserting a new event with the given parameters and return the event ID
     def insertEvent(self, participants, date, owner, amount, comment):
@@ -49,7 +50,7 @@ class DBParser:
             
             cur.execute("SELECT * FROM splitpot_events ORDER BY ID DESC limit 1")
             eventID = cur.fetchone()[0]
-        return eventID 
+            return eventID 
 
     # checks if an user already exists
     def userExists(self, email):
@@ -76,6 +77,17 @@ class DBParser:
         else:
             print "User already exists"
             return False
+
+    # return hashedPassword
+    def getPassword(self, email):
+        if self.userExists(email):
+            with connection:
+                cur = connection.cursor()
+                cur.execute("SELECT password FROM splitpot_users where email = ?", [email])
+                pw = cur.fetchone()[0]
+                return pw
+        else:
+            print "User doesn't exist"
     
 def main():
     x = DBParser() 
@@ -84,6 +96,7 @@ def main():
     x.listEvents()
     x.insertEvent("blub, test, uni", "21.01.2012", "martin@dinhmail.de", 33.2, "This is another comment")
     x.registerUser("martin@0xabc.de", "Martin Dinh", "blub")
+    print x.getPassword("martin@0xabc.de")
 
 # call main method
 main()
