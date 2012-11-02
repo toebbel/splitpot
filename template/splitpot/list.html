@@ -1,0 +1,25 @@
+<%inherit file="base.html" />
+
+You'r debts: ${debts}€ <br />
+Others owe you: ${others_debts}€
+<hr />
+<table>
+  <tr>
+    <td>Date</td>
+    <td>Amount</td>
+    <td>Details</td>
+  </tr>
+  % for x in entries:
+    <tr>
+      <td>
+        ${x.date}
+      </td>
+      <td>
+        ${x.amount}
+      </td>
+      <td>
+        <a href="/../show/${x.id}">more</a>
+      </td>
+    </tr>
+
+</table>
