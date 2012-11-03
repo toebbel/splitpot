@@ -46,6 +46,10 @@ class login_controller(object):
       return Splitpot.index()
 
   @cherrypy.expose
+  def doLogout(self):
+    cherrypy.lib.sessions.delete()
+
+  @cherrypy.expose
   def doRegister(self, email = None, pwd1 = None, pwd2 = None):
     print "register " + email + ":" + pwd1 + " == " + pwd2 #TODO remove!
     tmpl = lookup.get_template("register.html")
