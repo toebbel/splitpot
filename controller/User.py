@@ -1,7 +1,7 @@
 import cherrypy
 from mako.template import Template
 from mako.lookup import TemplateLookup
-lookup = TemplateLookup(directories=['template/login', 'template'])
+lookup = TemplateLookup(directories=['template/user', 'template'])
 import re #gex
 import string
 import sys
@@ -17,14 +17,9 @@ import Splitpot
 import logging
 log = logging.getLogger("appLog")
 
-class login_controller(object):
+class user_controller(object):
 
   mail_regex = """^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,3}|[0-9]{1,3})(\\]?)$"""
-
-  @cherrypy.expose
-  def index(self):
-    log.info("provide login form")
-    return lookup.get_template("index.html").render()
 
   @cherrypy.expose
   def register(self):
@@ -35,22 +30,6 @@ class login_controller(object):
   def forgot(self):
     log.info("provide forgot form")
     return lookup.get_template("forgot_pwd.html").render()
-
-  @cherrypy.expose
-  def doLogin(self, email = None, pwd = None):
-    log.info("login " + email + " with pwd " + pwd) #TODO remove pwd from logging!
-    tmpl = lookup.get_template("register.html")
-    if (not db.login(email, pwd)):
-      #TODO do login here
-      return tmpl.render(feedback="User or password incorrect")
-    else:
-      return Splitpot.index()
-
-  @cherrypy.expose
-  def doLogout(self):
-    log.info("do Logout")
-    cherrypy.lib.sessions.delete()
-    return Splitpot.about()
 
   @cherrypy.expose
   def doRegister(self, email = None, pwd1 = None, pwd2 = None):
