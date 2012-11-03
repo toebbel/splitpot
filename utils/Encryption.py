@@ -4,7 +4,7 @@ import string
 import random
 import hashlib
 
-CHAR_POOL = chars=string.ascii_uppercase + string.ascii_lowercase + string.digits
+CHAR_POOL = string.ascii_uppercase + string.ascii_lowercase + string.digits
 
 class EncryptionHelper(object):
     @staticmethod

@@ -9,8 +9,7 @@ import random
 import hashlib
 import logging
 
-sys.path.append('utils/')
-import Encryption
+from utils import Encryption
 
 DB_FILE = 'resource/splitpotDB_DEV.sqlite'
 SALT_LENGTH = 30
@@ -30,8 +29,18 @@ class DBParser:
         with connection:
             log.info("database connection successful.")
 
-    def verifyLogin(self):
-        print "nothing"
+    def verifyLogin(self, email, password):
+        log.info("verify user and given password")
+        with connection:
+            cur = connection.cursor()
+            cur.execute("SELECT salt FROM splitpot_users WHERE email = ?", [email])
+            userSalt = cur.fetchone()[0] 
+            cur.execute("SELECT password FROM splitpot_users WHERE email = ?", [email])
+            hashedPw = cur.fetchone()[0]
+            print "ad: " + str(hashedPw)
+        #True if (Encryption.hashPassword(userSalt, password) == hashedPw) else False 
+        tmpBla = Encryption.hashPassword(userSalt, password)
+        print tmpBla
 
     # returns a list with all events
     def listEvents(self):
@@ -44,10 +53,19 @@ class DBParser:
 
     # inserting a new event with the given parameters and return the event ID
     def insertEvent(self, participants, date, owner, amount, comment):
+        newUsers = []
         with connection:
             cur = connection.cursor()
             # TODO: split participants and create new ghost user for non registered user
-            cur.execute("INSERT INTO splitpot_events VALUES (?,?,?,?,?,?)", (None, participants, date, amount, owner, comment))
+            for email in participants:
+                if self.userExists(email):
+                    cur.execute("INSERT INTO splitpot_events VALUES (?,?,?,?,?,?)", (None, email, date, amount, owner, comment))
+                else:
+                    tmpPassword = Encryption.generateSalt(6)
+                    self.registerUser(self, email, "Not Registered", tmpPassword) 
+                    cur.execute("INSERT INTO splitpot_events VALUES (?,?,?,?,?,?)", (None, email, date, amount, owner, comment))
+                    # return dictionaries with email:tmpPassword
+                    newUsers.append({email:tmpPassword})
 
             cur.execute("SELECT * FROM splitpot_events ORDER BY ID DESC limit 1")
             eventID = cur.fetchone()[0]
@@ -72,7 +90,7 @@ class DBParser:
                 print "hashed Password: " + hashedPassword
 
                 cur = connection.cursor()
-                cur.execute("INSERT INTO splitpot_users VALUES (?, ?, ?, ?)", (email, name, salt, hashedPassword))
+                cur.execute("INSERT INTO splitpot_users VALUES (?, ?, ?, ?, ?)", (email, name, 0, salt, hashedPassword))
 
                 return True
         else:
@@ -105,21 +123,16 @@ class DBParser:
 def main():
     x = DBParser()
     x.connectToDB()
-    x.verifyLogin()
+    x.registerUser("test@0xabc.de", "Test Account", "Test")
+    print x.verifyLogin("test@0xabc.de", "asfelkj")
+    print x.verifyLogin("test@0xabc.de", "Test")
     x.listEvents()
     print x.getPassword("martin@0xabc.de")
     print x.setEventStatus("tobstu@gmail.com", 2, "paid")
 
 # call main method
 main()
-# login
-    # email
-    # password
 
 # isValidResetUrl
     # email
     # url-key
-
-# setEventStatus
-    # ID
-    # status
