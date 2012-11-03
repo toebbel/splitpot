@@ -11,6 +11,8 @@ import DatabaseParser
 db = DatabaseParser
 
 import Splitpot
+import logging
+log = logging.getLogger("appLog")
 
 def sendMail(host, sender, to, subject, body):
   msg = MIMEText(body)
@@ -29,14 +31,17 @@ class MailHelper(object):
     sendMail("localhost", "splitpot@0xabc.de", sender, to, subject, body)
 
   def signupConfirm(email, key):
+    log.info("sending signup confirmation to " + email + ": " + key)
     tmpl = lookup.get_template("signup_confirmation.email")
     SettingsWrapper(email, "Signup Confirmation", tmpl.render(url = runningUrl + "/user/confirm?key=" + key))
 
   def forgotConfirmation(email, key):
+    log.info("sending a forgot-pwd-conf-key to " + email + ": " + key)
     tmpl = lookup.get_template("forgot_confirmation.email")
     SettingsWrapper(email, "Password Reset", tmpl.render(url = runningUrl + "/user/forgot_form?key=" + key))
 
   def forgotNewPwd(email, pwd):
+    log.info("sending a new pwd to " + email + ": " + pwd) #TODO removeme
     tmpl = lookup.get_template("forgot_success.email")
     SettingsWrapper(email, "Info: Password reset successfully", tmpl.render(pwd = pwd))
 

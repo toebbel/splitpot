@@ -13,6 +13,9 @@ import Encryption
 import DatabaseParser
 db = DatabaseParser
 import Splitpot
+import logging
+
+log = logging.getLogger("appLog")
 
 class login_controller(object):
 
@@ -20,25 +23,25 @@ class login_controller(object):
 
   @cherrypy.expose
   def index(self):
-    print "provide login form"
+    log.info("provide login form")
     tmpl = lookup.get_template("index.html")
     return tmpl.render()
 
   @cherrypy.expose
   def register(self):
-    print "provide register form"
+    log.info("provide register form")
     tmpl = lookup.get_template("register.html")
     return tmpl.render()
 
   @cherrypy.expose
   def forgot(self):
-    print "provide forgot form"
+    log.info("provide forgot form")
     tmpl = lookup.get_template("forgot_pwd.html")
     return tmpl.render()
 
   @cherrypy.expose
   def doLogin(self, email = None, pwd = None):
-    print "login " + email + " with pwd " + pwd #TODO remove!
+    log.info("login " + email + " with pwd " + pwd) #TODO remove!
     tmpl = lookup.get_template("register.html")
     if (not db.login(email, pwd)):
       return tmpl.render(feedback="User or password incorrect")
@@ -47,11 +50,12 @@ class login_controller(object):
 
   @cherrypy.expose
   def doLogout(self):
+    log.info("do Logout")
     cherrypy.lib.sessions.delete()
 
   @cherrypy.expose
   def doRegister(self, email = None, pwd1 = None, pwd2 = None):
-    print "register " + email + ":" + pwd1 + " == " + pwd2 #TODO remove!
+    log.info("register " + email + ":" + pwd1 + " == " + pwd2) #TODO remove!
     tmpl = lookup.get_template("register.html")
     if(email is None):
       tmpl.render(feedback="Du musst eine Email angeben")
@@ -72,7 +76,7 @@ class login_controller(object):
 
   @cherrypy.expose
   def requestForgot(self, email = None):
-    print "request forgot for " + email
+    log.info("request forgot for " + email)
     tmpl = lookup.get_template("forgot.html")
     if(not db.userExists(email)):
       return tmpl.render(feedback="Email not found")
@@ -82,7 +86,7 @@ class login_controller(object):
 
   @cherrypy.expose
   def doForgot(self, email = None, resetKey = None):
-    print "forgot " + email + ", key " + resetKey
+    log.info("forgot " + email + ", key " + resetKey)
     tmpl = lookup.get_template("forgot.html")
     if(db.isValidResetUrl(email, resetKey)):
       new_pwd = Encryption.generateSalt(8)
