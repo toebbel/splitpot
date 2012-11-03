@@ -4,6 +4,9 @@
 
 *.py[co]
 
+# app specific
+log/app.log
+
 # Packages
 *.egg
 *.egg-info
