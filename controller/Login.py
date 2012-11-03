@@ -15,7 +15,6 @@ import DatabaseParser
 db = DatabaseParser
 import Splitpot
 import logging
-
 log = logging.getLogger("appLog")
 
 class login_controller(object):
@@ -25,26 +24,24 @@ class login_controller(object):
   @cherrypy.expose
   def index(self):
     log.info("provide login form")
-    tmpl = lookup.get_template("index.html")
-    return tmpl.render()
+    return lookup.get_template("index.html").render()
 
   @cherrypy.expose
   def register(self):
     log.info("provide register form")
-    tmpl = lookup.get_template("register.html")
-    return tmpl.render()
+    return lookup.get_template("register.html").render()
 
   @cherrypy.expose
   def forgot(self):
     log.info("provide forgot form")
-    tmpl = lookup.get_template("forgot_pwd.html")
-    return tmpl.render()
+    return lookup.get_template("forgot_pwd.html").render()
 
   @cherrypy.expose
   def doLogin(self, email = None, pwd = None):
-    log.info("login " + email + " with pwd " + pwd) #TODO remove!
+    log.info("login " + email + " with pwd " + pwd) #TODO remove pwd from logging!
     tmpl = lookup.get_template("register.html")
     if (not db.login(email, pwd)):
+      #TODO do login here
       return tmpl.render(feedback="User or password incorrect")
     else:
       return Splitpot.index()
@@ -53,10 +50,11 @@ class login_controller(object):
   def doLogout(self):
     log.info("do Logout")
     cherrypy.lib.sessions.delete()
+    return Splitpot.about()
 
   @cherrypy.expose
   def doRegister(self, email = None, pwd1 = None, pwd2 = None):
-    log.info("register " + email + ":" + pwd1 + " == " + pwd2) #TODO remove!
+    log.info("register " + email + ":" + pwd1 + " == " + pwd2) #TODO remove pwd from loggin!
     tmpl = lookup.get_template("register.html")
     if(email is None):
       tmpl.render(feedback="Du musst eine Email angeben")
@@ -92,6 +90,7 @@ class login_controller(object):
     if(db.isValidResetUrl(email, resetKey)):
       new_pwd = EncryptionHelper.generateSalt(8)
       MailHelper.forgotNewPwd(email, new_pwd)
+      #todo store pwd in user entry
       return tmpl.render(feedback="You'r password has been reset and in on it's way to your mailbox")
     else:
       return tmpl.render(feedback="You'r reset key is invalid")
