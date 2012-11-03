@@ -9,7 +9,8 @@ import random
 import hashlib
 import logging
 
-from utils import Encryption
+sys.path.append('utils/')
+from Encryption import EncryptionHelper
 
 DB_FILE = 'resource/splitpotDB_DEV.sqlite'
 SALT_LENGTH = 30
@@ -37,10 +38,7 @@ class DBParser:
             userSalt = cur.fetchone()[0] 
             cur.execute("SELECT password FROM splitpot_users WHERE email = ?", [email])
             hashedPw = cur.fetchone()[0]
-            print "ad: " + str(hashedPw)
-        #True if (Encryption.hashPassword(userSalt, password) == hashedPw) else False 
-        tmpBla = Encryption.hashPassword(userSalt, password)
-        print tmpBla
+        return True if (EncryptionHelper.hashPassword(userSalt, password) == hashedPw) else False 
 
     # returns a list with all events
     def listEvents(self):
@@ -84,9 +82,9 @@ class DBParser:
     def registerUser(self, email, name, password):
         if not self.userExists(email):
             with connection:
-                salt = Encryption.generateSalt(SALT_LENGTH)
+                salt = EncryptionHelper.generateSalt(SALT_LENGTH)
                 print "salt: " + salt
-                hashedPassword = Encryption.hashPassword(salt, password)
+                hashedPassword = EncryptionHelper.hashPassword(salt, password)
                 print "hashed Password: " + hashedPassword
 
                 cur = connection.cursor()

@@ -4,10 +4,11 @@ from mako.lookup import TemplateLookup
 lookup = TemplateLookup(directories=['template/login', 'template'])
 import re #gex
 import string
+import sys
 
 import Email
 
-#sys.path.append('utils/')
+sys.path.append('utils/')
 import Encryption
 
 import DatabaseParser
@@ -89,7 +90,7 @@ class login_controller(object):
     log.info("forgot " + email + ", key " + resetKey)
     tmpl = lookup.get_template("forgot.html")
     if(db.isValidResetUrl(email, resetKey)):
-      new_pwd = Encryption.generateSalt(8)
+      new_pwd = EncryptionHelper.generateSalt(8)
       MailHelper.forgotNewPwd(email, new_pwd)
       return tmpl.render(feedback="You'r password has been reset and in on it's way to your mailbox")
     else:
