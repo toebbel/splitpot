@@ -17,17 +17,18 @@ SALT_LENGTH = 30
 
 # connects to a given database file
 connection = None
+log = logging.getLogger("appLog")
 
 class DBParser:
 
     # instantiate 'connection'
     def connectToDB(self):
-        logging.info("connecting to database...")
+        log.info("connecting to database...")
         global connection
         connection = lite.connect(DB_FILE)
 
         with connection:
-            logging.info("database connection successful.")
+            log.info("database connection successful.")
 
     def verifyLogin(self):
         print "nothing"
