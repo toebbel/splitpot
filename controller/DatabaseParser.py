@@ -26,11 +26,11 @@ def verifyLogin(email, password):
     with connection:
         cur = connection.cursor()
         cur.execute("SELECT salt FROM splitpot_users WHERE email = ?", [email])
-        userSalt = cur.fetchone()[0] 
+        userSalt = cur.fetchone()[0]
         cur.execute("SELECT password FROM splitpot_users WHERE email = ?", [email])
         hashedPw = cur.fetchone()[0]
 
-    return True if (EncryptionHelper.hashPassword(userSalt, password) == hashedPw) else False 
+    return True if (EncryptionHelper.hashPassword(userSalt, password) == hashedPw) else False
 
 # returns a list with all events
 def listEvents():
@@ -42,28 +42,43 @@ def listEvents():
     return events
 
 # inserting a new event with the given parameters and return the event ID
-def insertEvent(participants, date, owner, amount, comment):
+def insertEvent(owner, date, amount, participants, comment):
     newUsers = []
     with connection:
         cur = connection.cursor()
-        # TODO: split participants and create new ghost user for non registered user
-        for email in participants:
-             if userExists(email):
-                 cur.execute("INSERT INTO splitpot_events VALUES (?,?,?,?,?,?)", (None, email, date, amount, owner, comment))
-             else:
-                 tmpPassword = Encryption.generateSalt(6)
-                 registerUser(email, "Not Registered", tmpPassword) 
-                 cur.execute("INSERT INTO splitpot_events VALUES (?,?,?,?,?,?)", (None, email, date, amount, owner, comment))
-                 # return dictionaries with email:tmpPassword
-                 newUsers.append({email:tmpPassword})
+        if not userExists(owner):
+            tmpPassword = EncryptionHelper.generateSalt(6)
+            registerUser(owner, "Not Registered", tmpPassword)
+            newUsers.append({owner:tmpPassword})
+
+        for curParticipant in participants:
+             if not userExists(curParticipant):
+                 tmpPassword = EncryptionHelper.generateSalt(6)
+                 registerUser(curParticipant, "Not Registered", tmpPassword)
+                 newUsers.append({curParticipant:tmpPassword})
+
+        cur.execute("INSERT INTO splitpot_events VALUES (?,?,?,?,?,?)", (None, owner, date, amount, str(participants), comment))
+
+        # TODO: handle newUsers[] list
 
         cur.execute("SELECT * FROM splitpot_events ORDER BY ID DESC limit 1")
         eventID = cur.fetchone()[0]
+        updateParticipantTable(participants, eventID, "new")
     return eventID
+
+# update the participant table with a given event and list of
+# participants
+def updateParticipantTable(participants, eventID, status):
+    log.info("update participants table")
+    with connection:
+        cur = connection.cursor()
+        for curParticipant in participants:
+            cur.execute("INSERT INTO splitpot_participants VALUES (?, ?, ?)", (curParticipant, eventID, status))
+    return True
 
 # checks if an user already exists
 def userExists(email):
-    print "check if email: " + email + " exists."
+    log.info("check if email: " + email + " exists.")
     with connection:
         cur = connection.cursor()
         cur.execute("SELECT count(*) FROM splitpot_users WHERE email = ?", [email])
@@ -75,9 +90,7 @@ def registerUser(email, name, password):
     if not userExists(email):
          with connection:
               salt = EncryptionHelper.generateSalt(SALT_LENGTH)
-              print "salt: " + salt
               hashedPassword = EncryptionHelper.hashPassword(salt, password)
-              print "hashed Password: " + hashedPassword
 
               cur = connection.cursor()
               cur.execute("INSERT INTO splitpot_users VALUES (?, ?, ?, ?, ?)", (email, name, 0, salt, hashedPassword))
@@ -96,8 +109,8 @@ def getPassword(email):
                pw = cur.fetchone()[0]
                return pw
      else:
-          print "User doesn't exist"
-    
+          log.warning("Can't return password of " + email + ", because user doesn't exist")
+
 # set the event status for a given user
 def setEventStatus(email, event, status):
      with connection:
@@ -108,7 +121,7 @@ def setEventStatus(email, event, status):
                cur.execute("UPDATE splitpot_participants SET status = ? WHERE user = ? AND event = ?", (status, email, event))
                return True
           else:
-               print "Event and/or email doesn't exist"
+               log.warning(event + " or " + email + " doesn't exist")
 
 def main():
     registerUser("test@0xabc.de", "Test Account", "Test")
@@ -117,6 +130,9 @@ def main():
     listEvents()
     print getPassword("martin@0xabc.de")
     print setEventStatus("tobstu@gmail.com", 2, "paid")
+    insertEvent("martin@dinhnet.de", "4.11.2012", 312.33,
+                ["martin@dinhmail.de", "tobstu@gmail.com", "peter@0xabc.de", "hans@0xabc.de"],
+                "New Event")
 
 # call main method
 main()
