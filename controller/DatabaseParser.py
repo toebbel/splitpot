@@ -21,6 +21,18 @@ log = logging.getLogger("appLog")
 log.info("connecting to database...")
 connection = lite.connect(DB_FILE)
 
+def clear():
+  """
+  Clears *ALL THE FUCKING DATA* from the Database
+  """
+  log.info("kill database - right now")
+  with connection:
+    cur = connection.cursor()
+    cur.execute("DELETE FROM splitpot_participants")
+    cur.execute("DELETE FROM splitpot_events")
+    cur.execute("DELETE FROM splitpot_users")
+
+
 def verifyLogin(email, password):
     log.info("verify user and given password")
     with connection:
@@ -116,7 +128,7 @@ def setEventStatus(email, event, status):
                cur.execute("UPDATE splitpot_participants SET status = ? WHERE user = ? AND event = ?", (status, email, event))
                return True
           else:
-               log.warning(event + " or " + email + " doesn't exist")
+               log.warning(str(event) + " or " + email + " doesn't exist")
 
 def main():
     registerUser("test@0xabc.de", "Test Account", "Test")
