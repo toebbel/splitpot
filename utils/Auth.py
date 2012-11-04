@@ -11,8 +11,7 @@ CURRENT_USER_NAME = '_splitpot_username'
 def check_credentials(username, password):
     """Verifies credentials for username and password.
     Returns None on success or a string describing the error on failure"""
-    #TODO Real login here!
-    if username in ('test') and password == 'secret':
+    if verifyLogin(username, password):
         return None
     else:
         return u"Incorrect username or password."

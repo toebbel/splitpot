@@ -23,20 +23,29 @@ class user_controller(object):
 
   @cherrypy.expose
   def register(self):
+    """
+    Provides the Register form
+    """
     log.info("provide register form")
     return lookup.get_template("register.html").render()
 
   @cherrypy.expose
   def forgot(self):
+    """
+    Provides the "Forgot pwd" Form
+    """
     log.info("provide forgot form")
     return lookup.get_template("forgot_pwd.html").render()
 
   @cherrypy.expose
   def doRegister(self, email = None, pwd1 = None, pwd2 = None):
+    """
+    Processes a register-request: checks email & pwd & if user exists. Sends activation email, if successfull.
+    """
     log.info("register " + email + ":" + pwd1 + " == " + pwd2) #TODO remove pwd from loggin!
     tmpl = lookup.get_template("register.html")
     if(email is None):
-      tmpl.render(feedback="Du musst eine Email angeben")
+      tmpl.render(feedback="You have to provide an email adress")
     if(str(email).__len__() < 6):
       return tmpl.render(feedback="You'r password is too short")
     if(re.match(email_regex, email) == None):
@@ -48,12 +57,15 @@ class user_controller(object):
     else:
       if (db.user.register(email, pwd1)):
         MailHelper.signupConfirm(email, "") #TODO get signup confirmation key from db
-        return login(email, pwd1)
+        return tmpl.render(feedback="You'll hear from us - check your mailbox")
       else:
         return tmpl.render(feedback="Something went wrong. Please try again later")
 
   @cherrypy.expose
   def requestForgot(self, email = None):
+    """
+    Processes the "If-forgot-my-pwd" request from the form. Generates confirmation key & sends email, if username is correct.
+    """
     log.info("request forgot for " + email)
     tmpl = lookup.get_template("forgot.html")
     if(not db.userExists(email)):
@@ -64,6 +76,9 @@ class user_controller(object):
 
   @cherrypy.expose
   def doForgot(self, email = None, resetKey = None):
+    """
+    Processes the confirmed reset of a pwd (user clicke on link in email). Generates new password and sends it via mail
+    """
     log.info("forgot " + email + ", key " + resetKey)
     tmpl = lookup.get_template("forgot.html")
     if(db.isValidResetUrl(email, resetKey)):

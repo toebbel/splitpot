@@ -11,14 +11,21 @@ log = logging.getLogger("appLog")
 
 class splitpot_controller(object):
 
+  #TODO make admin-only
   @cherrypy.expose
   def inspectSession(self):
-    log.info("Session:" + cherrypy.session.get('currentUser'))
+    """
+    Pulls all information from utils/session and pushes them naked into the response
+    """
+    log.info("Session:" + cherrypy.session.get('currentUser')) #TODO use session helper
     return index()
 
   @cherrypy.expose
   @require()
   def index(self):
+    """
+    [users] Returns the overview of the accounting of the current user. Contains debts and link to overview as well as creation of new events.
+    """
     log.info("deliver index")
     tmpl = lookup.get_template("index.html")
     return tmpl.render(debts=12.2, others_debts=0.2, entries = [])
@@ -26,11 +33,17 @@ class splitpot_controller(object):
   @cherrypy.expose
   @require()
   def add(self): #gives the form for entering a new event
+    """
+    [users] Delivers the "Add-Event form"
+    """
     log.info("deliver add form")
     return lookup.get_template("add.html").render()
 
   @cherrypy.expose
   def about(self):
+    """
+    [users] Delivers a static page, which is the welcome screen for users, that are not logged in
+    """
     log.info("deliver about page")
     return lookup.get_template("about.html").render()
 
@@ -42,5 +55,15 @@ class splitpot_controller(object):
     If one of the given emails in other is not a known user, an invitation email will be sent.
     """
     log.info("do Add" + comment + ", " + amount + "euro" + others)
+    #TODO implement this *lol*
     return index();
 
+  @cherrypy.expose
+  @require()
+  def list(self):
+    """
+    Lists all events of a user, which he is participating/is owner
+    """
+    tmpl = lookup.get_template("list.html")
+    #TODO retrieve data
+    return tmpl.render()
