@@ -43,23 +43,18 @@ def listEvents():
 
 # inserting a new event with the given parameters and return the event ID
 def insertEvent(owner, date, amount, participants, comment):
-    newUsers = []
     with connection:
         cur = connection.cursor()
         if not userExists(owner):
             tmpPassword = EncryptionHelper.generateSalt(6)
             registerUser(owner, "Not Registered", tmpPassword)
-            newUsers.append({owner:tmpPassword})
 
         for curParticipant in participants:
              if not userExists(curParticipant):
                  tmpPassword = EncryptionHelper.generateSalt(6)
                  registerUser(curParticipant, "Not Registered", tmpPassword)
-                 newUsers.append({curParticipant:tmpPassword})
 
         cur.execute("INSERT INTO splitpot_events VALUES (?,?,?,?,?,?)", (None, owner, date, amount, str(participants), comment))
-
-        # TODO: handle newUsers[] list
 
         cur.execute("SELECT * FROM splitpot_events ORDER BY ID DESC limit 1")
         eventID = cur.fetchone()[0]
