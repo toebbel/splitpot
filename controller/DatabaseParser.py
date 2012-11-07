@@ -131,10 +131,7 @@ def setEventStatus(email, event, status):
                log.warning(str(event) + " or " + email + " doesn't exist")
 
 def main():
-    registerUser("test@0xabc.de", "Test Account", "Test")
-    print verifyLogin("test@0xabc.de", "asfelkj")
-    print verifyLogin("test@0xabc.de", "Test")
-    listEvents()
+    listEvents() #TODO  move to testcase
     print getPassword("martin@0xabc.de")
     print setEventStatus("tobstu@gmail.com", 2, "paid")
     insertEvent("martin@dinhnet.de", "4.11.2012", 312.33,
