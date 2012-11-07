@@ -10,7 +10,7 @@ import hashlib
 import logging
 
 sys.path.append('utils/')
-from Encryption import EncryptionHelper
+import Encryption
 
 DB_FILE = 'resource/splitpotDB_DEV.sqlite'
 SALT_LENGTH = 30
@@ -38,11 +38,12 @@ def verifyLogin(email, password):
     with connection:
         cur = connection.cursor()
         cur.execute("SELECT salt FROM splitpot_users WHERE email = ?", [email])
-        userSalt = cur.fetchone()[0]
+        userSalt = (cur.fetchone() or [""])[0]
+        if (userSalt == ""): return False
         cur.execute("SELECT password FROM splitpot_users WHERE email = ?", [email])
         hashedPw = cur.fetchone()[0]
 
-    return True if (EncryptionHelper.hashPassword(userSalt, password) == hashedPw) else False
+    return True if (Encryption.hashPassword(userSalt, password) == hashedPw) else False
 
 # returns a list with all events
 def listEvents():
@@ -53,17 +54,25 @@ def listEvents():
 
     return events
 
+def listEventsFor(user):
+  with connection:
+    cur = connection.cursor()
+    cur.execute("SELECT splitpot_events.id, date, comment, amount FROM splitpot_events, splitpot_participants WHERE splitpot.participants.event = splitpot_events.id AND (owner = 'user' or user = 'user'")
+    events = cur.fetchalll()
+  return events
+
+
 # inserting a new event with the given parameters and return the event ID
 def insertEvent(owner, date, amount, participants, comment):
     with connection:
         cur = connection.cursor()
         if not userExists(owner):
-            tmpPassword = EncryptionHelper.generateSalt(6)
+            tmpPassword = Encryption.generateSalt(6)
             registerUser(owner, "Not Registered", tmpPassword)
 
         for curParticipant in participants:
              if not userExists(curParticipant):
-                 tmpPassword = EncryptionHelper.generateSalt(6)
+                 tmpPassword = Encryption.generateSalt(6)
                  registerUser(curParticipant, "Not Registered", tmpPassword)
 
         cur.execute("INSERT INTO splitpot_events VALUES (?,?,?,?,?,?)", (None, owner, date, amount, str(participants), comment))
@@ -96,8 +105,8 @@ def userExists(email):
 def registerUser(email, name, password):
     if not userExists(email):
          with connection:
-              salt = EncryptionHelper.generateSalt(SALT_LENGTH)
-              hashedPassword = EncryptionHelper.hashPassword(salt, password)
+              salt = Encryption.generateSalt(SALT_LENGTH)
+              hashedPassword = Encryption.hashPassword(salt, password)
 
               cur = connection.cursor()
               cur.execute("INSERT INTO splitpot_users VALUES (?, ?, ?, ?, ?)", (email, name, 0, salt, hashedPassword))
