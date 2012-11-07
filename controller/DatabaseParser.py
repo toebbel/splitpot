@@ -97,7 +97,7 @@ def userExists(email):
     log.info("check if email: " + email + " exists.")
     with connection:
         cur = connection.cursor()
-        cur.execute("SELECT count(*) FROM splitpot_users WHERE email = ?", [email])
+        cur.execute("SELECT count(*) FROM splitpot_users WHERE email = ?", [email.lower()])
         exists = cur.fetchone()[0]
     return False if exists == 0 else True
 
@@ -109,7 +109,7 @@ def registerUser(email, name, password):
               hashedPassword = Encryption.hashPassword(salt, password)
 
               cur = connection.cursor()
-              cur.execute("INSERT INTO splitpot_users VALUES (?, ?, ?, ?, ?)", (email, name, 0, salt, hashedPassword))
+              cur.execute("INSERT INTO splitpot_users VALUES (?, ?, ?, ?, ?)", (email.lower(), name, 0, salt, hashedPassword))
 
          return True
     else:

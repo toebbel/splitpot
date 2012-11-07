@@ -1,5 +1,6 @@
 import unittest
 import sys
+from datetime import datetime
 
 sys.path.append('controller/')
 import DatabaseParser
@@ -23,9 +24,15 @@ class TestDatabaseParser(unittest.TestCase):
     self.assertTrue(db.userExists("benjamin@flowerpower.org"))
     self.assertTrue(db.userExists("karlaColumna@bild.de"))
 
-
-
-
+  @unittest.skip("interface not finished")
+  def testListEvents(self):
+    db.registerUser("a", "alpha", "1")
+    db.registerUser("b", "beta", "2")
+    db.registerUser("c", "charlie", "3")
+    date_a = datetime.now
+    id_a = db.insertEvent("a", str(date_a), 10, ["b"], "Event1")
+    print db.listEvents()
+    self.assertTrue(db.listEvents() == [(id_a, str(date_a), "Event1")])
 
 
 if __name__ == '__main__':
