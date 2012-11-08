@@ -4,7 +4,9 @@ from mako.template import Template
 from mako.lookup import TemplateLookup
 lookup = TemplateLookup(directories=['template/', 'template/splitpot/'])
 
-from utils.Auth import require
+from DatabaseParser import *
+from utils.Auth import *
+from datetime import datetime
 
 import logging
 log = logging.getLogger("appLog")
@@ -49,13 +51,19 @@ class splitpot_controller(object):
 
   @cherrypy.expose
   @require()
-  def doAdd(self, comment, amount, others):
+  # signature of insertEvent: insertEvent(owner, date, amount, participants, comment)
+  def doAdd(self, amount, others, comment):
     """
     Adds an event with the current user as owner and users with emails in 'others' as participants
     If one of the given emails in other is not a known user, an invitation email will be sent.
     """
     log.info("do Add" + comment + ", " + amount + "euro" + others)
-    #TODO implement this *lol*
+    print getCurrentUserName()
+    print datetime.date()
+    print amount
+    print others
+    print comment
+    #insertEvent(getCurrentUserName(), datetime.date(), amount, others, comment) 
     return index();
 
   @cherrypy.expose
