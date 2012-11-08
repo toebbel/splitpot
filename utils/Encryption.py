@@ -7,7 +7,7 @@ import hashlib
 CHAR_POOL = string.ascii_uppercase + string.ascii_lowercase + string.digits
 
   # generates a salt with alphanumeric characters with a given length
-def generateSalt(length):
+def generateRandomChars(length):
   return ''.join(random.choice(CHAR_POOL) for x in range(length))
 
 # create a salted hash value from password and salt

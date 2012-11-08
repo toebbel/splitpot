@@ -67,12 +67,12 @@ def insertEvent(owner, date, amount, participants, comment):
     with connection:
         cur = connection.cursor()
         if not userExists(owner):
-            tmpPassword = Encryption.generateSalt(6)
+            tmpPassword = Encryption.generateRandomChars(6)
             registerUser(owner, "Not Registered", tmpPassword)
 
         for curParticipant in participants:
              if not userExists(curParticipant):
-                 tmpPassword = Encryption.generateSalt(6)
+                 tmpPassword = Encryption.generateRandomChars(6)
                  registerUser(curParticipant, "Not Registered", tmpPassword)
 
         cur.execute("INSERT INTO splitpot_events VALUES (?,?,?,?,?,?)", (None, owner, date, amount, str(participants), comment))
@@ -105,7 +105,7 @@ def userExists(email):
 def registerUser(email, name, password):
     if not userExists(email):
          with connection:
-              salt = Encryption.generateSalt(SALT_LENGTH)
+              salt = Encryption.generateRandomChars(SALT_LENGTH)
               hashedPassword = Encryption.hashPassword(salt, password)
 
               cur = connection.cursor()
