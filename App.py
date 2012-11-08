@@ -6,8 +6,6 @@ from controller.User import *
 from controller.Email import *
 from utils.Auth import check_auth
 
-import sys
-sys.path.append('utils/')
 import utils.Auth
 
 #def main():
@@ -20,6 +18,3 @@ root.user = User
 
 cherrypy.quickstart(root, config="resource/app.cfg")
 log.info("Splitpot stopped")
-
-#if __name__ == '__main__':
-#    main()
