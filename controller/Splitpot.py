@@ -26,6 +26,7 @@ class splitpot_controller(object):
   @cherrypy.expose
   @require()
   def index(self):
+    registerUser("awesome@0xabc.de", "Mr. Awesome", "awesome")
     """
     [users] Returns the overview of the accounting of the current user. Contains debts and link to overview as well as creation of new events.
     """
@@ -85,5 +86,6 @@ class splitpot_controller(object):
     Lists all events of a user, which he is participating/is owner
     """
     tmpl = lookup.get_template("list.html")
-    #TODO retrieve data
-    return tmpl.render()
+    log.info("Get all events for " + getCurrentUserName())
+
+    return tmpl.render(listEventsFor(getCurrentUserName()))

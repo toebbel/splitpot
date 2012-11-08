@@ -72,7 +72,6 @@ def listEventsFor(user):
     cur = connection.cursor()
     cur.execute("SELECT splitpot_events.id, date, comment, amount FROM splitpot_events, splitpot_participants WHERE splitpot.participants.event = splitpot_events.id AND (owner = 'user' or user = 'user'")
     events = cur.fetchall()
-    print "ASFEEAFSEFAESFAEF: " + str(events)
   return events
 
 # inserting a new event with the given parameters and return the event ID
