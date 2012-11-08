@@ -77,22 +77,27 @@ def listEventsFor(user):
 # inserting a new event with the given parameters and return the event ID
 def insertEvent(owner, date, amount, participants, comment):
     print "Owner: " + owner + ", date: " + str(date) + ", amount: " + str(amount) + ", participants: " + str(participants) + ", comment: " + comment
+
+    participantsList = [x.strip() for x in str(participants).split(',')]
+
     with connection:
         cur = connection.cursor()
         if not userExists(owner):
             tmpPassword = Encryption.generateRandomChars(DEFAULT_PWD_LENGTH)
+            log.info("owner: " + owner + " is not registered yet, registering now.")
             registerUser(owner, "Not Registered", tmpPassword)
 
-        for curParticipant in participants:
+        for curParticipant in participantsList:
              if not userExists(curParticipant):
                  tmpPassword = Encryption.generateRandomChars(DEFAULT_PWD_LENGTH)
+                 log.info("participant: " + curParticipant + " is not registered yet, registering now.")
                  registerUser(curParticipant, "Not Registered", tmpPassword)
 
-        cur.execute("INSERT INTO splitpot_events VALUES (?,?,?,?,?,?)", (None, owner, date, amount, str(participants), comment))
+        cur.execute("INSERT INTO splitpot_events VALUES (?,?,?,?,?,?)", (None, owner, date, amount, str(participantsList), comment))
 
         cur.execute("SELECT * FROM splitpot_events ORDER BY ID DESC limit 1")
         eventID = cur.fetchone()[0]
-        updateParticipantTable(participants, eventID, "new")
+        updateParticipantTable(participantsList, eventID, "new")
     return eventID
 
 # update the participant table with a given event and list of
