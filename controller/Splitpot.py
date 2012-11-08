@@ -60,7 +60,7 @@ class splitpot_controller(object):
     """
     othersList = [x.strip() for x in str(others).split(',')]
 
-    log.info("removing duplicated from others list, if there are any.")
+    log.info("removing duplicates from others list, if there are any.")
     duplicates = set()
     duplicates_add = duplicates.add
     othersList = [ x for x in othersList if x not in duplicates and not duplicates_add(x)]
@@ -70,7 +70,11 @@ class splitpot_controller(object):
             log.info("Email: " + str(others) + " is malformed.")
             #TODO: template.render error for wrong emails
 
-    log.info("Add " + amount + "Euro to " + str(othersList) + ", comment: " + comment) 
+    if not entryCommentRegex.metch(comment):
+        log.info("Comment is malformed.")
+        #TODO: template.render error for malformed comments
+
+    log.info("Add " + amount + " Euro to " + str(othersList) + ", comment: " + comment) 
     insertEvent(getCurrentUserName(), date.today(), amount, othersList, comment)
     return self.index()
 
