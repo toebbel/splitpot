@@ -1,10 +1,10 @@
 <%inherit file="base.html" />
 <%block name="title">Login</%block>
 
+${feedback}<br />
 <form action="requestForgot" method="post">
   <p>
     <label for="email">Email:</label>
-
     <input type="text" name="email" /><br />
     <input type="submit" value="Send" />
   </p>

@@ -1,17 +1,13 @@
 <%inherit file="base.html" />
 <%block name="title">Login</%block>
 
+${feedback}<br />
 <form action="doRegister" method="post">
   <p>
-    <label for="email">Email:</label>
-    <label for="nick">Nick:</label>
-    <label for="pwd1">Pwd:</label>
-    <label for="pwd2">Pwd (wdh):</label>
-
-    <input type="text" name="email" /><br />
-    <input type="text" name="nick" /><br />
-    <input type="password" name="pwd1" /><br />
-    <input type="password" name="pwd2" /><br />
+    Email: <input type="text" name="email" /><br />
+    Nick: <input type="text" name="nick" /><br />
+    Pasword: <input type="password" name="pwd1" /><br />
+    aaaand again:<input type="password" name="pwd2" /><br />
     <input type="submit" value="Send" />
   </p>
 </form>
