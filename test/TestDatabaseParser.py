@@ -2,13 +2,12 @@ import unittest
 
 import sys
 sys.path.append('controller')
-import DatabaseParser
-db = DatabaseParser
+from DatabaseParser import *
 
 class TestDatabaseParser(unittest.TestCase):
 
   def setUp(self):
-    db.clear()
+    clear()
 
   def testListEvents_emptyDB(self):
     listEvents()
@@ -27,3 +26,11 @@ class TestDatabaseParser(unittest.TestCase):
   def testSetEventStatus(self):
     setEventStatus("tobstu@gmail.com", 2, "paid")
 
+  def testResetUrl(self):
+    registerUser("dummy@0xabc.de", "dummy", "thisIsMyPwd")
+    reset = getResetUrlKey("dummy@0xabc.de")
+    self.assertTrue(str(reset).__len__() == 8)
+    self.assertTrue(isValidResetUrlKey("dummy@0xabc.de", reset))
+
+if __name__ == '__main__':
+  unittest.main()

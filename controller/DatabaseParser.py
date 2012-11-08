@@ -139,18 +139,19 @@ def setEventStatus(email, event, status):
           else:
                log.warning(str(event) + " or " + email + " doesn't exist")
 
-def main():
-    listEvents() #TODO  move to testcase
-    print getPassword("martin@0xabc.de")
-    print setEventStatus("tobstu@gmail.com", 2, "paid")
-    registerUser("awesome@0xabc.de", "Mr. Awesome", "awesome")
-    insertEvent("martin@dinhnet.de", "4.11.2012", 312.33,
-                ["martin@dinhmail.de", "tobstu@gmail.com", "peter@0xabc.de", "hans@0xabc.de"],
-                "New Event")
+def isValidResetUrlKey(email, key):
+  """
+  ~ for pwd reset (forgot pwd feature)
+  """
+  if (userExists(email) and getPassword(email)[:8] == key):
+    return True
+  else:
+    return False
 
-# call main method
-main()
+def getResetUrlKey(email):
+  """
+  ~ for a pwd-reset (forgot pwd feature)
+  """
+  if userExists(email):
+    return getPassword(email)[:8]
 
-# isValidResetUrl
-    # email
-    # url-key
