@@ -25,7 +25,7 @@ def register():
   Provides the Register form
   """
   log.info("provide register form")
-  return lookup.get_template("register.html").render()
+  return lookup.get_template("register.html").render(feedback = "")
 
 @cherrypy.expose
 def forgot():
@@ -33,14 +33,14 @@ def forgot():
   Provides the "Forgot pwd" Form
   """
   log.info("provide forgot form")
-  return lookup.get_template("forgot_pwd.html").render()
+  return lookup.get_template("forgot_pwd.html").render(feedback = "")
 
 @cherrypy.expose
 def doRegister(email = None, nick = None, pwd1 = None, pwd2 = None):
   """
   Processes a register-request: checks email & pwd & if user exists. Sends activation email, if successfull.
   """
-  log.info("register " + str(email) + ":" + str(pwd1) + " == " + str(pwd2)) #TODO remove pwd from loggin!
+  log.info("register " + str(email) + " (" + str(nick) + ")")
   tmpl = lookup.get_template("register.html")
   errors = ""
   if(email is None):
@@ -50,13 +50,13 @@ def doRegister(email = None, nick = None, pwd1 = None, pwd2 = None):
   if(str(pwd1).__len__() < 6):
     errors += "<li>You'r password is too short</li>"
   if(emailRegex.match(email) == None):
-    errors += "You'r email is invalid"
+    errors += "<li>You'r email is invalid</li>"
   if(not pwd1 == pwd2):
-    errors += "Passwort repition incorrect"
+    errors += "<li>Passwort repition incorrect</li>"
   if (db.userExists(email)):
-    errors += "User already exists"
+    errors += "<li>User already exists</li>"
   if (not errors == ""):
-    tmpl.render(feedback="<ul>" + errors + "</ul>")
+    return tmpl.render(feedback="<ul>" + errors + "</ul>")
   else:
     if (db.registerUser(email, nick, pwd1)):
       Email.signupConfirm(email, "") #TODO get signup confirmation key from db
