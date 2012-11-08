@@ -61,7 +61,6 @@ def listEventsFor(user):
     events = cur.fetchalll()
   return events
 
-
 # inserting a new event with the given parameters and return the event ID
 def insertEvent(owner, date, amount, participants, comment):
     with connection:
