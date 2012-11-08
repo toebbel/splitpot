@@ -72,7 +72,6 @@ def require(*conditions):
         return f
     return decorate
 
-
 # Conditions are callables that return True
 # if the user fulfills the conditions they define, False otherwise
 # They can access the current username as cherrypy.request.login
