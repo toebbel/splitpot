@@ -19,7 +19,7 @@ log = logging.getLogger("appLog")
 
 # connects to a given database file
 log.info("connecting to database...")
-connection = lite.connect(DB_FILE)
+connection = lite.connect(DB_FILE, check_same_thread = False)
 
 def clear():
   """
