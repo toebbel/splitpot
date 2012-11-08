@@ -13,7 +13,7 @@ log.info("Splitpot started")
 cherrypy.log.access_file = None
 
 root = splitpot_controller()
-root.user = user_controller()
+root.user = User
 root.auth = AuthController()
 
 cherrypy.quickstart(root, config="resource/app.cfg")
