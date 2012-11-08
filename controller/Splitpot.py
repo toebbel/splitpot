@@ -1,11 +1,14 @@
 import cherrypy
-import cherrypy
 from mako.template import Template
 from mako.lookup import TemplateLookup
 lookup = TemplateLookup(directories=['template/', 'template/splitpot/'])
 
 from DatabaseParser import *
-from utils.Auth import *
+import User
+import sys
+sys.path.append('utils/')
+import Auth
+from Auth import require
 from datetime import datetime
 
 import logging
@@ -63,7 +66,7 @@ class splitpot_controller(object):
     print amount
     print others
     print comment
-    #insertEvent(getCurrentUserName(), datetime.date(), amount, others, comment) 
+    #insertEvent(getCurrentUserName(), datetime.date(), amount, others, comment)
     return index();
 
   @cherrypy.expose

@@ -34,7 +34,7 @@ def SettingsWrapper(to, subject, body):
   Sends mail using sendMail-method. Adds the required parameters like host & sender from the config file
   """
   #TODO read from config file and provide login data
-  sendMail("localhost", "splitpot@0xabc.de", sender, to, subject, body)
+  sendMail("localhost", "splitpot@0xabc.de", to, subject, body)
 
 def signupConfirm(email, key):
   """
