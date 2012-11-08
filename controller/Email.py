@@ -27,7 +27,6 @@ def sendMail(host, sender, to, subject, body):
   server.sendmail(sender, [to], msg.as_string())
   server.quit()
 
-MailHelper(object):
 runningUrl = "http://0xabc.de/splitpot/"
 
 def SettingsWrapper(to, subject, body):
@@ -61,9 +60,9 @@ def forgotNewPwd(email, pwd):
   tmpl = lookup.get_template("forgot_success.email")
   SettingsWrapper(email, "Info: Password reset successfully", tmpl.render(pwd = pwd))
 
- def payday(email, payments):
-   """
-   Sends a mail with all paiments of specific user. No changes on database/payments. This is only the helper for the template-retrieval
-   """
+def payday(email, payments):
+  """
+  Sends a mail with all paiments of specific user. No changes on database/payments. This is only the helper for the template-retrieval
+  """
   tmpl = lookup.get_template("payday.email")
   SettingsWrapper(email, "Payday!", tmpl.render(payments)) #TODO enough data or more?
