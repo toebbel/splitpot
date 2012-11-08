@@ -70,7 +70,8 @@ def listEvents():
 def listEventsFor(user):
   with connection:
     cur = connection.cursor()
-    cur.execute("SELECT splitpot_events.id, date, comment, amount FROM splitpot_events, splitpot_participants WHERE splitpot.participants.event = splitpot_events.id AND (owner = 'user' or user = 'user'")
+    #cur.execute("SELECT splitpot_events.id, date, comment, amount FROM splitpot_events, splitpot_participants WHERE splitpot.participants.event = splitpot_events.id AND (owner = 'user' or user = 'user'")
+    cur.execute("SELECT splitpot_events.ID, date, comment, amount FROM splitpot_events, splitpot_participants WHERE splitpot_participants.event = splitpot_events.ID AND (splitpot_events.owner = ? OR splitpot_participants.user = ?)", [user, user])
     events = cur.fetchall()
   return events
 

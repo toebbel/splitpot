@@ -88,4 +88,5 @@ class splitpot_controller(object):
     tmpl = lookup.get_template("list.html")
     log.info("Get all events for " + getCurrentUserName())
 
-    return tmpl.render(listEventsFor(getCurrentUserName()))
+#    return tmpl.render(listEventsFor(getCurrentUserName()))
+    return tmpl.render(debts=23423, others_debts=323, entries=[]) 

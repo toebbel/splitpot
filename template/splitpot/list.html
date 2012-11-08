@@ -1,6 +1,7 @@
+## -*- coding: utf-8 -*-
 <%inherit file="base.html" />
 
-You'r debts: ${debts}E <br />
+Your debts: ${debts}€ <br />
 Others owe you: ${others_debts}€
 <hr />
 <table>
@@ -21,5 +22,6 @@ Others owe you: ${others_debts}€
         <a href="/../show/${x.id}">more</a>
       </td>
     </tr>
+  % endfor
 
 </table>
