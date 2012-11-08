@@ -1,11 +1,14 @@
 import cherrypy
-import cherrypy
 from mako.template import Template
 from mako.lookup import TemplateLookup
 lookup = TemplateLookup(directories=['template/', 'template/splitpot/'])
 
 from DatabaseParser import *
-from utils.Auth import *
+import User
+import sys
+sys.path.append('utils/')
+import Auth
+from Auth import require
 from datetime import date
 
 import logging

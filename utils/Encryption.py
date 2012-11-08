@@ -12,4 +12,4 @@ def generateRandomChars(length):
 
 # create a salted hash value from password and salt
 def hashPassword(salt, password):
-  return hashlib.sha256(salt + password).hexdigest()
+  return hashlib.sha256(salt + str(password)).hexdigest()
