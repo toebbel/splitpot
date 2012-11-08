@@ -8,6 +8,23 @@ import cherrypy
 
 CURRENT_USER_NAME = '_splitpot_username'
 
+def getCurrentUserName():
+  """
+  Returns the username of the currently logged in user, or "" if no user is logged in
+  """
+  user = cherrypy.session.get(CURRENT_USER_NAME)
+  if user:
+    return user
+  else:
+    return ""
+
+
+def isLoggedIn():
+  """
+  True if the current user is logged in
+  """
+  return getcurrentUserName() != ""
+
 def check_credentials(username, password):
     """Verifies credentials for username and password.
     Returns None on success or a string describing the error on failure"""
