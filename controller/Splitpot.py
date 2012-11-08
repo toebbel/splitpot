@@ -5,10 +5,7 @@ lookup = TemplateLookup(directories=['template/', 'template/splitpot/'])
 
 from DatabaseParser import *
 import User
-import sys
-sys.path.append('utils/')
-import Auth
-from Auth import require
+from utils.Auth import *
 from datetime import date
 
 import logging

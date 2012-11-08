@@ -5,7 +5,7 @@
 #
 
 import cherrypy
-from DatabaseParser import verifyLogin
+from controller.DatabaseParser import verifyLogin
 
 CURRENT_USER_NAME = '_splitpot_username'
 
