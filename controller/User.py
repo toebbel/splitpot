@@ -70,11 +70,11 @@ def requestForgot(email = None):
   Processes the "If-forgot-my-pwd" request from the form. Generates confirmation key & sends email, if username is correct.
   """
   log.info("request forgot for " + email)
-  tmpl = lookup.get_template("forgot.html")
+  tmpl = lookup.get_template("forgot_pwd.html")
   if(not db.userExists(email)):
     return tmpl.render(feedback="Email not found")
   else:
-    MailHelper.forgotConfirmation(email, "")#TODO get forgot-key from db
+    Email.forgotConfirmation(email, db.getResetUrlKey(email))
     return tmpl.render(feedback="We sent you further instructions via email")
 
 @cherrypy.expose
@@ -85,9 +85,9 @@ def doForgot(email = None, resetKey = None):
   log.info("forgot " + email + ", key " + resetKey)
   tmpl = lookup.get_template("forgot.html")
   if(db.isValidResetUrl(email, resetKey)):
-    new_pwd = EncryptionHelper.generateRandomChars(8)
-    MailHelper.forgotNewPwd(email, new_pwd)
-   #todo store pwd in user entry
+    new_pwd = EncryptionHelper.generateRandomChars(8) #TODO use default length from utils/auth
+    Email.forgotNewPwd(email, new_pwd)
+    db.updateLogin(email, newPassword)
     return tmpl.render(feedback="You'r password has been reset and in on it's way to your mailbox")
   else:
     return tmpl.render(feedback="You'r reset key is invalid")

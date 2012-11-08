@@ -55,6 +55,14 @@ class TestDatabaseParser(unittest.TestCase):
     self.assertTrue(str(reset).__len__() == 8)
     self.assertTrue(isValidResetUrlKey("dummy@0xabc.de", reset))
 
+  def testResetLogin(self):
+    registerUser("userA@0xabc.de", "A", "123456")
+    registerUser("userB@0xabc.de", "B", "654321")
+    self.assertFalse(updateLogin("userC@0xabc.de", "ffffff"))
+    self.assertTrue(updateLogin("userb@0xabc.de", "abcdef"))
+    self.assertFalse(verifyLogin("userB@0xabc.de", "654321"))
+    self.assertTrue(verifyLogin("userB@0xabc.de", "abcdef"))
+    self.assertTrue(verifyLogin("userA@0xabc.de", "123456"))
 
 if __name__ == '__main__':
   unittest.main()

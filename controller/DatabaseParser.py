@@ -14,6 +14,7 @@ import Encryption
 
 DB_FILE = 'resource/splitpotDB_DEV.sqlite'
 SALT_LENGTH = 30
+DEFAULT_PWD_LENGTH = 6
 
 log = logging.getLogger("appLog")
 
@@ -32,15 +33,27 @@ def clear():
     cur.execute("DELETE FROM splitpot_events")
     cur.execute("DELETE FROM splitpot_users")
 
+def updateLogin(email, newPassword):
+  log.info("resetting the pwd for user '" + email + "'")
+  if not userExists(email):
+    return False
+  with connection:
+    cur = connection.cursor()
+    salt = Encryption.generateRandomChars(SALT_LENGTH)
+    hashedPwd = Encryption.hashPassword(salt, newPassword)
+    cur.execute("UPDATE splitpot_users SET password = ?, salt = ? WHERE email = ?", [hashedPwd, salt, email.lower()])
+    return cur.rowcount == 1
 
 def verifyLogin(email, password):
+    if not userExists(email.lower()):
+      return False
     log.info("verify user and given password")
     with connection:
         cur = connection.cursor()
-        cur.execute("SELECT salt FROM splitpot_users WHERE email = ?", [email])
-        userSalt = (cur.fetchone() or [""])[0]
+        cur.execute("SELECT salt FROM splitpot_users WHERE email = ?", [email.lower()])
+        userSalt = cur.fetchone()[0]
         if (userSalt == ""): return False
-        cur.execute("SELECT password FROM splitpot_users WHERE email = ?", [email])
+        cur.execute("SELECT password FROM splitpot_users WHERE email = ?", [email.lower()])
         hashedPw = cur.fetchone()[0]
 
     return True if (Encryption.hashPassword(userSalt, password) == hashedPw) else False
@@ -67,12 +80,12 @@ def insertEvent(owner, date, amount, participants, comment):
     with connection:
         cur = connection.cursor()
         if not userExists(owner):
-            tmpPassword = Encryption.generateRandomChars(6)
+            tmpPassword = Encryption.generateRandomChars(DEFAULT_PWD_LENGTH)
             registerUser(owner, "Not Registered", tmpPassword)
 
         for curParticipant in participants:
              if not userExists(curParticipant):
-                 tmpPassword = Encryption.generateRandomChars(6)
+                 tmpPassword = Encryption.generateRandomChars(DEFAULT_PWD_LENGTH)
                  registerUser(curParticipant, "Not Registered", tmpPassword)
 
         cur.execute("INSERT INTO splitpot_events VALUES (?,?,?,?,?,?)", (None, owner, date, amount, str(participants), comment))
