@@ -70,7 +70,7 @@ class splitpot_controller(object):
             log.info("Email: " + str(others) + " is malformed.")
             #TODO: template.render error for wrong emails
 
-    if not entryCommentRegex.metch(comment):
+    if not entryCommentRegex.match(comment):
         log.info("Comment is malformed.")
         #TODO: template.render error for malformed comments
 
