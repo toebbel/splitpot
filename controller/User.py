@@ -82,7 +82,7 @@ class user_controller(object):
     log.info("forgot " + email + ", key " + resetKey)
     tmpl = lookup.get_template("forgot.html")
     if(db.isValidResetUrl(email, resetKey)):
-      new_pwd = EncryptionHelper.generateSalt(8)
+      new_pwd = EncryptionHelper.generateRandomChars(8)
       MailHelper.forgotNewPwd(email, new_pwd)
       #todo store pwd in user entry
       return tmpl.render(feedback="You'r password has been reset and in on it's way to your mailbox")
