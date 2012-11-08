@@ -63,6 +63,7 @@ def listEventsFor(user):
 
 # inserting a new event with the given parameters and return the event ID
 def insertEvent(owner, date, amount, participants, comment):
+    print "Owner: " + owner + ", date: " + str(date) + ", amount: " + str(amount) + ", participants: " + str(participants) + ", comment: " + comment
     with connection:
         cur = connection.cursor()
         if not userExists(owner):
@@ -142,6 +143,7 @@ def main():
     listEvents() #TODO  move to testcase
     print getPassword("martin@0xabc.de")
     print setEventStatus("tobstu@gmail.com", 2, "paid")
+    registerUser("awesome@0xabc.de", "Mr. Awesome", "awesome")
     insertEvent("martin@dinhnet.de", "4.11.2012", 312.33,
                 ["martin@dinhmail.de", "tobstu@gmail.com", "peter@0xabc.de", "hans@0xabc.de"],
                 "New Event")
