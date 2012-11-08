@@ -6,7 +6,7 @@ lookup = TemplateLookup(directories=['template/', 'template/splitpot/'])
 
 from DatabaseParser import *
 from utils.Auth import *
-from datetime import datetime
+from datetime import date
 
 import logging
 log = logging.getLogger("appLog")
@@ -58,12 +58,7 @@ class splitpot_controller(object):
     If one of the given emails in other is not a known user, an invitation email will be sent.
     """
     log.info("do Add" + comment + ", " + amount + "euro" + others)
-    print getCurrentUserName()
-    print datetime.date()
-    print amount
-    print others
-    print comment
-    #insertEvent(getCurrentUserName(), datetime.date(), amount, others, comment) 
+    insertEvent(getCurrentUserName(), date.today(), amount, others, comment) 
     return index();
 
   @cherrypy.expose
