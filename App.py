@@ -10,6 +10,7 @@ import utils.Auth
 
 #def main():
 log = logging.getLogger("appLog")
+cherrypy.log.access_log.propagate = False
 log.info("Splitpot started")
 cherrypy.log.access_file = None
 

@@ -10,10 +10,8 @@ filehandler.setLevel(logging.DEBUG)
 filehandler.setFormatter(formatter)
 log.addHandler(filehandler)
 
-'''
-    # Log to stdout too
-    streamhandler = logging.StreamHandler()
-    streamhandler.setLevel(logging.DEBUG)
-    streamhandler.setFormatter(formatter)
-    log.addHandler(streamhandler)
-'''
+# Log to stdout too
+streamhandler = logging.StreamHandler()
+streamhandler.setLevel(logging.DEBUG)
+streamhandler.setFormatter(formatter)
+log.addHandler(streamhandler)
