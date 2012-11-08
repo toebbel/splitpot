@@ -4,8 +4,11 @@ from utils import Logger
 from controller.Splitpot import *
 from controller.User import *
 from controller.Email import *
-from controller.Auth import *
 from utils.Auth import check_auth
+
+import sys
+sys.path.append('utils/')
+import utils.Auth
 
 #def main():
 log = logging.getLogger("appLog")
@@ -14,7 +17,6 @@ cherrypy.log.access_file = None
 
 root = splitpot_controller()
 root.user = User
-root.auth = AuthController()
 
 cherrypy.quickstart(root, config="resource/app.cfg")
 log.info("Splitpot stopped")
