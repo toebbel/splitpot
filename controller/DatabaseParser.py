@@ -58,14 +58,13 @@ def listEventsFor(user):
   with connection:
     cur = connection.cursor()
     cur.execute("SELECT splitpot_events.id, date, comment, amount FROM splitpot_events, splitpot_participants WHERE splitpot.participants.event = splitpot_events.id AND (owner = 'user' or user = 'user'")
-    events = cur.fetchalll()
+    events = cur.fetchall()
+    print "ASFEEAFSEFAESFAEF: " + str(events)
   return events
 
 # inserting a new event with the given parameters and return the event ID
 def insertEvent(owner, date, amount, participants, comment):
     print "Owner: " + owner + ", date: " + str(date) + ", amount: " + str(amount) + ", participants: " + str(participants) + ", comment: " + comment
-
-    participantsList = [x.strip() for x in str(participants).split(',')]
 
     with connection:
         cur = connection.cursor()
@@ -74,17 +73,17 @@ def insertEvent(owner, date, amount, participants, comment):
             tmpPassword = Encryption.generateRandomChars(6)
             registerUser(owner, "Not Registered", tmpPassword)
 
-        for curParticipant in participantsList:
+        for curParticipant in participants:
              if not userExists(curParticipant):
                  log.info("participant: " + curParticipant + " is not registered yet, registering now.")
                  tmpPassword = Encryption.generateRandomChars(6)
                  registerUser(curParticipant, "Not Registered", tmpPassword)
 
-        cur.execute("INSERT INTO splitpot_events VALUES (?,?,?,?,?,?)", (None, owner, date, amount, str(participantsList), comment))
+        cur.execute("INSERT INTO splitpot_events VALUES (?,?,?,?,?,?)", (None, owner, date, amount, str(participants), comment))
 
         cur.execute("SELECT * FROM splitpot_events ORDER BY ID DESC limit 1")
         eventID = cur.fetchone()[0]
-        updateParticipantTable(participantsList, eventID, "new")
+        updateParticipantTable(participants, eventID, "new")
     return eventID
 
 # update the participant table with a given event and list of
@@ -145,18 +144,18 @@ def setEventStatus(email, event, status):
                log.warning(str(event) + " or " + email + " doesn't exist")
 
 def isValidResetUrlKey(email, key):
-  """
-  ~ for pwd reset (forgot pwd feature)
-  """
-  if (userExists(email) and getPassword(email)[:8] == key):
-    return True
-  else:
-    return False
+    """
+    ~ for pwd reset (forgot pwd feature)
+    """
+    if (userExists(email) and getPassword(email)[:8] == key):
+        return True
+    else:
+        return False
 
 def getResetUrlKey(email):
-  """
-  ~ for a pwd-reset (forgot pwd feature)
-  """
-  if userExists(email):
-    return getPassword(email)[:8]
+    """
+    ~ for a pwd-reset (forgot pwd feature)
+    """
+    if userExists(email):
+        return getPassword(email)[:8]
 
