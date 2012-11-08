@@ -20,7 +20,7 @@ class splitpot_controller(object):
     Pulls all information from utils/session and pushes them naked into the response
     """
     log.info("Session:" + cherrypy.session.get('currentUser')) #TODO use session helper
-    return index()
+    return self.index()
 
   @cherrypy.expose
   @require()
@@ -58,8 +58,8 @@ class splitpot_controller(object):
     If one of the given emails in other is not a known user, an invitation email will be sent.
     """
     log.info("do Add" + comment + ", " + amount + "euro" + others)
-    insertEvent(getCurrentUserName(), date.today(), amount, others, comment) 
-    return index();
+    insertEvent(getCurrentUserName(), date.today(), amount, others, comment)
+    return self.index()
 
   @cherrypy.expose
   @require()
