@@ -74,7 +74,8 @@ def listHostingEventsFor(user):
         cur.execute("SELECT ID, date, amount, participants, comment FROM splitpot_events WHERE splitpot_events.owner = ?", [user.lower()])
         result = cur.fetchall()
         for curEvent in result:
-            events.append(Event(curEvent[0], str(user), curEvent[1], curEvent[2], curEvent[3], curEvent[4])) 
+            events.append(Event(id=curEvent[0], owner=str(user), date=curEvent[1], 
+                          amount=curEvent[2], participants=curEvent[3], comment=curEvent[4])) 
     return events
 
 def listInvitedEventsFor(user):
@@ -84,7 +85,8 @@ def listInvitedEventsFor(user):
         cur.execute("SELECT splitpot_events.ID, date, amount, comment FROM splitpot_events, splitpot_participants WHERE splitpot_participants.event = splitpot_events.ID AND splitpot_participants.user = ?", [user.lower()])
         result = cur.fetchall()
         for curEvent in result:
-            events.append(Event(curEvent[0], "?", curEvent[1], -curEvent[2], "?", curEvent[3]))
+            #events.append(Event(curEvent[0], "?", curEvent[1], -curEvent[2], "?", curEvent[3]))
+            events.append(Event(id=curEvent[0], date=curEvent[1], amount=-curEvent[2], comment=curEvent[3]))
     return events
 
 def listAllEventsFor(user):

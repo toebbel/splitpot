@@ -96,5 +96,4 @@ class splitpot_controller(object):
               totalDebts += event.amount
           else:
               totalEarnings += event.amount
-          totalDebts += event.amount
       return tmpl.render(debts=totalDebts, others_debts=totalEarnings, entries=events) 
