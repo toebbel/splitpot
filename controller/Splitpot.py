@@ -82,11 +82,19 @@ class splitpot_controller(object):
   @cherrypy.expose
   @require()
   def list(self):
-    """
-    Lists all events of a user, which he is participating/is owner
-    """
-    tmpl = lookup.get_template("list.html")
-    log.info("Get all events for " + getCurrentUserName())
+      """
+      Lists all events of a user, which he is participating/is owner
+      """
+      tmpl = lookup.get_template("list.html")
+      log.info("Get all events for " + getCurrentUserName())
 
-#    return tmpl.render(listEventsFor(getCurrentUserName()))
-    return tmpl.render(debts=23423, others_debts=323, entries=[]) 
+      totalDebts = 0
+      totalEarnings = 0
+      events = listAllEventsFor(getCurrentUserName())
+      for event in events:
+          if (event.amount < 0):
+              totalDebts += event.amount
+          else:
+              totalEarnings += event.amount
+          totalDebts += event.amount
+      return tmpl.render(debts=totalDebts, others_debts=totalEarnings, entries=events) 

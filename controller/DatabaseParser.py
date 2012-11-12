@@ -9,8 +9,8 @@ import random
 import hashlib
 import logging
 
-sys.path.append('utils/')
-import Encryption
+from utils.Encryption import *
+from model.Event import Event
 
 DB_FILE = 'resource/splitpotDB_DEV.sqlite'
 SALT_LENGTH = 30
@@ -39,8 +39,8 @@ def updateLogin(email, newPassword):
     return False
   with connection:
     cur = connection.cursor()
-    salt = Encryption.generateRandomChars(SALT_LENGTH)
-    hashedPwd = Encryption.hashPassword(salt, newPassword)
+    salt = generateRandomChars(SALT_LENGTH)
+    hashedPwd = hashPassword(salt, newPassword)
     cur.execute("UPDATE splitpot_users SET password = ?, salt = ? WHERE email = ?", [hashedPwd, salt, email.lower()])
     return cur.rowcount == 1
 
@@ -56,7 +56,7 @@ def verifyLogin(email, password):
         cur.execute("SELECT password FROM splitpot_users WHERE email = ?", [email.lower()])
         hashedPw = cur.fetchone()[0]
 
-    return True if (Encryption.hashPassword(userSalt, password) == hashedPw) else False
+    return True if (hashPassword(userSalt, password) == hashedPw) else False
 
 # returns a list with all events
 def listEvents():
@@ -67,13 +67,28 @@ def listEvents():
 
     return events
 
-def listEventsFor(user):
-  with connection:
-    cur = connection.cursor()
-    #cur.execute("SELECT splitpot_events.id, date, comment, amount FROM splitpot_events, splitpot_participants WHERE splitpot.participants.event = splitpot_events.id AND (owner = 'user' or user = 'user'")
-    cur.execute("SELECT splitpot_events.ID, date, comment, amount FROM splitpot_events, splitpot_participants WHERE splitpot_participants.event = splitpot_events.ID AND (splitpot_events.owner = ? OR splitpot_participants.user = ?)", [user, user])
-    events = cur.fetchall()
-  return events
+def listHostingEventsFor(user):
+    events = []
+    with connection:
+        cur = connection.cursor()
+        cur.execute("SELECT ID, date, amount, participants, comment FROM splitpot_events WHERE splitpot_events.owner = ?", [user.lower()])
+        result = cur.fetchall()
+        for curEvent in result:
+            events.append(Event(curEvent[0], str(user), curEvent[1], curEvent[2], curEvent[3], curEvent[4])) 
+    return events
+
+def listInvitedEventsFor(user):
+    events = []
+    with connection:
+        cur = connection.cursor()
+        cur.execute("SELECT splitpot_events.ID, date, amount, comment FROM splitpot_events, splitpot_participants WHERE splitpot_participants.event = splitpot_events.ID AND splitpot_participants.user = ?", [user.lower()])
+        result = cur.fetchall()
+        for curEvent in result:
+            events.append(Event(curEvent[0], "?", curEvent[1], -curEvent[2], "?", curEvent[3]))
+    return events
+
+def listAllEventsFor(user):
+    return listHostingEventsFor(user) + listInvitedEventsFor(user)
 
 # inserting a new event with the given parameters and return the event ID
 def insertEvent(owner, date, amount, participants, comment):
@@ -82,13 +97,13 @@ def insertEvent(owner, date, amount, participants, comment):
     with connection:
         cur = connection.cursor()
         if not userExists(owner):
-            tmpPassword = Encryption.generateRandomChars(DEFAULT_PWD_LENGTH)
+            tmpPassword = generateRandomChars(DEFAULT_PWD_LENGTH)
             log.info("owner: " + owner + " is not registered yet, registering now.")
             registerUser(owner, "Not Registered", tmpPassword)
 
         for curParticipant in participants:
              if not userExists(curParticipant):
-                 tmpPassword = Encryption.generateRandomChars(DEFAULT_PWD_LENGTH)
+                 tmpPassword = generateRandomChars(DEFAULT_PWD_LENGTH)
                  log.info("participant: " + curParticipant + " is not registered yet, registering now.")
                  registerUser(curParticipant, "Not Registered", tmpPassword)
 
@@ -122,8 +137,8 @@ def userExists(email):
 def registerUser(email, name, password):
     if not userExists(email):
          with connection:
-              salt = Encryption.generateRandomChars(SALT_LENGTH)
-              hashedPassword = Encryption.hashPassword(salt, password)
+              salt = generateRandomChars(SALT_LENGTH)
+              hashedPassword = hashPassword(salt, password)
 
               cur = connection.cursor()
               cur.execute("INSERT INTO splitpot_users VALUES (?, ?, ?, ?, ?)", (email.lower(), name, 0, salt, hashedPassword))
