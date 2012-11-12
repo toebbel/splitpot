@@ -1,5 +1,5 @@
 class Event:
-    def __init__(self, id, owner, date, amount, participants, comment):
+    def __init__(self, id=None, owner=None, date=None, amount=None, participants=None, comment=None):
         self.id = id
         self.owner = owner
         self.date = date
