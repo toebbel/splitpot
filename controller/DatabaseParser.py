@@ -115,9 +115,10 @@ def listInvitedEventsFor(user):
 
             # events.append(Event(curEvent[0], "?", curEvent[1], -curEvent[2], "?", curEvent[3]))
 
-            events.append(Event(id=curEvent[0], date=curEvent[1],
-                          amount=-curEvent[2], comment=curEvent[3]),
-                          owner=curEvent[4])
+            events.append(Event(id=curEvent[0], owner=curEvent[4],
+                          date=curEvent[1], amount=-curEvent[2],
+                          comment=curEvent[3]))
+
     return events
 
 
@@ -153,6 +154,7 @@ def insertEvent(
     participants,
     comment,
     ):
+
     log.info('Owner: ' + owner + ', date: ' + str(date) + ', amount: '
              + str(amount) + ', participants: ' + str(participants)
              + ', comment: ' + comment)
