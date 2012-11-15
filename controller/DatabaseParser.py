@@ -75,9 +75,17 @@ def listEventsFor(user):
     events = cur.fetchall()
   return events
 
+def getEvent(id):
+  log.info("retrieve event " + str(id))
+  with connection:
+    cur = connection.cursor()
+    cur.execute("SELECT owner, date, amount, participants, comment FROM splitpot_events where id = ?", [id])
+    return cur.fetchone()
+
+
 # inserting a new event with the given parameters and return the event ID
 def insertEvent(owner, date, amount, participants, comment):
-    print "Owner: " + owner + ", date: " + str(date) + ", amount: " + str(amount) + ", participants: " + str(participants) + ", comment: " + comment
+    log.info("Owner: " + owner + ", date: " + str(date) + ", amount: " + str(amount) + ", participants: " + str(participants) + ", comment: " + comment)
 
     with connection:
         cur = connection.cursor()

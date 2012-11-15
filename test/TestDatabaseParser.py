@@ -64,5 +64,11 @@ class TestDatabaseParser(unittest.TestCase):
     self.assertTrue(verifyLogin("userB@0xabc.de", "abcdef"))
     self.assertTrue(verifyLogin("userA@0xabc.de", "123456"))
 
+  def testGetEvent(self):
+    registerUser("userA@0xabc.de", "A", "123456")
+    id = insertEvent("userA@0xabc.de", "10.4.2013", 101.12, ["tobstu@gmail.com"], "comment")
+    self.assertEqual(getEvent(id + 1), None)
+    self.assertEqual(getEvent(id), (u'userA@0xabc.de', u'10.4.2013', 101.12, u"['tobstu@gmail.com']", u'comment'))
+
 if __name__ == '__main__':
   unittest.main()

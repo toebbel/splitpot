@@ -36,6 +36,15 @@ class splitpot_controller(object):
 
   @cherrypy.expose
   @require()
+  def event(self, id): #TODO ensure that users can only see events, they are participating/hosting
+    tmpl = lookup.get_template("event.html")
+    if not eventIdRegex.match(id):
+      return self.index()
+    return tmpl.render(event=getEvent(id))
+
+
+  @cherrypy.expose
+  @require()
   def add(self): #gives the form for entering a new event
     """
     [users] Delivers the "Add-Event form"
@@ -75,7 +84,7 @@ class splitpot_controller(object):
         log.info("Comment is malformed.")
         #TODO: template.render error for malformed comments
 
-    log.info("Add " + amount + " Euro to " + str(othersList) + ", comment: " + comment) 
+    log.info("Add " + amount + " Euro to " + str(othersList) + ", comment: " + comment)
     insertEvent(getCurrentUserName(), date.today(), amount, othersList, comment)
     return self.index()
 
@@ -89,4 +98,4 @@ class splitpot_controller(object):
     log.info("Get all events for " + getCurrentUserName())
 
 #    return tmpl.render(listEventsFor(getCurrentUserName()))
-    return tmpl.render(debts=23423, others_debts=323, entries=[]) 
+    return tmpl.render(debts=23423, others_debts=323, entries=[])
