@@ -1,13 +1,16 @@
+<%! import cherrypy %>
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%block name="title" /></title>
+	<%include file="defaulthead.mako"/>
   </head>
   <body>
-    <h1>Splitpot</h1>
-
-    <p>
-      ${self.body()}
-    </p>
+	<%include file="navi.mako"/>
+    
+	<div class="container">
+		<p>
+		      ${self.body()}
+		</p>
+	</div>
   </body>
 </html>
