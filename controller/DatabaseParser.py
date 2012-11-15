@@ -8,9 +8,12 @@ import sys
 import random
 import hashlib
 import logging
+import json
 
-from utils.Encryption import *
-from model.Event import Event
+sys.path.append('utils/')
+from Encryption import *
+sys.path.append('model/')
+from Event import Event
 
 DB_FILE = 'resource/splitpotDB_DEV.sqlite'
 SALT_LENGTH = 30
@@ -74,19 +77,19 @@ def listHostingEventsFor(user):
         cur.execute("SELECT ID, date, amount, participants, comment FROM splitpot_events WHERE splitpot_events.owner = ?", [user.lower()])
         result = cur.fetchall()
         for curEvent in result:
-            events.append(Event(id=curEvent[0], owner=str(user), date=curEvent[1], 
-                          amount=curEvent[2], participants=curEvent[3], comment=curEvent[4])) 
+            events.append(Event(id=curEvent[0], owner=str(user), date=curEvent[1],
+                          amount=curEvent[2], participants=curEvent[3], comment=curEvent[4]))
     return events
 
 def listInvitedEventsFor(user):
     events = []
     with connection:
         cur = connection.cursor()
-        cur.execute("SELECT splitpot_events.ID, date, amount, comment FROM splitpot_events, splitpot_participants WHERE splitpot_participants.event = splitpot_events.ID AND splitpot_participants.user = ?", [user.lower()])
+        cur.execute("SELECT splitpot_events.ID, date, amount, comment, owner FROM splitpot_events, splitpot_participants WHERE splitpot_participants.event = splitpot_events.ID AND splitpot_participants.user = ?", [user.lower()])
         result = cur.fetchall()
         for curEvent in result:
             #events.append(Event(curEvent[0], "?", curEvent[1], -curEvent[2], "?", curEvent[3]))
-            events.append(Event(id=curEvent[0], date=curEvent[1], amount=-curEvent[2], comment=curEvent[3]))
+            events.append(Event(id=curEvent[0], date=curEvent[1], amount=-curEvent[2], comment=curEvent[3]), owner=currEvent[4])
     return events
 
 def listAllEventsFor(user):
@@ -97,10 +100,13 @@ def getEvent(id):
   with connection:
     cur = connection.cursor()
     cur.execute("SELECT owner, date, amount, participants, comment FROM splitpot_events where id = ?", [id])
-    return cur.fetchone()
+    e = cur.fetchone()
+    if e:
+      return Event(id=id, owner=str(e[0]), date=e[1], amount=e[2], participants=json.loads(e[3]), comment=e[4])
+    return None
 
 
-# inserting a new event with the given parameters and return the event ID
+# inserting a new event with the given parameters and return the event ID. "participants" contains the IDs of the participants as list.
 def insertEvent(owner, date, amount, participants, comment):
     log.info("Owner: " + owner + ", date: " + str(date) + ", amount: " + str(amount) + ", participants: " + str(participants) + ", comment: " + comment)
 
@@ -117,7 +123,7 @@ def insertEvent(owner, date, amount, participants, comment):
                  log.info("participant: " + curParticipant + " is not registered yet, registering now.")
                  registerUser(curParticipant, "Not Registered", tmpPassword)
 
-        cur.execute("INSERT INTO splitpot_events VALUES (?,?,?,?,?,?)", (None, owner, date, amount, str(participants), comment))
+        cur.execute("INSERT INTO splitpot_events VALUES (?,?,?,?,?,?)", (None, owner, date, amount, json.dumps(participants), comment))
 
         cur.execute("SELECT * FROM splitpot_events ORDER BY ID DESC limit 1")
         eventID = cur.fetchone()[0]

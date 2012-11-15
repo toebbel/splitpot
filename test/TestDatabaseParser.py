@@ -3,6 +3,7 @@ import sys
 from datetime import datetime
 
 sys.path.append('controller/')
+
 from DatabaseParser import *
 
 class TestDatabaseParser(unittest.TestCase):
@@ -30,7 +31,7 @@ class TestDatabaseParser(unittest.TestCase):
     date_a = datetime.now
     id_a = insertEvent("a", "1.4.2013", 10, ["b"], "Event1")
     print listEvents()
-    self.assertEqual(listEvents(), [(id_a, u"a", "1.4.2013", 10, u"['b']", u"Event1")])
+    self.assertEqual(listEvents(), [(id_a, u'a', '1.4.2013', 10, u'["b"]', u'Event1')])
 
   def testListEvents_emptyDB(self):
     listEvents()
@@ -68,7 +69,8 @@ class TestDatabaseParser(unittest.TestCase):
     registerUser("userA@0xabc.de", "A", "123456")
     id = insertEvent("userA@0xabc.de", "10.4.2013", 101.12, ["tobstu@gmail.com"], "comment")
     self.assertEqual(getEvent(id + 1), None)
-    self.assertEqual(getEvent(id), (u'userA@0xabc.de', u'10.4.2013', 101.12, u"['tobstu@gmail.com']", u'comment'))
+    print str(getEvent(id))
+    self.assertEqual(str(getEvent(id)), str(Event(id=id, owner="userA@0xabc.de", date="10.4.2013", amount=101.12, participants=['tobstu@gmail.com'], comment="comment")))
 
 if __name__ == '__main__':
   unittest.main()

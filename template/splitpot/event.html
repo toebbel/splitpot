@@ -4,6 +4,9 @@
   <h2>Event</h2>
     <p>Sorry - coul not find this event :(</p>
 % else:
-  <h2>Event from ${event[0]}</h2>
+  <h2>Meetup from ${event.date} - ${event.amount}€</h2>
+    <p> Event hosted by ${event.owner}</p>
+    <p>${event.comment}</p>
+    <p>Attendants: ${reduce(lambda list, current : '<li>' + current + '</li>' + list, event.participants, '')}</p>
 % endif
 
