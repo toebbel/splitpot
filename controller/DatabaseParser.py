@@ -31,8 +31,8 @@ connection = lite.connect(DB_FILE, check_same_thread=False)
 
 def clear():
     """
-  Clears *ALL THE FUCKING DATA* from the Database
-  """
+    Clear *ALL THE FUCKING DATA* from the database.
+    """
 
     log.info('kill database - right now')
     with connection:
@@ -43,7 +43,11 @@ def clear():
 
 
 def updateLogin(email, newPassword):
-    log.info("resetting the pwd for user '" + email + "'")
+    """
+    Update the login for a given user with a given password.
+    """
+
+    log.info("resetting the password for user '" + email.lower() + "'")
     if not userExists(email):
         return False
     with connection:
@@ -56,6 +60,10 @@ def updateLogin(email, newPassword):
 
 
 def verifyLogin(email, password):
+    """
+    Check if the given email and password match.
+    """
+
     if not userExists(email.lower()):
         return False
     log.info('verify user and given password')
@@ -74,9 +82,12 @@ def verifyLogin(email, password):
             == hashedPw else False)
 
 
-# returns a list with all events
-
 def listEvents():
+    """
+    List all events that are in the database.
+    """
+
+    log.info('list all events in database')
     with connection:
         cur = connection.cursor()
         cur.execute('SELECT * FROM splitpot_events')
@@ -86,8 +97,13 @@ def listEvents():
 
 
 def listHostingEventsFor(user):
+    """
+    List all events of a given user, where the user was the host.
+    """
+
     events = []
     with connection:
+        log.info("list all hosting events for '" + user.lower() + "'")
         cur = connection.cursor()
         cur.execute('SELECT ID, date, amount, participants, comment FROM splitpot_events WHERE splitpot_events.owner = ?'
                     , [user.lower()])
@@ -105,16 +121,19 @@ def listHostingEventsFor(user):
 
 
 def listInvitedEventsFor(user):
+    """
+    List all events of a given user, where the user was the guest.
+    """
+
     events = []
     with connection:
+        log.info("list all invited to events for '" + user.lower() + "'"
+                 )
         cur = connection.cursor()
         cur.execute('SELECT splitpot_events.ID, date, amount, comment, owner FROM splitpot_events, splitpot_participants WHERE splitpot_participants.event = splitpot_events.ID AND splitpot_participants.user = ?'
                     , [user.lower()])
         result = cur.fetchall()
         for curEvent in result:
-
-            # events.append(Event(curEvent[0], "?", curEvent[1], -curEvent[2], "?", curEvent[3]))
-
             events.append(Event(id=curEvent[0], owner=curEvent[4],
                           date=curEvent[1], amount=-curEvent[2],
                           comment=curEvent[3]))
@@ -123,10 +142,19 @@ def listInvitedEventsFor(user):
 
 
 def listAllEventsFor(user):
+    """
+    List all events for a given user.
+    """
+
+    log.info('list all events for "' + user.lower() + '"')
     return listHostingEventsFor(user) + listInvitedEventsFor(user)
 
 
 def getEvent(id):
+    """
+    Return an event with a given id, if existent.
+    """
+
     log.info('retrieve event ' + str(id))
     with connection:
         cur = connection.cursor()
@@ -145,8 +173,6 @@ def getEvent(id):
         return None
 
 
-# inserting a new event with the given parameters and return the event ID. "participants" contains the IDs of the participants as list.
-
 def insertEvent(
     owner,
     date,
@@ -154,6 +180,11 @@ def insertEvent(
     participants,
     comment,
     ):
+    """
+    Insert a new event with the given parameters and return the event ID.
+    The 'participants' table contains the IDs of the participants
+    as a list in JSON format.
+    """
 
     log.info('Owner: ' + owner + ', date: ' + str(date) + ', amount: '
              + str(amount) + ', participants: ' + str(participants)
@@ -192,10 +223,11 @@ def insertEvent(
     return eventID
 
 
-# update the participant table with a given event and list of
-# participants
-
 def updateParticipantTable(participants, eventID, status):
+    """
+    Update the participant table with a given event and list of participants.
+    """
+
     log.info('update participants table')
     with connection:
         cur = connection.cursor()
@@ -205,9 +237,11 @@ def updateParticipantTable(participants, eventID, status):
     return True
 
 
-# checks if an user already exists
-
 def userExists(email):
+    """
+    Check if a given user already exists.
+    """
+
     log.info('check if email: ' + email + ' exists.')
     with connection:
         cur = connection.cursor()
@@ -217,9 +251,12 @@ def userExists(email):
     return (False if exists == 0 else True)
 
 
-# register a new user
-
 def registerUser(email, name, password):
+    """
+    Register a new user.
+    """
+
+    log.info('register user "' + email.lower() + '"')
     if not userExists(email):
         with connection:
             salt = generateRandomChars(SALT_LENGTH)
@@ -236,9 +273,12 @@ def registerUser(email, name, password):
         return False
 
 
-# return hashedPassword
-
 def getPassword(email):
+    """
+    Return the hashed password of a given user.
+    """
+
+    log.info('get hashed password of "' + email.lower() + '"')
     if userExists(email):
         with connection:
             cur = connection.cursor()
@@ -251,9 +291,13 @@ def getPassword(email):
                     + ", because user doesn't exist")
 
 
-# set the event status for a given user
-
 def setEventStatus(email, event, status):
+    """
+    Set the event status for a given user.
+    """
+
+    log.info('set event status of "' + email.lower() + '" with id "'
+             + str(event) + '" to "' + status + '"')
     with connection:
         cur = connection.cursor()
         cur.execute('SELECT COUNT(*) FROM splitpot_participants WHERE user = ? AND event = ?'
@@ -285,5 +329,11 @@ def getResetUrlKey(email):
 
     if userExists(email):
         return getPassword(email)[:8]
+
+
+def replaceUser(oldUser, newUser):
+    """
+    ~ used for merging users
+    """
 
 
