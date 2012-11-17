@@ -253,7 +253,7 @@ def getPassword(email):
         with connection:
             cur = connection.cursor()
             cur.execute('SELECT password FROM splitpot_users WHERE email = ?'
-                        , [email])
+                        , [email.lower()])
             pw = cur.fetchone()[0]
             return pw
     else:
