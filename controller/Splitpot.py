@@ -5,12 +5,9 @@ lookup = TemplateLookup(directories=['template/', 'template/splitpot/'])
 
 from DatabaseParser import *
 import User
-import sys
-from Auth import *
+from utils.Auth import *
 from datetime import date
-from Regex import *
-sys.path.append('controller')
-from Email import * 
+from utils.Regex import *
 
 import logging
 log = logging.getLogger("appLog")
@@ -29,7 +26,6 @@ class splitpot_controller(object):
   @cherrypy.expose
   @require()
   def index(self):
-    activateUser("awesome@0xabc.de", "Mr. Awesome", "awesome", True)
     """
     [users] Returns the overview of the accounting of the current user. Contains debts and link to overview as well as creation of new events.
     """
@@ -89,9 +85,10 @@ class splitpot_controller(object):
 
     for curParticipant in othersList:
             if not userExists(curParticipant, True):
+                tmpPassword = generateRandomChars(DEFAULT_PWD_LENGTH)
                 log.info('participant: ' + curParticipant + ' is not registered yet, registering now.')
                 registerUser(curParticipant)
-		sendInvitation(curParticipant, getResetUrlKey(email))
+                #TODO send Email to User with tmpPassword
 
     log.info("Add " + amount + " Euro to " + str(othersList) + ", comment: " + comment)
     insertEvent(getCurrentUserName(), date.today(), amount, othersList, comment)
