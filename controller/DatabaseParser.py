@@ -281,7 +281,6 @@ def isValidResetUrlKey(email, key, forGhost=False):
     """
     ~ for pwd reset (forgot pwd feature)
     """
-    log.info("check " + str(getResetUrlKey(email, forGhost)[:ACTIVATE_CODE_LEN]) + " =? " + key)
     if userExists(email, forGhost) and getResetUrlKey(email, forGhost)[:ACTIVATE_CODE_LEN] == key:
         return True
     else:
