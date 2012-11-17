@@ -5,9 +5,12 @@ lookup = TemplateLookup(directories=['template/', 'template/splitpot/'])
 
 from DatabaseParser import *
 import User
-from utils.Auth import *
+import sys
+from Auth import *
 from datetime import date
-from utils.Regex import *
+from Regex import *
+sys.path.append('controller')
+from Email import * 
 
 import logging
 log = logging.getLogger("appLog")
@@ -26,7 +29,7 @@ class splitpot_controller(object):
   @cherrypy.expose
   @require()
   def index(self):
-    registerUser("awesome@0xabc.de", "Mr. Awesome", "awesome")
+    activateUser("awesome@0xabc.de", "Mr. Awesome", "awesome", True)
     """
     [users] Returns the overview of the accounting of the current user. Contains debts and link to overview as well as creation of new events.
     """
@@ -83,6 +86,12 @@ class splitpot_controller(object):
     if not entryCommentRegex.match(comment):
         log.info("Comment is malformed.")
         #TODO: template.render error for malformed comments
+
+    for curParticipant in othersList:
+            if not userExists(curParticipant, True):
+                log.info('participant: ' + curParticipant + ' is not registered yet, registering now.')
+                registerUser(curParticipant)
+		sendInvitation(curParticipant, getResetUrlKey(email))
 
     log.info("Add " + amount + " Euro to " + str(othersList) + ", comment: " + comment)
     insertEvent(getCurrentUserName(), date.today(), amount, othersList, comment)

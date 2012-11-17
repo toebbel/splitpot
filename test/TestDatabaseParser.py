@@ -18,16 +18,28 @@ class TestDatabaseParser(unittest.TestCase):
     self.assertFalse(verifyLogin("test@0xabc.de", "asfelkj"))
 
   def testRegister(self):
-    self.assertTrue(registerUser("benjamin@flowerpower.org", "Beni", "schokolade"))
-    self.assertFalse(registerUser("benJamin@flowerpower.org", "Benjamin", "schokolade"))
-    self.assertTrue(registerUser("karlaColumna@bild.de", "Carla", "pwd"))
-    self.assertTrue(userExists("benjamin@flowerpower.org"))
-    self.assertTrue(userExists("karlaColumna@bild.de"))
+    self.assertTrue(registerUser("benjamin@flowerpower.org"))
+    self.assertFalse(registerUser("benJamin@flowerpower.org"))
+    self.assertTrue(registerUser("karlaColumna@bild.de"))
+    self.assertTrue(userExists("benjamin@flowerpower.org", includeGhosts = True))
+    self.assertTrue(userExists("karlaColumna@bild.de", includeGhosts = True))
+    self.assertFalse(userExists("benjamin@flowerpower.org"))
+    self.assertFalse(userExists("karlaColumna@bild.de"))
+
+  def testActivate(self):
+    activateUser("test@0xabc.de", "test", "123456", True) #force = register if not present and activate
+    self.assertTrue(userExists("test@0xabc.de"))
+
+    self.assertFalse(activateUser("test@0xabc.de", "test2", "765432")) #an activated user can't be activated a second time
+    
+    registerUser("ghost@test.de")
+    self.assertTrue(activateUser("ghost@test.de", "ghosty", "123456")) #activate a ghost user
+    self.assertTrue(userExists("ghost@test.de")) #User should be found in "normal" users
 
   def testListEvents(self):
-    registerUser("a", "alpha", "1")
-    registerUser("b", "beta", "2")
-    registerUser("c", "charlie", "3")
+    activateUser("a", "alpha", "1", True)
+    activateUser("b", "beta", "2", True)
+    activateUser("c", "charlie", "3", True)
     date_a = datetime.now
     id_a = insertEvent("a", "1.4.2013", 10, ["b"], "Event1")
     print listEvents()
@@ -40,25 +52,25 @@ class TestDatabaseParser(unittest.TestCase):
     getPassword("martin@0xabc.de")
 
   def testGetPassword(self):
-    registerUser("awesome@0xabc.de", "Bluemchen", "blume")
+    activateUser("awesome@0xabc.de", "Bluemchen", "blume", True)
     getPassword("awesome@0xabc.de")
 
   def testInsertEvent(self):
-    registerUser("awesome@0xabc.de", "Bluemchen", "blume")
+    activateUser("awesome@0xabc.de", "Bluemchen", "blume", True)
     insertEvent("awesome@0xabc.de", "4.1.2010", 12.1, ["tobstu@0xabc.de"], "An Event")
 
   def testSetEventStatus(self):
     setEventStatus("tobstu@gmail.com", 2, "paid")
 
   def testResetUrl(self):
-    registerUser("dummy@0xabc.de", "dummy", "thisIsMyPwd")
+    activateUser("dummy@0xabc.de", "dummy", "thisIsMyPwd", True)
     reset = getResetUrlKey("dummy@0xabc.de")
     self.assertTrue(str(reset).__len__() == 8)
     self.assertTrue(isValidResetUrlKey("dummy@0xabc.de", reset))
 
   def testResetLogin(self):
-    registerUser("userA@0xabc.de", "A", "123456")
-    registerUser("userB@0xabc.de", "B", "654321")
+    activateUser("userA@0xabc.de", "A", "123456", True)
+    activateUser("userB@0xabc.de", "B", "654321", True)
     self.assertFalse(updateLogin("userC@0xabc.de", "ffffff"))
     self.assertTrue(updateLogin("userb@0xabc.de", "abcdef"))
     self.assertFalse(verifyLogin("userB@0xabc.de", "654321"))
@@ -66,7 +78,7 @@ class TestDatabaseParser(unittest.TestCase):
     self.assertTrue(verifyLogin("userA@0xabc.de", "123456"))
 
   def testGetEvent(self):
-    registerUser("userA@0xabc.de", "A", "123456")
+    activateUser("userA@0xabc.de", "A", "123456", True)
     id = insertEvent("userA@0xabc.de", "10.4.2013", 101.12, ["tobstu@gmail.com"], "comment")
     self.assertEqual(getEvent(id + 1), None)
     print str(getEvent(id))

@@ -29,6 +29,11 @@ def sendMail(host, sender, to, subject, body):
 
 runningUrl = "http://0xabc.de/splitpot/"
 
+def sendInvitationMail(to, code):
+  log.info("sending invitation to " + to + " with code " + code)
+  tmpl = lookup.get_template("ghost_user_link.email")
+  SettingsWrapper(to, "Splitpot Invitation", tmpl.render(activateUrl=runningUrl + "/user/register?code=" + code))
+
 def SettingsWrapper(to, subject, body):
   """
   Sends mail using sendMail-method. Adds the required parameters like host & sender from the config file

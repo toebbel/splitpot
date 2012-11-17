@@ -1,0 +1,9 @@
+<%inherit file="base.html" />
+
+${feedback}<br />
+<form action="doResend" method="post">
+  <p>
+  Email: <input type="text" name="email" value="${email}" /><br />
+    <input type="submit" value="Send" />
+  </p>
+</form>

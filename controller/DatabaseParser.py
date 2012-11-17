@@ -20,6 +20,7 @@ from Event import Event
 DB_FILE = 'resource/splitpotDB_DEV.sqlite'
 SALT_LENGTH = 30
 DEFAULT_PWD_LENGTH = 6
+ACTIVATE_CODE_LEN = 8
 
 log = logging.getLogger('appLog')
 
@@ -161,19 +162,11 @@ def insertEvent(
 
     with connection:
         cur = connection.cursor()
-        if not userExists(owner):
+        if not userExists(owner, True):
             tmpPassword = generateRandomChars(DEFAULT_PWD_LENGTH)
             log.info('owner: ' + owner
                      + ' is not registered yet, registering now.')
-            registerUser(owner, 'Not Registered', tmpPassword)
-
-        for curParticipant in participants:
-            if not userExists(curParticipant):
-                tmpPassword = generateRandomChars(DEFAULT_PWD_LENGTH)
-                log.info('participant: ' + curParticipant
-                         + ' is not registered yet, registering now.')
-                registerUser(curParticipant, 'Not Registered',
-                             tmpPassword)
+            registerUser(owner, 'Not Registered', tmpPassword) #TODO I don't think we should allow this
 
         cur.execute('INSERT INTO splitpot_events VALUES (?,?,?,?,?,?)',
                     (
@@ -207,32 +200,49 @@ def updateParticipantTable(participants, eventID, status):
 
 # checks if an user already exists
 
-def userExists(email):
-    log.info('check if email: ' + email + ' exists.')
+def userExists(email, includeGhosts=False):
+    log.info('check if email: ' + email + ' exists. isGhost?' + str(includeGhosts))
     with connection:
         cur = connection.cursor()
-        cur.execute('SELECT count(*) FROM splitpot_users WHERE email = ?'
-                    , [email.lower()])
+	if includeGhosts:
+	        cur.execute('SELECT count(*) FROM splitpot_users WHERE email = ?', [email.lower()])
+	else:
+		cur.execute('SELECT count(*) FROM splitpot_users WHERE email = ? AND registered == 0', [email.lower()])
         exists = cur.fetchone()[0]
     return (False if exists == 0 else True)
 
+def registerUser(email):
+	if (not userExists(email, True)):
+		log.info('register user ' + email)
+		with connection:
+			activateKey = generateRandomChars(ACTIVATE_CODE_LEN)
+			cur = connection.cursor()
+			cur.execute('INSERT INTO splitpot_users VALUES (?, ?, 1, ?, ?)', (email.lower(), email, activateKey, activateKey))
+		return True
+	log.info('did not register ' + email + ' because the email is attached to another user')
+	return False
 
 # register a new user
 
-def registerUser(email, name, password):
-    if not userExists(email):
+def activateUser(email, name, password, force = False): #activate previously registered user. Force revokes register, if needed.
+    log.info('activate user ' + email + ', force ' + str(force))
+    if not userExists(email, True) and force:
+	registerUser(email)
+    if (not userExists(email)): #Only Ghost users can register, or they are new ghosts
         with connection:
             salt = generateRandomChars(SALT_LENGTH)
             hashedPassword = hashPassword(salt, password)
 
             cur = connection.cursor()
-            cur.execute('INSERT INTO splitpot_users VALUES (?, ?, ?, ?, ?)'
-                        , (email.lower(), name, 0, salt,
-                        hashedPassword))
+            cur.execute('UPDATE splitpot_users SET name = ?, registered = 0, salt = ?, password = ? WHERE email = ? AND registered != 0'
+                        , (name, salt, hashedPassword, email.lower()))
 
         return True
     else:
-        print 'User already exists'
+	if not userExists(email, True):
+        	print 'user is not invited'
+	else:
+		print 'user already exists' #TODO return this info as result
         return False
 
 
@@ -272,7 +282,7 @@ def isValidResetUrlKey(email, key):
     ~ for pwd reset (forgot pwd feature)
     """
 
-    if userExists(email) and getPassword(email)[:8] == key:
+    if userExists(email) and getPassword(email)[:ACTIVATE_CODE_LEN] == key:
         return True
     else:
         return False

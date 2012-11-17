@@ -4,10 +4,11 @@
 ${feedback}<br />
 <form action="doRegister" method="post">
   <p>
-    Email: <input type="text" name="email" /><br />
+  Email: <input type="text" name="email" /><br />
+    ActivationKey: <input type="text" name="key" value="${givenKey}" /><br />
     Nick: <input type="text" name="nick" /><br />
     Pasword: <input type="password" name="pwd1" /><br />
-    aaaand again:<input type="password" name="pwd2" /><br />
+    aaand again:<input type="password" name="pwd2" /><br />
     <input type="submit" value="Send" />
   </p>
 </form>

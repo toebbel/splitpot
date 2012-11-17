@@ -20,12 +20,12 @@ log = logging.getLogger("appLog")
 from Regex import emailRegex
 
 @cherrypy.expose
-def register():
+def register(key=""):
   """
   Provides the Register form
   """
   log.info("provide register form")
-  return lookup.get_template("register.html").render(feedback = "")
+  return lookup.get_template("register.html").render(feedback = "", givenKey = str(key))
 
 @cherrypy.expose
 def forgot():
@@ -36,29 +36,48 @@ def forgot():
   return lookup.get_template("forgot_pwd.html").render(feedback = "")
 
 @cherrypy.expose
-def doRegister(email = None, nick = None, pwd1 = None, pwd2 = None):
+def resend(email = ""):
+  return lookup.get_template("resend.html").render(feedback = "", email = email)
+
+@cherrypy.expose
+def doResend(email):
+  if(email is None or not emailRegex.match(email) or not db.userExists(email, True)):
+    tmpl = lookup.get_template("resend.html")
+    return tmpl.render(feedback="we could not find your email", email=email)
+  Email.sendInvitationMail(email, db.getResetUrlKey(email))
+  tmpl = lookup.get_template("register.html")
+  return tmpl.render(feedback="We resent your invitation code :)", email=email) 
+
+@cherrypy.expose
+def doRegister(email = None, key = None, nick = None, pwd1 = None, pwd2 = None):
   """
   Processes a register-request: checks email & pwd & if user exists. Sends activation email, if successfull.
   """
   log.info("register " + str(email) + " (" + str(nick) + ")")
   tmpl = lookup.get_template("register.html")
   errors = ""
+  escapeRegex = False #Quick checking some values against the DB
   if(email is None):
     errors += "<li>You have to provide an email adress</li>"
+  if(key is None):
+    errors += "<li>You have to provide a registration key(<a href='resend?email=" + str(email) + "'>resend</a>)</li>"
+  if(emailRegex.match(email) == None):
+    errors += "<li>You'r email is invalid</li>"
+    escapeRegex = True
+  if not escapeRegex and not db.isValidResetUrlKey(email, key):
+    errors += "<li>The registration key is invalid(<a href='resend?email=" + str(email) + "'>resend</a>)</li>"
   if(nick is None or str(nick).__len__() < 3):
     errors += "<li>Please enter a nick, with a minimum length of 3</li>"
   if(str(pwd1).__len__() < 6):
     errors += "<li>You'r password is too short</li>"
-  if(emailRegex.match(email) == None):
-    errors += "<li>You'r email is invalid</li>"
   if(not pwd1 == pwd2):
     errors += "<li>Passwort repition incorrect</li>"
-  if (db.userExists(email)):
+  if not escapeRegex and (db.userExists(email, False)):
     errors += "<li>User already exists</li>"
   if (not errors == ""):
-    return tmpl.render(feedback="<ul>" + errors + "</ul>")
+    return tmpl.render(feedback="<ul>" + errors + "</ul>", givenKey=key)
   else:
-    if (db.registerUser(email, nick, pwd1)):
+    if (db.activateUser(email, nick, pwd1, True)):
       Email.signupConfirm(email, "") #TODO get signup confirmation key from db
       return tmpl.render(feedback="You'll hear from us - check your mailbox")
     else:
