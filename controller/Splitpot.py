@@ -5,9 +5,9 @@ lookup = TemplateLookup(directories=['template/', 'template/splitpot/'])
 
 from DatabaseParser import *
 import User
-from utils.Auth import *
+from Auth import *
 from datetime import date
-from utils.Regex import *
+from Regex import *
 
 import logging
 log = logging.getLogger("appLog")

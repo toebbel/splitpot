@@ -2,6 +2,7 @@ import unittest
 import sys
 
 sys.path.append('controller/')
+sys.path.append('utils/')
 from User import *
 
 from DatabaseParser import *
