@@ -41,6 +41,7 @@ def resend(email = ""):
 
 @cherrypy.expose
 def doResend(email):
+  log.info("do a resend request for '" + str(email) + "'")
   if(email is None or not emailRegex.match(email) or not db.userExists(email, True)):
     tmpl = lookup.get_template("resend.html")
     return tmpl.render(feedback="we could not find your email", email=email)
@@ -64,7 +65,7 @@ def doRegister(email = None, key = None, nick = None, pwd1 = None, pwd2 = None):
   if(emailRegex.match(email) == None):
     errors += "<li>You'r email is invalid</li>"
     escapeRegex = True
-  if not escapeRegex and not db.isValidResetUrlKey(email, key):
+  if not escapeRegex and not db.isValidResetUrlKey(email, key, True):
     errors += "<li>The registration key is invalid(<a href='resend?email=" + str(email) + "'>resend</a>)</li>"
   if(nick is None or str(nick).__len__() < 3):
     errors += "<li>Please enter a nick, with a minimum length of 3</li>"

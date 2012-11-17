@@ -248,8 +248,8 @@ def activateUser(email, name, password, force = False): #activate previously reg
 
 # return hashedPassword
 
-def getPassword(email):
-    if userExists(email):
+def getPassword(email, forGhost=False):
+    if userExists(email, forGhost):
         with connection:
             cur = connection.cursor()
             cur.execute('SELECT password FROM splitpot_users WHERE email = ?'
@@ -277,23 +277,23 @@ def setEventStatus(email, event, status):
             log.warning(str(event) + ' or ' + email + " doesn't exist")
 
 
-def isValidResetUrlKey(email, key):
+def isValidResetUrlKey(email, key, forGhost=False):
     """
     ~ for pwd reset (forgot pwd feature)
     """
-
-    if userExists(email) and getPassword(email)[:ACTIVATE_CODE_LEN] == key:
+    log.info("check " + str(getResetUrlKey(email, forGhost)[:ACTIVATE_CODE_LEN]) + " =? " + key)
+    if userExists(email, forGhost) and getResetUrlKey(email, forGhost)[:ACTIVATE_CODE_LEN] == key:
         return True
     else:
         return False
 
 
-def getResetUrlKey(email):
+def getResetUrlKey(email, forGhost=False):
     """
     ~ for a pwd-reset (forgot pwd feature)
     """
 
-    if userExists(email):
-        return getPassword(email)[:8]
+    if userExists(email, forGhost):
+        return getPassword(email, forGhost)[:8]
 
 

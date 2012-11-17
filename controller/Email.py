@@ -30,9 +30,9 @@ def sendMail(host, sender, to, subject, body):
 runningUrl = "http://0xabc.de/splitpot/"
 
 def sendInvitationMail(to, code):
-  log.info("sending invitation to " + to + " with code " + code)
+  log.info("sending invitation to " + str(to) + " with code " + str(code))
   tmpl = lookup.get_template("ghost_user_link.email")
-  SettingsWrapper(to, "Splitpot Invitation", tmpl.render(activateUrl=runningUrl + "/user/register?code=" + code))
+  SettingsWrapper(to, "Splitpot Invitation", tmpl.render(activateUrl=runningUrl + "/user/register?code=" + str(code)))
 
 def SettingsWrapper(to, subject, body):
   """
