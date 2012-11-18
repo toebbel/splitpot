@@ -24,19 +24,23 @@ class TestTransactionGraph(unittest.TestCase):
         self.assertTrue(cmpDicts(graphNodes, {123: UserNode(123), 321: UserNode(321)}))
         self.assertTrue(cmpDicts(graphEdges, {edge.keyify(): edge}))
 
-    def testGetPath1(self):
+    def testGetPaths(self):
         edgeA = TransactionEdge(0, 1, 1, 1)
         edgeB = TransactionEdge(1, 2, 1, 2)
         edgeC = TransactionEdge(0, 3, 1, 3)
         edgeD = TransactionEdge(2, 4, 1, 4)
+        edgeE = TransactionEdge(1, 3, 1, 5)
         insertEdge(edgeA)
         insertEdge(edgeB)
         insertEdge(edgeC)
         insertEdge(edgeD)
-        self.assertEqual([0], getPath(0, 0))
-        self.assertEqual([0, 1, 2, 4], getPath(0, 4))
-        self.assertEqual(None, getPath(4, 0))
-        self.assertEqual([0, 3], getPath(0, 3))
+        insertEdge(edgeE)
+        self.assertEqual([[0]], getPaths(0, 0))
+        self.assertEqual([[0, 1, 2, 4]], getPaths(0, 4))
+        self.assertEqual([], getPaths(4, 0))
+        res = getPaths(0, 3)
+        print res
+        self.assertTrue([[0, 3], [0, 1, 3]] == res or res == [[0, 1, 3], [0, 3]])
 
     def testGetCycle(self):
         insertEdge(TransactionEdge('a', 'b', 1, 0))

@@ -38,28 +38,31 @@ def getCycle(node):
     """
 
 
-def getPath(fromId, toId):
+def getPaths(fromId, toId):
     """
     Returns all paths from one node to another, if the path exists. Returns empty otherwise. Won't work for cycles!
     """
     if not fromId in graphNodes.keys() or not toId in graphNodes.keys():
-        return None
-    return _getPaths(graphNodes[fromId], graphNodes[toId], [], [], [])
+        return []
+    result = []
+    _getPaths(graphNodes[fromId], graphNodes[toId], [], [], result)
+    return result
 
 def _getPaths(fro, to, visited, path, result):
     if fro.userId in visited:
-        return None 
+        return 
     subPath = copy(path)
     subPath.append(fro)
-    visited.append(fro.userId)
+    subVisited = copy(visited)
+    subVisited.append(fro.userId)
     if fro == to:
+        print "found a path: " + str(subPath)
         result.append(subPath)
         return
     for e in fro.outgoing.keys():
         if not e in visited:
             assert e in graphNodes
-            res = _getPath(graphNodes[e], to, visited, subPath)
-    return result 
+            _getPaths(graphNodes[e], to, subVisited, subPath, result)
 
 def removeUnusedEdges():
     """
