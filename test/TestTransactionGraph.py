@@ -39,7 +39,6 @@ class TestTransactionGraph(unittest.TestCase):
         self.assertEqual([[0, 1, 2, 4]], getPaths(0, 4))
         self.assertEqual([], getPaths(4, 0))
         res = getPaths(0, 3)
-        print res
         self.assertTrue([[0, 3], [0, 1, 3]] == res or res == [[0, 1, 3], [0, 3]])
 
     def testGetCycle(self):
@@ -47,9 +46,11 @@ class TestTransactionGraph(unittest.TestCase):
         insertEdge(TransactionEdge('b', 'c', 1, 1))
         insertEdge(TransactionEdge('c', 'a', 1, 2))
         insertEdge(TransactionEdge('c', 'b', 1, 3))
-        self.assertEqual(['a', 'b', 'c', 'a'], getCycle('a'))
-        res2 = getCycle('b')
-        self.assertTrue(res2 == ['b', 'c', 'b'] or res2 == ['b', 'c', 'a', 'b'])
+        self.assertEqual([[graphNodes['a'], graphNodes['b'], graphNodes['c'], graphNodes['a']]], getCycles('a'))
+        subA = [graphNodes['b'], graphNodes['c'], graphNodes['b']]
+        subB = [graphNodes['b'], graphNodes['c'], graphNodes['a'], graphNodes['b']]
+        res = getCycles('b')
+        self.assertTrue(res == [subA, subB] or res == [subB, subA])
 
     def testMinimizePath(self):
         insertEdge(TransactionEdge('a', 'b', 1, 0))

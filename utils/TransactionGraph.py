@@ -29,14 +29,21 @@ def insertEdge(edge):
         graphNodes[edge.toUser].addInEdge(edge)
         graphEdges[edge.keyify()] = edge
 
-def getCycle(node):
+def getCycles(node):
     """
     Returns a list of paths that are cycles from the given node.
 
-    The paths will start end end with the given node.
-    No path? -> None
+    All paths will start end end with the given node.
+    No path? -> []
     """
-
+    assert node in graphNodes, "node %r is not in graph" % node
+    result = []
+    for n in graphNodes[node].outgoing.keys():
+        paths = getPaths(n, node)
+        for p in paths:
+            p.insert(0, graphNodes[node])
+            result.append(p)
+    return result
 
 def getPaths(fromId, toId):
     """
@@ -56,7 +63,6 @@ def _getPaths(fro, to, visited, path, result):
     subVisited = copy(visited)
     subVisited.append(fro.userId)
     if fro == to:
-        print "found a path: " + str(subPath)
         result.append(subPath)
         return
     for e in fro.outgoing.keys():
