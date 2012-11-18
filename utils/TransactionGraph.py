@@ -18,7 +18,7 @@ def insertNode(node):
 
 def insertEdge(edge):
     """
-    Adds an edge to the graph structure. Adds nodes, if they are not existent.
+    Adds an edge to the graph structure. Adds nodes, if they are not existent. If the edge exists already, we sum up the amount
     """
     if not isinstance(edge, TransactionEdge):
         raise TypeError("parameter is not a transaction edge")
@@ -27,7 +27,10 @@ def insertEdge(edge):
         insertNode(UserNode(edge.toUser))
         graphNodes[edge.fromUser].addOutEdge(edge)
         graphNodes[edge.toUser].addInEdge(edge)
-        graphEdges[edge.keyify()] = edge
+        if edge.keyify() in graphEdges:
+            graphEdges[edge.keyify()].amount += edge.amount
+        else:
+            graphEdges[edge.keyify()] = edge
 
 def getCycles(node):
     """
@@ -87,8 +90,10 @@ def minimizePath(path):
         graphEdges[e.keyify()].amount -= amount
 
 def amountOf(path):
+    if len(path) < 2:
+        return None
     amount = float("inf")
-    for p in path:
-        if p.amount < amount:
+    for i in range(0, len(path) - 2):
+        if p[i].amount < amount:
             amount = p.amount
     return amount

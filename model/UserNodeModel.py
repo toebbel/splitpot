@@ -11,12 +11,16 @@ class UserNode:
             raise TypeError("parameter is not a transaction edge")
         if not edge.keyify() in self.outgoing:
             self.outgoing[edge.toUser] = edge
+        else:
+            self.outgoing[edge.toUser].amount += edge.amount
 
     def addInEdge(self, edge):
         if not isinstance(edge, TransactionEdge):
             raise TypeError("parameter is not an transaction edge")
         if not edge.keyify() in self.incoming:
             self.incoming[edge.fromUser] = edge
+        else:
+            self.incoming[edge.fromUser].amount += edge.amount
 
     def __eq__(self, other):
         if isinstance(other, UserNode):
