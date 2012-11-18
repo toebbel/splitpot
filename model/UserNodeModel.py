@@ -31,7 +31,7 @@ class UserNode:
         return not self. __eq__(other)
 
     def __str__(self):
-        return "u" + str(self.userId)
+        return str(self.userId)
 
     def __repr__(self):
         return self.__str__()

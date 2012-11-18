@@ -91,9 +91,15 @@ def minimizePath(path):
 
 def amountOf(path):
     if len(path) < 2:
-        return None
+        return 0 
     amount = float("inf")
     for i in range(0, len(path) - 2):
-        if p[i].amount < amount:
-            amount = p.amount
+        edgeId = TransactionEdge(path[i], path[i+1], 0).keyify()
+        if not edgeId in graphEdges:#path not in graph? Amount of 0
+            return 0
+        curAmount = graphEdges[edgeId].amount
+        if curAmount < amount:
+            amount = curAmount
+    if amount == float("inf"):
+        amount = 0
     return amount

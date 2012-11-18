@@ -59,10 +59,12 @@ class TestTransactionGraph(unittest.TestCase):
         insertEdge(TransactionEdge('a', 'd', 3))
         insertEdge(TransactionEdge('d', 'a', 4))
         insertEdge(TransactionEdge('c', 'b', 3))
-        self.assertEqual(amountOf(getPaths('a', 'c')[0]), 1)
-
-
-        
+        self.assertEqual(amountOf(['d', 'a']), 0) #amount of nonexistent path
+        self.assertEqual(amountOf(['a', 'b', 'c']), 1)
+        self.assertEqual(amountOf(['a', 'b', 'c', 'a']), 1)
+        self.assertEqual(amountOf(['a', 'b', 'c', 'b', 'c', 'a', 'd', 'a']), 1)
+        self.assertEqual(amountOf(['a', 'd', 'a']), 3)
+        self.assertEqual(amountOf(['a']), 0)
 
 
 
