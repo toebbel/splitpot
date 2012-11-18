@@ -59,13 +59,75 @@ class TestTransactionGraph(unittest.TestCase):
         insertEdge(TransactionEdge('a', 'd', 3))
         insertEdge(TransactionEdge('d', 'a', 4))
         insertEdge(TransactionEdge('c', 'b', 3))
-        self.assertEqual(amountOf(['d', 'a']), 0) #amount of nonexistent path
+        self.assertRaises(ValueError, amountOf, (['d', 'b'])) #amount of nonexistent path
         self.assertEqual(amountOf(['a', 'b', 'c']), 1)
         self.assertEqual(amountOf(['a', 'b', 'c', 'a']), 1)
         self.assertEqual(amountOf(['a', 'b', 'c', 'b', 'c', 'a', 'd', 'a']), 1)
         self.assertEqual(amountOf(['a', 'd', 'a']), 3)
         self.assertEqual(amountOf(['a']), 0)
 
+    def testPathToEdgeSequence(self):
+        self.assertEqual([], pathToEdgeSequence([]))
+        self.assertEqual([], pathToEdgeSequence(['a']))
+        e1 = TransactionEdge('a', 'b', 0).keyify()
+        self.assertEqual([e1], pathToEdgeSequence(['a', 'b']))
+        e2 = TransactionEdge('b', 'c', 0).keyify()
+        self.assertEqual([e1, e2], pathToEdgeSequence(['a', 'b', 'c']))
+
+    def testMinimize(self):
+        e1 = TransactionEdge('a', 'b', 1)
+        e2 = TransactionEdge('b', 'c', 2)
+        e3 = TransactionEdge('c', 'a', 5)
+        e4 = TransactionEdge('a', 'd', 3)
+        e5 = TransactionEdge('d', 'a', 4)
+        e6 = TransactionEdge('c', 'b', 3)
+        insertEdge(e1)
+        insertEdge(e2)
+        insertEdge(e3)
+        insertEdge(e4)
+        insertEdge(e5)
+        insertEdge(e6)
+        minimizePath(['a', 'd', 'a'])
+        self.assertEquals(e4.amount, 0)
+        self.assertEquals(e5.amount, 1)
+        
+        minimizePath(['a', 'd', 'a']) # call again: should change nothing
+        self.assertEquals(e4.amount, 0)
+        self.assertEquals(e5.amount, 1)
+        
+        self.assertRaises(RuntimeError, minimizePath, (['a', 'b', 'c', 'b', 'c', 'a']))#should change nothing!
+        self.assertEquals(e1.amount, 1)
+        self.assertEquals(e2.amount, 2)
+        self.assertEquals(e3.amount, 5)
+
+        minimizePath(['a', 'b', 'c', 'a'])
+        self.assertEquals(e1.amount, 0)
+        self.assertEquals(e2.amount, 1)
+        self.assertEquals(e3.amount, 4)
+
+        self.assertRaises(RuntimeError, minimizePath, (['a', 'b']))
+
+    def testRemoveUnusedEdges(self):
+        e1 = TransactionEdge('a', 'b', 0)
+        e2 = TransactionEdge('b', 'c', 2)
+        e3 = TransactionEdge('c', 'a', 5)
+        e4 = TransactionEdge('a', 'd', 0)
+        e5 = TransactionEdge('d', 'a', 4)
+        e6 = TransactionEdge('c', 'b', 0)
+        insertEdge(e1)
+        insertEdge(e2)
+        insertEdge(e3)
+        insertEdge(e4)
+        insertEdge(e5)
+        insertEdge(e6)
+        self.assertTrue(removeUnusedEdges())
+        self.assertNotIn(e1.keyify(), graphEdges.keys())
+        self.assertIn(e2.keyify(), graphEdges.keys())
+        self.assertIn(e3.keyify(), graphEdges.keys())
+        self.assertNotIn(e4.keyify(), graphEdges.keys())
+        self.assertIn(e5.keyify(), graphEdges.keys())
+        self.assertNotIn(e6.keyify(), graphEdges.keys())
+        self.assertFalse(removeUnusedEdges())
 
 
 def cmpDicts(a, b):

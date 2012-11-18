@@ -80,23 +80,48 @@ def removeUnusedEdges():
     mod = False
     for e in graphEdges.keys(): #use key as iterator so we can modify the dict
         if graphEdges[e].amount <= 0:
-            del graphEdge[e]
+            del graphEdges[e]
             mod = True
     return mod
 
 def minimizePath(path):
+    """
+    Runs through a cycle and lowers the amount by the min. amount in the cycle.
+
+    Path HAS to be a cycle. if not -> RuntimeError
+    No edge can be twice in the path, othweise -> Runtime Error
+    """
+    if path[0] != path[len(path) - 1]:
+        raise RuntimeError("the given path is not a cycle and can't be minimized")
+    
+    unchecked = pathToEdgeSequence(path)
+    accepted = []
+    while(len(unchecked) > 0):
+        head = unchecked.pop(0)
+        if head in accepted:
+            raise RuntimeError("minimized edge " + head + " in the same path already before! Possible loss of money")
+        accepted.insert(0, head)
+
     amount = amountOf(path)
-    for e in path:
-        graphEdges[e.keyify()].amount -= amount
+    for e in accepted:
+        if not e in graphEdges:
+            raise ValueError("edge " + e + " is not in graph")
+        graphEdges[e].amount -= amount
+
+def pathToEdgeSequence(path):
+    result = []
+    for i in range(0, len(path) - 1):
+        result.append(TransactionEdge(path[i], path[i+1], 0).keyify())
+    return result
+
 
 def amountOf(path):
     if len(path) < 2:
         return 0 
     amount = float("inf")
-    for i in range(0, len(path) - 2):
-        edgeId = TransactionEdge(path[i], path[i+1], 0).keyify()
+    for edgeId in pathToEdgeSequence(path):
         if not edgeId in graphEdges:#path not in graph? Amount of 0
-            return 0
+           raise ValueError("edge " + edgeId + " not in graph") 
         curAmount = graphEdges[edgeId].amount
         if curAmount < amount:
             amount = curAmount
