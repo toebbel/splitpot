@@ -3,8 +3,8 @@
 
 Which other account would you like to merge with this account?
 
-<form name="mergeUser" action= "mergeUser" method="post">
-    New account: <input type="text" name="newAccount" readonly="readonly"/>${oldUser}<br />
-  Old account: <input type="text" name="oldAccount" /><br />
-  <input type="submit" value="submit">
+<form name="merge" action="mergeUser" method="post">
+    New account: <input type="text" name="newAccount" readonly="readonly" value=${oldUser} /><br />
+    Other account: <input type="text" name="oldAccount" /><br />
+    <input type="submit" value="submit">
 </form>
