@@ -152,8 +152,9 @@ class splitpot_controller(object):
             errors += '<li>You have to provide an email address</li>'
         if emailRegex.match(email) == None:
             errors += '<li>Your email is invalid</li>'
-        if not userExists(email):
-            errors += '<li>' + str(email.lower()) + ' doesn\'t exist</li>'
+        elif not userExists(email):
+            errors += '<li>' + str(email.lower()) \
+                + ' doesn\'t exist</li>'
         if userExists(getCurrentUserName()):
             events = listAllEventsFor(getCurrentUserName())
             for event in events:
@@ -164,14 +165,19 @@ class splitpot_controller(object):
                              + '" are listed as hoster and participant. Can\'t merge'
                              )
                     errors = \
-                    '<li>Can\'t merge these two accounts, because there are events, where host and participant are the same person.</li>'
+                        '<li>Can\'t merge these two accounts, because there are events, where host and participant are the same person.</li>'
         if not errors == '':
-            return tmpl.render(feedback='<ul>' + errors + '</ul>', newUser=getCurrentUserName())
+            return tmpl.render(feedback='<ul>' + errors + '</ul>',
+                               newUser=getCurrentUserName())
         else:
             if mergeUser(getCurrentUserName(), email):
                 Email.mergeRequest(getCurrentUserName(), email, '')  # TODO get merge confirmation key from db
-                return tmpl.render(feedback='An email has be sent to "' + email.lower() + '" for further information', newUser=getCurrentUserName())
+                return tmpl.render(feedback='An email has be sent to "'
+                                   + email.lower()
+                                   + '" for further information',
+                                   newUser=getCurrentUserName())
             else:
-                return tmpl.render(feedback='Oh no! Something went wrong. Please try again later.', newUser=getCurrentUserName())
+                return tmpl.render(feedback='Oh no! Something went wrong. Please try again later.'
+                                   , newUser=getCurrentUserName())
 
 
