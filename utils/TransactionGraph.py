@@ -7,6 +7,10 @@ from copy import copy
 graphNodes = {}
 graphEdges = {}
 
+def clearTransactionGraph():
+    graphNodes.clear()
+    graphEdges.clear()
+
 def insertNode(node):
     """
     Adds a node to the graph, only if is not already in the grahp
@@ -48,6 +52,17 @@ def getCycles(node):
             result.append(p)
     return result
 
+def getAllCycles():
+    """
+    Returns all cycles in the graph and their amount as tuple <cycle, amount>
+    """
+    result = []
+    for n in graphNodes.keys():
+        tmp = getCycles(n)
+        for c in tmp:
+            if not c in result:
+                result.append((c, amount(c)))
+    return result
 def getPaths(fromId, toId):
     """
     Returns all paths from one node to another, if the path exists. Returns empty otherwise. Won't work for cycles!
@@ -103,6 +118,8 @@ def minimizePath(path):
         accepted.insert(0, head)
 
     amount = amountOf(path)
+    if amount == 0:
+        return 
     for e in accepted:
         if not e in graphEdges:
             raise ValueError("edge " + e + " is not in graph")

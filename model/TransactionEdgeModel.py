@@ -9,8 +9,11 @@ class TransactionEdge:
 
     def __eq__(self, other):
         if isinstance(other, TransactionEdge):
-            return self.fromUser == other.fromUser and self.toUser == other.toUser and self.amount == other.amount
+            return self.fromUser == other.fromUser and self.toUser == other.toUser and (self.amount - other.amount < 0.01)
         return TypeError("can't compare Transaction edge to " + str(other))
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
+    def __str__(self):
+        return "from " + self.fromUser + ", " + self.toUser + ", amount " + str(self.amount)

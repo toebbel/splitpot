@@ -2,13 +2,16 @@ import cherrypy
 from mako.template import Template
 from mako.lookup import TemplateLookup
 lookup = TemplateLookup(directories=['template/', 'template/splitpot/'])
+import sys
 
 from DatabaseParser import *
 import User
-from utils.Auth import *
-from datetime import date
-from utils.Regex import *
+sys.path.append('utils')
+from Auth import *
+from TransactionGraph import *
+from Regex import *
 
+from datetime import date
 import logging
 log = logging.getLogger("appLog")
 
@@ -106,3 +109,32 @@ class splitpot_controller(object):
           else:
               totalEarnings += event.amount
       return tmpl.render(debts=totalDebts, others_debts=totalEarnings, entries=events)
+
+
+def payday():
+    log.info("PayDay! Build Transactiongraph")
+    keys = buildTransactionTree()
+
+    log.info("Optimize graph")
+    changed = True
+    while(changed):
+        changed = False
+        cycles = getAllCycles()
+        #TODO sort cycles by their amount (<1>)
+        for c in cycles:
+            if c[1] > 0:
+                changed = True
+                minimizePath(c[0])
+    log.info("Finished optimization")
+
+    #Generate emails from Tree
+    for userId in graphNodes.keys():
+        incoming = 0
+        outgoing = 0
+        for i in graphNodes[userId].incoming:
+            incoming += i.amount
+        for o in graphNodes[userId].outgoing:
+            outgoing += o.amount
+        payday(userId, graphNodes[userId].incoming, graphNodes[userId].outgoing, incoming, outgoing)
+    log.info("writing graphBack")
+    TransactionGraphWriteback(keys)

@@ -2,6 +2,21 @@
 
 It's Payday!
 You know what this means: Everybody pays his debts and hopefully gets a lot of money :)
-This is the overview of you'r expenses over the last month:
 
-#TODO think about data format & finish email template
+Your total debts: ${outDebts}.
+Others owe you: ${inDebts}.
+
+Please transfer money to the following people:
+% for c in outPayments:
+    * ${c.amount} to ${c.toUserId}
+% endfor
+
+You will get money from these people:
+% for c in inPayments:
+    * ${c.amount} from ${t.fromUserId}
+% endfor
+
+You can see all the events from the lsat month on the website.
+Bes Whishes,
+
+Splitpot

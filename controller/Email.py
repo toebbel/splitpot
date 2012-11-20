@@ -60,9 +60,11 @@ def forgotNewPwd(email, pwd):
   tmpl = lookup.get_template("forgot_success.email")
   SettingsWrapper(email, "Info: Password reset successfully", tmpl.render(pwd = pwd))
 
-def payday(email, payments):
+def payday(email, inPayments, outPayments, inDebt, outDebt):
   """
   Sends a mail with all paiments of specific user. No changes on database/payments. This is only the helper for the template-retrieval
   """
   tmpl = lookup.get_template("payday.email")
-  SettingsWrapper(email, "Payday!", tmpl.render(payments)) #TODO enough data or more?
+  #SettingsWrapper(email, "Payday!", tmpl.render(InPayments,outPayments, inDebt, outDebt)) #TODO enough data or more?
+
+  print (tmpl.render(InPayments,outPayments, inDebt, outDebt))
