@@ -45,7 +45,9 @@ class splitpot_controller(object):
         tmpl = lookup.get_template('index.html')
         return tmpl.render(debts=12.2, others_debts=0.2, entries=[])
 
-    @cherrypy.expose  # TODO ensure that users can only see events, they are participating/hosting
+                      # TODO ensure that users can only see events, they are participating/hosting
+
+    @cherrypy.expose
     @require()
     def event(self, id):
         tmpl = lookup.get_template('event.html')
@@ -53,7 +55,9 @@ class splitpot_controller(object):
             return self.index()
         return tmpl.render(event=getEvent(id))
 
-    @cherrypy.expose  # gives the form for entering a new event
+                      # gives the form for entering a new event
+
+    @cherrypy.expose
     @require()
     def add(self):
         """
@@ -207,14 +211,17 @@ class splitpot_controller(object):
         if userExists(getCurrentUserName()):
             events = listAllEventsFor(getCurrentUserName())
             for event in events:
-                if str(event.participants).find(email) != -1 \
-                    or str(event.owner).find(email) != -1:
+                if str(event.participants).find(email) != -1:
                     log.info('found instance where "' + email.lower()
                              + '" and "' + getCurrentUserName().lower()
                              + '" are listed as hoster and participant. Can\'t merge'
                              )
                     errors = \
                         '<li>Can\'t merge these two accounts, because there are events, where host and participant are the same person.</li>'
+                if str(event.owner).find(email) != -1:
+                    log.info('found instance where owner and to-be-merged user are the same'
+                             )
+                    errors = '<li>Can\'t merge two same accounts.</li>'
         if not errors == '':
             return tmpl.render(feedback='<ul>' + errors + '</ul>',
                                newUser=getCurrentUserName())
