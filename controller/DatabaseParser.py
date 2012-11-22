@@ -14,6 +14,7 @@ import json
 
 sys.path.append('utils/')
 from Encryption import *
+from TransactionGraph import *
 sys.path.append('model/')
 from Event import Event
 
@@ -32,8 +33,8 @@ connection = lite.connect(DB_FILE, check_same_thread=False)
 
 def clear():
     """
-  Clears *ALL THE FUCKING DATA* from the Database
-  """
+    Clear *ALL THE FUCKING DATA* from the database.
+    """
 
     log.info('kill database - right now')
     with connection:
@@ -44,7 +45,11 @@ def clear():
 
 
 def updateLogin(email, newPassword):
-    log.info("resetting the pwd for user '" + email + "'")
+    """
+    Update the login for a given user with a given password.
+    """
+
+    log.info("resetting the password for user '" + email.lower() + "'")
     if not userExists(email):
         return False
     with connection:
@@ -57,6 +62,10 @@ def updateLogin(email, newPassword):
 
 
 def verifyLogin(email, password):
+    """
+    Check if the given email and password match.
+    """
+
     if not userExists(email.lower()):
         return False
     log.info('verify user and given password')
@@ -75,9 +84,12 @@ def verifyLogin(email, password):
             == hashedPw else False)
 
 
-# returns a list with all events
-
 def listEvents():
+    """
+    List all events that are in the database.
+    """
+
+    log.info('list all events in database')
     with connection:
         cur = connection.cursor()
         cur.execute('SELECT * FROM splitpot_events')
@@ -87,8 +99,13 @@ def listEvents():
 
 
 def listHostingEventsFor(user):
+    """
+    List all events of a given user, where the user was the host.
+    """
+
     events = []
     with connection:
+        log.info("list all hosting events for '" + user.lower() + "'")
         cur = connection.cursor()
         cur.execute('SELECT ID, date, amount, participants, comment FROM splitpot_events WHERE splitpot_events.owner = ?'
                     , [user.lower()])
@@ -99,35 +116,52 @@ def listHostingEventsFor(user):
                 owner=str(user),
                 date=curEvent[1],
                 amount=curEvent[2],
-                participants=curEvent[3],
+                participants=json.loads(curEvent[3]),
                 comment=curEvent[4],
                 ))
     return events
 
 
 def listInvitedEventsFor(user):
+    """
+    List all events of a given user, where the user was the guest.
+    """
+
     events = []
     with connection:
+        log.info("list all invited to events for '" + user.lower() + "'"
+                 )
         cur = connection.cursor()
-        cur.execute('SELECT splitpot_events.ID, date, amount, comment, owner FROM splitpot_events, splitpot_participants WHERE splitpot_participants.event = splitpot_events.ID AND splitpot_participants.user = ?'
+        cur.execute('SELECT splitpot_events.ID, owner, date, amount, splitpot_events.participants, comment FROM splitpot_events, splitpot_participants WHERE splitpot_participants.event = splitpot_events.ID AND splitpot_participants.user = ?'
                     , [user.lower()])
         result = cur.fetchall()
         for curEvent in result:
-
-            # events.append(Event(curEvent[0], "?", curEvent[1], -curEvent[2], "?", curEvent[3]))
-
-            events.append(Event(id=curEvent[0], owner=curEvent[4],
-                          date=curEvent[1], amount=-curEvent[2],
-                          comment=curEvent[3]))
+            events.append(Event(
+                id=curEvent[0],
+                owner=curEvent[1],
+                date=curEvent[2],
+                amount=-curEvent[3],
+                participants=curEvent[4],
+                comment=curEvent[5],
+                ))
 
     return events
 
 
 def listAllEventsFor(user):
+    """
+    List all events for a given user.
+    """
+
+    log.info('list all events for "' + user.lower() + '"')
     return listHostingEventsFor(user) + listInvitedEventsFor(user)
 
 
 def getEvent(id):
+    """
+    Return an event with a given id, if existent.
+    """
+
     log.info('retrieve event ' + str(id))
     with connection:
         cur = connection.cursor()
@@ -146,8 +180,6 @@ def getEvent(id):
         return None
 
 
-# inserting a new event with the given parameters and return the event ID. "participants" contains the IDs of the participants as list.
-
 def insertEvent(
     owner,
     date,
@@ -155,6 +187,11 @@ def insertEvent(
     participants,
     comment,
     ):
+    """
+    Insert a new event with the given parameters and return the event ID.
+    The 'participants' table contains the IDs of the participants
+    as a list in JSON format.
+    """
 
     log.info('Owner: ' + owner + ', date: ' + str(date) + ', amount: '
              + str(amount) + ', participants: ' + str(participants)
@@ -166,7 +203,7 @@ def insertEvent(
             tmpPassword = generateRandomChars(DEFAULT_PWD_LENGTH)
             log.info('owner: ' + owner
                      + ' is not registered yet, registering now.')
-            registerUser(owner, 'Not Registered', tmpPassword) #TODO I don't think we should allow this
+            registerUser(owner, 'Not Registered', tmpPassword)  # TODO I don't think we should allow this
 
         cur.execute('INSERT INTO splitpot_events VALUES (?,?,?,?,?,?)',
                     (
@@ -185,10 +222,11 @@ def insertEvent(
     return eventID
 
 
-# update the participant table with a given event and list of
-# participants
-
 def updateParticipantTable(participants, eventID, status):
+    """
+    Update the participant table with a given event and list of participants.
+    """
+
     log.info('update participants table')
     with connection:
         cur = connection.cursor()
@@ -198,37 +236,51 @@ def updateParticipantTable(participants, eventID, status):
     return True
 
 
-# checks if an user already exists
-
 def userExists(email, includeGhosts=False):
-    log.info('check if email: ' + email + ' exists. isGhost?' + str(includeGhosts))
+    """
+    Check if a given user already exists.
+    """
+
+    log.info('check if email: ' + email + ' exists. isGhost?'
+             + str(includeGhosts))
     with connection:
         cur = connection.cursor()
-	if includeGhosts:
-	        cur.execute('SELECT count(*) FROM splitpot_users WHERE email = ?', [email.lower()])
-	else:
-		cur.execute('SELECT count(*) FROM splitpot_users WHERE email = ? AND registered == 0', [email.lower()])
+        if includeGhosts:
+            cur.execute('SELECT count(*) FROM splitpot_users WHERE email = ?'
+                        , [email.lower()])
+        else:
+            cur.execute('SELECT count(*) FROM splitpot_users WHERE email = ? AND registered == 0'
+                        , [email.lower()])
         exists = cur.fetchone()[0]
     return (False if exists == 0 else True)
 
+
 def registerUser(email):
-	if (not userExists(email, True)):
-		log.info('register user ' + email)
-		with connection:
-			activateKey = generateRandomChars(ACTIVATE_CODE_LEN)
-			cur = connection.cursor()
-			cur.execute('INSERT INTO splitpot_users VALUES (?, ?, 1, ?, ?)', (email.lower(), email, activateKey, activateKey))
-		return True
-	log.info('did not register ' + email + ' because the email is attached to another user')
-	return False
+    if not userExists(email, True):
+        log.info('register user ' + email)
+        with connection:
+            activateKey = generateRandomChars(ACTIVATE_CODE_LEN)
+            cur = connection.cursor()
+            cur.execute('INSERT INTO splitpot_users VALUES (?, ?, 1, ?, ?)'
+                        , (email.lower(), email, activateKey,
+                        activateKey))
+        return True
+    log.info('did not register ' + email
+             + ' because the email is attached to another user')
+    return False
 
-# register a new user
 
-def activateUser(email, name, password, force = False): #activate previously registered user. Force revokes register, if needed.
+def activateUser(  # activate previously registered user. Force revokes register, if needed.
+    email,
+    name,
+    password,
+    force=False,
+    ):
+
     log.info('activate user ' + email + ', force ' + str(force))
     if not userExists(email, True) and force:
-	registerUser(email)
-    if (not userExists(email)): #Only Ghost users can register, or they are new ghosts
+        registerUser(email)
+    if not userExists(email):  # Only Ghost users can register, or they are new ghosts
         with connection:
             salt = generateRandomChars(SALT_LENGTH)
             hashedPassword = hashPassword(salt, password)
@@ -239,16 +291,18 @@ def activateUser(email, name, password, force = False): #activate previously reg
 
         return True
     else:
-	if not userExists(email, True):
-        	print 'user is not invited'
-	else:
-		print 'user already exists' #TODO return this info as result
+        if not userExists(email, True):
+            print 'user is not invited'
+        else:
+            print 'user already exists'  # TODO return this info as result
         return False
 
 
-# return hashedPassword
-
 def getPassword(email, forGhost=False):
+    """
+    Return the hashed password of a given user.
+    """
+
     if userExists(email, forGhost):
         with connection:
             cur = connection.cursor()
@@ -261,9 +315,13 @@ def getPassword(email, forGhost=False):
                     + ", because user doesn't exist")
 
 
-# set the event status for a given user
-
 def setEventStatus(email, event, status):
+    """
+    Set the event status for a given user.
+    """
+
+    log.info('set event status of "' + email.lower() + '" with id "'
+             + str(event) + '" to "' + status + '"')
     with connection:
         cur = connection.cursor()
         cur.execute('SELECT COUNT(*) FROM splitpot_participants WHERE user = ? AND event = ?'
@@ -281,7 +339,9 @@ def isValidResetUrlKey(email, key, forGhost=False):
     """
     ~ for pwd reset (forgot pwd feature)
     """
-    if userExists(email, forGhost) and getResetUrlKey(email, forGhost)[:ACTIVATE_CODE_LEN] == key:
+
+    if userExists(email, forGhost) and getResetUrlKey(email,
+            forGhost)[:ACTIVATE_CODE_LEN] == key:
         return True
     else:
         return False
@@ -295,34 +355,89 @@ def getResetUrlKey(email, forGhost=False):
     if userExists(email, forGhost):
         return getPassword(email, forGhost)[:8]
 
+
 def buildTransactionTree():
-     """
+    """
      Takes all participation entries with status 'new' and puts them into the Transaction Graph (which is cleard before).
      Returns a list of tuples with all <eventId, userId> keys, that were taken.
      """
-     clearTransactionGraph()
-     with connection:
-         cur = connection.cursor()
-         cur.execute("select id, amount, owner, user, tmp.num_parts FROM splitpot_participants, splitpot_events, (SELECT event, count(event) as 'num_parts' FROM splitpot_participants group by event) tmp WHERE splitpot_participants.event = splitpot_events.id;")
-         data = cur.fetchall()
-         keys = []
-         for entry in data:
-           keys.append((entry[0], entry[3]))
-           insertEdge(TransactionEdge(entry[3], entry[2], entry[1] / (entry[4] + 1)))
-     return keys
- 
+
+    clearTransactionGraph()
+    with connection:
+        cur = connection.cursor()
+        cur.execute("select id, amount, owner, user, tmp.num_parts FROM splitpot_participants, splitpot_events, (SELECT event, count(event) as 'num_parts' FROM splitpot_participants group by event) tmp WHERE splitpot_participants.event = splitpot_events.id;"
+                    )
+        data = cur.fetchall()
+        keys = []
+        for entry in data:
+            keys.append((entry[0], entry[3]))
+            insertEdge(TransactionEdge(entry[3], entry[2], entry[1]
+                       / (entry[4] + 1)))
+    return keys
+
+
 def TransactionGraphWriteback(keys):
-     """
+    """
      Bulk update for participant table. Sets all tuples <eventId, userId> in the participants table to status = 'payday'
      """
-     update = ""
-     for k in keys:
-         update += " OR (event = " + keys[0] + " AND user = '" + keys[1] + "')"
-     if len(update) == 0:
-         app.log("empty transaction graph - no write back")
-         return
-     update = "UPDATE splitpot_participants SET status = 'payday' WHERE " + update[3:] + ";"
-     app.log("transactiongraph Writeback: " + update)
-     with connection:
-         cur = connection.curser()
-         cur.execute(update)
+
+    update = ''
+    for k in keys:
+        update += ' OR (event = ' + keys[0] + " AND user = '" + keys[1] \
+            + "')"
+    if len(update) == 0:
+        app.log('empty transaction graph - no write back')
+        return
+    update = \
+        "UPDATE splitpot_participants SET status = 'payday' WHERE " \
+        + update[3:] + ';'
+    app.log('transactiongraph Writeback: ' + update)
+    with connection:
+        cur = connection.curser()
+        cur.execute(update)
+
+
+def mergeUser(newUser, oldUser):
+    """
+    Merge to given users.
+    """
+
+    log.info('replace "' + oldUser.lower() + '" with "'
+             + newUser.lower() + '"')
+
+    with connection:
+        cur = connection.cursor()
+        if userExists(newUser) and userExists(oldUser):
+            log.info('replacing every "' + oldUser.lower() + '" with "'
+                     + newUser.lower() + ' in events.participants')
+            events = listInvitedEventsFor(oldUser)
+
+            for event in events:
+                oldParticipants = event.participants
+                newParticipants = \
+                    oldParticipants.replace(str(oldUser.lower()),
+                        str(newUser.lower()))
+
+                cur.execute('UPDATE splitpot_events SET participants = ? WHERE participants = ?'
+                            , [newParticipants, oldParticipants])
+
+            log.info('replacing every "' + oldUser.lower() + '" with "'
+                     + newUser.lower() + ' in participants table')
+            cur.execute('UPDATE splitpot_participants SET user = ? WHERE user = ?'
+                        , [newUser.lower(), oldUser.lower()])
+
+            log.info('replacing events where owner is "'
+                     + oldUser.lower() + '" with "' + newUser.lower()
+                     + '"')
+            cur.execute('UPDATE splitpot_events SET owner = ? WHERE owner = ?'
+                        , [newUser.lower(), oldUser.lower()])
+
+            log.info('deleting the user "' + oldUser.lower() + '"')
+            cur.execute('DELETE FROM splitpot_users WHERE email = ?',
+                        [oldUser.lower()])
+
+            return True
+
+    return False
+
+
