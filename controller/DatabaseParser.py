@@ -14,7 +14,6 @@ import json
 
 sys.path.append('utils/')
 from Encryption import *
-from TransactionGraph import *
 sys.path.append('model/')
 from Event import Event
 
@@ -287,34 +286,4 @@ def getResetUrlKey(email):
     if userExists(email):
         return getPassword(email)[:8]
 
-def buildTransactionTree():
-    """
-    Takes all participation entries with status 'new' and puts them into the Transaction Graph (which is cleard before).
-    Returns a list of tuples with all <eventId, userId> keys, that were taken.
-    """
-    clearTransactionGraph()
-    with connection:
-        cur = connection.cursor()
-        cur.execute("select id, amount, owner, user, tmp.num_parts FROM splitpot_participants, splitpot_events, (SELECT event, count(event) as 'num_parts' FROM splitpot_participants group by event) tmp WHERE splitpot_participants.event = splitpot_events.id;")
-        data = cur.fetchall()
-        keys = []
-        for entry in data:
-          keys.append((entry[0], entry[3]))
-          insertEdge(TransactionEdge(entry[3], entry[2], entry[1] / (entry[4] + 1)))
-    return keys
 
-def TransactionGraphWriteback(keys):
-    """
-    Bulk update for participant table. Sets all tuples <eventId, userId> in the participants table to status = 'payday'
-    """
-    update = ""
-    for k in keys:
-        update += " OR (event = " + keys[0] + " AND user = '" + keys[1] + "')"
-    if len(update) == 0:
-        app.log("empty transaction graph - no write back")
-        return
-    update = "UPDATE splitpot_participants SET status = 'payday' WHERE " + update[3:] + ";"
-    app.log("transactiongraph Writeback: " + update)
-    with connection:
-        cur = connection.curser()
-        cur.execute(update)
