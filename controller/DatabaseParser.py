@@ -116,7 +116,7 @@ def listHostingEventsFor(user):
                 owner=str(user),
                 date=curEvent[1],
                 amount=curEvent[2],
-                participants=json.loads(curEvent[3]),
+                participants=curEvent[3],
                 comment=curEvent[4],
                 ))
     return events
