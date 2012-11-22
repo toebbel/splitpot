@@ -85,9 +85,9 @@ class TestDatabaseParser(unittest.TestCase):
     self.assertEqual(str(getEvent(id)), str(Event(id=id, owner="userA@0xabc.de", date="10.4.2013", amount=101.12, participants=['tobstu@gmail.com'], comment="comment")))
 
   def testBuildTransactionTree(self):
-    registerUser("userA@0xabc.de", "A", "123456")
-    registerUser("userB@0xabc.de", "B", "123456")
-    registerUser("userC@0xabc.de", "C", "123456")
+    registerUser("userA@0xabc.de")
+    registerUser("userB@0xabc.de")
+    registerUser("userC@0xabc.de")
     insertEvent("userA@0xabc.de", "1.1.2010", 12, ["userB@0xabc.de", "userC@0xabc.de"], "event1")
     insertEvent("userA@0xabc.de", "1.1.2010", 2, ["userC@0xabc.de"], "event2")
     insertEvent("userB@0xabc.de", "1.1.2010", 3.3, ["userA@0xabc.de", "userC@0xabc.de"], "event3")
@@ -114,7 +114,6 @@ class TestDatabaseParser(unittest.TestCase):
     self.assertEqual(graphNodes["userA@0xabc.de"].incoming["userB@0xabc.de"], TransactionEdge("userB@0xabc.de", "userA@0xabc.de", 4))
     self.assertEqual(graphNodes["userB@0xabc.de"].outgoing["userA@0xabc.de"], TransactionEdge("userB@0xabc.de", "userA@0xabc.de", 4))
 
-  def test
 
 if __name__ == '__main__':
   unittest.main()
