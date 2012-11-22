@@ -209,7 +209,7 @@ def insertEvent(
             owner,
             date,
             amount,
-            json.dumps(participants, separators=','),
+            json.dumps(participants),
             comment,
             ))
 
@@ -340,7 +340,7 @@ def mergeUser(newUser, oldUser):
 
     with connection:
         cur = connection.cursor()
-        if userExists(newUser):
+        if (userExists(newUser) and userExists(oldUser)):
             log.info('replacing every "' + oldUser.lower() + '" with "'
                      + newUser.lower() + ' in events.participants')
             events = listInvitedEventsFor(oldUser)
@@ -369,7 +369,7 @@ def mergeUser(newUser, oldUser):
             cur.execute('DELETE FROM splitpot_users WHERE email = ?',
                         [oldUser.lower()])
 
-        return True
+            return True
 
     return False
 
