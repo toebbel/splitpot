@@ -1,0 +1,35 @@
+PRAGMA foreign_keys=OFF;
+BEGIN TRANSACTION;
+CREATE TABLE "splitpot_events" (
+"ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+"owner" TEXT NOT NULL,
+"date" TEXT NOT NULL,
+"amount" INTEGER NOT NULL,
+"participants" TEXT,
+"comment" TEXT
+);
+INSERT INTO "splitpot_events" VALUES(53,'awesome@0xabc.de','2012-11-17',123.32,'["tobstu@0xabc.de"]','test');
+INSERT INTO "splitpot_events" VALUES(54,'awesome@0xabc.de','2012-11-17',321,'["martin@0xabc.de"]','test2');
+INSERT INTO "splitpot_events" VALUES(55,'awesome@0xabc.de','2012-11-17',7891,'["martin@0xabc.de", "tobstu@0xabc.de"]','blub');
+CREATE TABLE "splitpot_participants" (
+"user" TEXT REFERENCES "splitpot_users"("email") NOT NULL,
+"event" INTEGER REFERENCES "splitpot_participants"("ID") NOT NULL,
+"status" TEXT NOT NULL
+);
+INSERT INTO "splitpot_participants" VALUES('tobstu@0xabc.de',53,'new');
+INSERT INTO "splitpot_participants" VALUES('martin@0xabc.de',54,'new');
+INSERT INTO "splitpot_participants" VALUES('martin@0xabc.de',55,'new');
+INSERT INTO "splitpot_participants" VALUES('tobstu@0xabc.de',55,'new');
+CREATE TABLE "splitpot_users" (
+"email" TEXT PRIMARY KEY NOT NULL UNIQUE,
+"name" TEXT NOT NULL,
+"registered" INTEGER NOT NULL,
+"salt" TEXT NOT NULL,
+"password" TEXT NOT NULL UNIQUE
+);
+INSERT INTO "splitpot_users" VALUES('awesome@0xabc.de','Mr. Awesome',0,'tzPHQT2FIWJp3K9JrCtz5OLDIijfeQ','aa21d7ca5af3b12e26233b9ee3490abd1c99040629e2b28dedc9d8091ea6878d');
+INSERT INTO "splitpot_users" VALUES('tobstu@0xabc.de','tobstu@0xabc.de',1,'oAjnxBPD','oAjnxBPD');
+INSERT INTO "splitpot_users" VALUES('martin@0xabc.de','martin@0xabc.de',1,'B7YpMo2w','B7YpMo2w');
+DELETE FROM sqlite_sequence;
+INSERT INTO "sqlite_sequence" VALUES('splitpot_events',55);
+COMMIT;

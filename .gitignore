@@ -1,5 +1,7 @@
+
 #gEdit
 *~
+
 # system
 .DS_Store
 .swp
@@ -8,6 +10,7 @@
 
 # app specific
 log/app.log
+resources/splitpotDB_DEV.sqlite
 
 # Packages
 *.egg
