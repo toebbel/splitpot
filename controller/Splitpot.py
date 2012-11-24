@@ -23,17 +23,6 @@ log = logging.getLogger('appLog')
 
 class splitpot_controller(object):
 
-  # TODO make admin-only
-
-    @cherrypy.expose
-    def inspectSession(self):
-        """
-    Pulls all information from utils/session and pushes them naked into the response
-    """
-
-        log.info('Session:' + cherrypy.session.get('currentUser'))  # TODO use session helper
-        return self.index()
-
     @cherrypy.expose
     @require()
     def index(self):
