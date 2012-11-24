@@ -54,7 +54,7 @@ class splitpot_controller(object):
     """
 
         log.info('deliver add form')
-        return lookup.get_template('add.html').render()
+        return lookup.get_template('add.html').render(feedback = "")
 
     @cherrypy.expose
     def about(self):
@@ -89,20 +89,20 @@ class splitpot_controller(object):
         othersList = [x for x in othersList if x not in duplicates
                       and not duplicates_add(x)]
 
+        tmpl = lookup.get_template('add.html')
+        if not amountRegex.match(amount):
+            log.info("mal formed amount")
+            return tmpl.render(feedback = "Amount is mal formed. Please correct & try again")
+
         for other in othersList:
-            if not emailRegex.match(others):
-                log.info('Email: ' + str(others) + ' is malformed.')
-
-            # TODO: template.render error for wrong emails
-
-            log.info('deliver add form')
-            return lookup.get_template('add.html').render()
+            if not emailRegex.match(other):
+                log.info('Email: ' + str(other) + ' is malformed.')
+                return tmpl.render(feedback = "Email " + other + " is mal formed. Please correct")        
 
         if not entryCommentRegex.match(comment):
             log.info('Comment is malformed.')
-
-        # TODO: template.render error for malformed comments
-
+            return tmpl.render(feedback = "Comment is malformed. Plase correct & try again")
+        
         for curParticipant in othersList:
             if not userExists(curParticipant, True):
                 tmpPassword = generateRandomChars(DEFAULT_PWD_LENGTH)

@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+
 import re  # gex
 
 entryCommentRegex = \
@@ -10,3 +11,4 @@ emailRegex = \
                , re.IGNORECASE)
 eventIdRegex = re.compile("\A[0-9]*\Z")
 activatenCode = re.compile("\A[0-9a-zA-Z]*\Z")
+amountRegex = re.compile("\A[0-9]+(\.[0-9]{2})?\Z")
