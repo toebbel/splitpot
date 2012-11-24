@@ -133,7 +133,13 @@ def mergeRequest(newEmail, oldEmail, key):
 def participantEmail(userId, event):
     assert isinstance(event, Event)
     num_part = len(event.participants) + 1
-    text = lookup.get_template('add_event.email').render(owner = event.owner, total = event.amount, num_participants = num_part, amount = event.amount / num_part)
+    text = lookup.get_template('add_event_participant.email').render(owner = event.owner, total = event.amount, num_participants = num_part, amount = event.amount / num_part)
     if not db.userExists(userId, False):
         text += lookup.get_template('ghost_user_link.email').render(activateUrl = RUNNING_URL + 'user/register?key=' + db.getResetUrlKey(userId, True))
     SettingsWrapper(userId, 'New Splitpot Entry', text)
+
+def ownerEmail(userId, event):
+    assert isinstance(event, Event)
+    num_part = len(event.participants) + 1
+    body = lookup.get_template('add_event_owner.email').render(total = event.amount, num_participants = num_part, amount = event.amount / num_part)
+    SettingsWrapper(userId, 'New Splitpot Entry', body)

@@ -118,6 +118,8 @@ class splitpot_controller(object):
 
         for participant in othersList:
             Email.participantEmail(participant, event)
+        Email.ownerEmail(getCurrentUserName(), event)
+
         return self.index()
 
     @cherrypy.expose
