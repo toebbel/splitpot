@@ -5,6 +5,14 @@ use 'python App.py' from root dir, to start the server wit the default configura
 
 # Installation
 ... coming soon
+requires: 
+* sqlite3
+* cherrypy
+* mako
+
+To fill/reset the database with test data:
+* resource/reset_database.sh
+* Database contains some data. Use login awesome@0xabc.de : awesome
 
 # Unittesting
 * start all tests via 'python -m unittest discover' (in root dir)
