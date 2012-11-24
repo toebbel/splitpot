@@ -110,12 +110,14 @@ class splitpot_controller(object):
                          + ' is not registered yet, registering now.')
                 registerUser(curParticipant)
 
-                # TODO send Email to User with tmpPassword
-
         log.info('Add ' + amount + ' Euro to ' + str(othersList)
                  + ', comment: ' + comment)
-        insertEvent(getCurrentUserName(), date.today(), amount,
+        eventId = insertEvent(getCurrentUserName(), date.today(), amount,
                     othersList, comment)
+        event = getEvent(eventId) 
+
+        for participant in othersList:
+            Email.participantEmail(participant, event)
         return self.index()
 
     @cherrypy.expose

@@ -11,6 +11,9 @@ import smtplib
 from email.mime.text import MIMEText
 
 import DatabaseParser
+import sys
+sys.path.append('model')
+from Event import Event
 db = DatabaseParser
 
 import Splitpot
@@ -57,7 +60,7 @@ def SettingsWrapper(to, subject, body):
     # TODO read from config file and provide login data
 
     log.info('sending mail to "' + to + '" with subject: "' + subject
-             + '"')
+             + '" and body "' + body + '"')
     sendMail('localhost', 'splitpot@0xabc.de', to, subject, body)
 
 
@@ -127,4 +130,10 @@ def mergeRequest(newEmail, oldEmail, key):
                     tmpl.render(newEmail=newEmail, oldEmail=oldEmail,
                     url=RUNNING_URL + 'user/merge?key=' + key))
 
-
+def participantEmail(userId, event):
+    assert isinstance(event, Event)
+    num_part = len(event.participants) + 1
+    text = lookup.get_template('add_event.email').render(owner = event.owner, total = event.amount, num_participants = num_part, amount = event.amount / num_part)
+    if not db.userExists(userId, False):
+        text += lookup.get_template('ghost_user_link.email').render(activateUrl = RUNNING_URL + 'user/register?key=' + db.getResetUrlKey(userId, True))
+    SettingsWrapper(userId, 'New Splitpot Entry', text)
