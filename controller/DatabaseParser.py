@@ -22,6 +22,7 @@ DB_FILE = 'resource/splitpotDB_DEV.sqlite'
 SALT_LENGTH = 30
 DEFAULT_PWD_LENGTH = 6
 ACTIVATE_CODE_LEN = 8
+MERGE_KEY_LEN = 16
 
 log = logging.getLogger('appLog')
 
@@ -353,8 +354,50 @@ def getResetUrlKey(email, forGhost=False):
     """
 
     if userExists(email, forGhost):
-        return getPassword(email, forGhost)[:8]
+        return getPassword(email, forGhost)[:ACTIVATE_CODE_LEN]
 
+def getMergeUrlKey(newMail, oldMail):
+    """
+    Generate a key for merge of two accounts.
+    """
+
+    log.info('generate key for mergeing user "' + newMail + '" and "' + oldMail +'"')
+    key = ''
+    if (userExists(newMail) and userExists(oldMail, True)):
+        key += getPassword(newMail)[:MERGE_KEY_LEN/2]
+        key += getPassword(oldMail, True)[:MERGE_KEY_LEN/2]
+
+    return key
+
+def isValidMergeUrlKey(key):
+    """
+    Check if a given key is a valid key to merge two accounts.
+    """
+
+    log.info('checking if merging key is correct')
+
+    if (key != None and len(key) == MERGE_KEY_LEN):
+        newMail = getUserFromPassword(key[:MERGE_KEY_LEN/2])
+        oldMail = getUserFromPassword(key[MERGE_KEY_LEN/2:])
+
+        if (getMergeUrlKey(newMail, oldMail)[:MERGE_KEY_LEN] == key):
+            return True
+    return False
+
+
+def getUserFromPassword(pwd):
+    """
+    Return the user to which the pwd is part of the whole password.
+    """
+
+    log.info('getting user with following string in password "' + str(pwd) + '"')
+
+    with connection:
+        cur = connection.cursor()
+        cur.execute('SELECT email FROM splitpot_users WHERE password LIKE ?', [pwd+'%'])
+        user = cur.fetchone()
+
+        return user[0] if user else None
 
 def buildTransactionTree():
     """
