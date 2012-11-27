@@ -54,7 +54,7 @@ class splitpot_controller(object):
     """
 
         log.info('deliver add form')
-        return lookup.get_template('add.html').render(feedback = "")
+        return lookup.get_template('add.html').render(feedback='')
 
     @cherrypy.expose
     def about(self):
@@ -91,18 +91,21 @@ class splitpot_controller(object):
 
         tmpl = lookup.get_template('add.html')
         if not amountRegex.match(amount):
-            log.info("mal formed amount")
-            return tmpl.render(feedback = "Amount is mal formed. Please correct & try again")
+            log.info('mal formed amount')
+            return tmpl.render(feedback='Amount is mal formed. Please correct & try again'
+                               )
 
         for other in othersList:
             if not emailRegex.match(other):
                 log.info('Email: ' + str(other) + ' is malformed.')
-                return tmpl.render(feedback = "Email " + other + " is mal formed. Please correct")        
+                return tmpl.render(feedback='Email ' + other
+                                   + ' is mal formed. Please correct')
 
         if not entryCommentRegex.match(comment):
             log.info('Comment is malformed.')
-            return tmpl.render(feedback = "Comment is malformed. Plase correct & try again")
-        
+            return tmpl.render(feedback='Comment is malformed. Plase correct & try again'
+                               )
+
         for curParticipant in othersList:
             if not userExists(curParticipant, True):
                 tmpPassword = generateRandomChars(DEFAULT_PWD_LENGTH)
@@ -112,9 +115,9 @@ class splitpot_controller(object):
 
         log.info('Add ' + amount + ' Euro to ' + str(othersList)
                  + ', comment: ' + comment)
-        eventId = insertEvent(getCurrentUserName(), date.today(), amount,
-                    othersList, comment)
-        event = getEvent(eventId) 
+        eventId = insertEvent(getCurrentUserName(), date.today(),
+                              amount, othersList, comment)
+        event = getEvent(eventId)
 
         for participant in othersList:
             Email.participantEmail(participant, event)
@@ -184,49 +187,67 @@ class splitpot_controller(object):
 
     @cherrypy.expose
     @require()
-    def doMerge(self, email):
+    def doMerge(self, email=None, key=None):
         """
     Merge two accounts together. Will send a confirmation mail to the to-be-merged email.
     """
 
-        log.info('merge "' + email.lower() + '" with "'
-                 + getCurrentUserName() + '"')
         tmpl = lookup.get_template('merge.html')
 
         errors = ''
-        if email is None:
-            errors += '<li>You have to provide an email address</li>'
-        if emailRegex.match(email) == None:
-            errors += '<li>Your email is invalid</li>'
-        elif not userExists(email):
-            errors += '<li>' + str(email.lower()) \
-                + ' doesn\'t exist</li>'
-        if userExists(getCurrentUserName()):
-            events = listAllEventsFor(getCurrentUserName())
-            for event in events:
-                if str(event.participants).find(email) != -1:
-                    log.info('found instance where "' + email.lower()
-                             + '" and "' + getCurrentUserName().lower()
-                             + '" are listed as hoster and participant. Can\'t merge'
-                             )
-                    errors = \
-                        '<li>Can\'t merge these two accounts, because there are events, where host and participant are the same person.</li>'
-                if str(event.owner).find(email) != -1:
-                    log.info('found instance where owner and to-be-merged user are the same'
-                             )
-                    errors = '<li>Can\'t merge two same accounts.</li>'
-        if not errors == '':
-            return tmpl.render(feedback='<ul>' + errors + '</ul>',
-                               newUser=getCurrentUserName())
+        if key is not None and isValidMergeUrlKey(key):
+            newUser = getPassword(newMail)[:MERGE_KEY_LEN / 2]
+            oldUser = getPassword(oldMail, True)[:MERGE_KEY_LEN / 2]
+
+            log.info('valid merging key, merging "' + newUser
+                     + '" and "' + oldUser + '" now')
+
+            if mergeUser(newUser, oldUser):
+                return self.index()
+            else:
+                log.warning('couldn\'t merge "' + newUser + '" and "'
+                            + oldUser + '" for some unexpected reason')
+                return tmpl.render(feedback='Oh no! Something went wrong. Please try again later.'
+                                   , newUser=getCurrentUserName())
         else:
-            if mergeUser(getCurrentUserName(), email):
-                Email.mergeRequest(getCurrentUserName(), email, '')  # TODO get merge confirmation key from db
+
+            log.info('merge "' + email.lower() + '" with "'
+                     + getCurrentUserName() + '"')
+            if email is None:
+                errors += \
+                    '<li>You have to provide an email address</li>'
+            if emailRegex.match(email) == None:
+                errors += '<li>Your email is invalid</li>'
+            elif not userExists(email, True):
+                errors += '<li>' + str(email.lower()) \
+                    + ' doesn\'t exist</li>'
+            if userExists(getCurrentUserName()):
+                events = listAllEventsFor(getCurrentUserName())
+                for event in events:
+                    if str(event.participants).find(email) != -1:
+                        log.info('found instance where "'
+                                 + email.lower() + '" and "'
+                                 + getCurrentUserName().lower()
+                                 + '" are listed as hoster and participant. Can\'t merge'
+                                 )
+                        errors = \
+                            '<li>Can\'t merge these two accounts, because there are events, where host and participant are the same person.</li>'
+                    if str(event.owner).find(email) != -1:
+                        log.info('found instance where owner and to-be-merged user are the same'
+                                 )
+                        errors = \
+                            '<li>Can\'t merge two same accounts.</li>'
+            if not errors == '':
+                return tmpl.render(feedback='<ul>' + errors + '</ul>',
+                                   newUser=getCurrentUserName())
+            else:
+                mergeKey = getMergeUrlKey(getCurrentUserName(), email)
+                Email.mergeRequest(getCurrentUserName(), email, (),
+                                   mergeKey)
+
                 return tmpl.render(feedback='An email has be sent to "'
                                    + email.lower()
                                    + '" for further information',
                                    newUser=getCurrentUserName())
-            else:
-                return tmpl.render(feedback='Oh no! Something went wrong. Please try again later.'
-                                   , newUser=getCurrentUserName())
 
 
