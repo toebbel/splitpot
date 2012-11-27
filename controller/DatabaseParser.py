@@ -356,18 +356,21 @@ def getResetUrlKey(email, forGhost=False):
     if userExists(email, forGhost):
         return getPassword(email, forGhost)[:ACTIVATE_CODE_LEN]
 
+
 def getMergeUrlKey(newMail, oldMail):
     """
     Generate a key for merge of two accounts.
     """
 
-    log.info('generate key for mergeing user "' + newMail + '" and "' + oldMail +'"')
+    log.info('generate key for mergeing user "' + newMail + '" and "'
+             + oldMail + '"')
     key = ''
-    if (userExists(newMail) and userExists(oldMail, True)):
-        key += getPassword(newMail)[:MERGE_KEY_LEN/2]
-        key += getPassword(oldMail, True)[:MERGE_KEY_LEN/2]
+    if userExists(newMail) and userExists(oldMail, True):
+        key += getPassword(newMail)[:MERGE_KEY_LEN / 2]
+        key += getPassword(oldMail, True)[:MERGE_KEY_LEN / 2]
 
     return key
+
 
 def isValidMergeUrlKey(key):
     """
@@ -376,11 +379,11 @@ def isValidMergeUrlKey(key):
 
     log.info('checking if merging key is correct')
 
-    if (key != None and len(key) == MERGE_KEY_LEN):
-        newMail = getUserFromPassword(key[:MERGE_KEY_LEN/2])
-        oldMail = getUserFromPassword(key[MERGE_KEY_LEN/2:])
+    if key != None and len(key) == MERGE_KEY_LEN:
+        newMail = getUserFromPassword(key[:MERGE_KEY_LEN / 2])
+        oldMail = getUserFromPassword(key[MERGE_KEY_LEN / 2:])
 
-        if (getMergeUrlKey(newMail, oldMail)[:MERGE_KEY_LEN] == key):
+        if getMergeUrlKey(newMail, oldMail)[:MERGE_KEY_LEN] == key:
             return True
     return False
 
@@ -390,14 +393,61 @@ def getUserFromPassword(pwd):
     Return the user to which the pwd is part of the whole password.
     """
 
-    log.info('getting user with following string in password "' + str(pwd) + '"')
+    log.info('getting user with following string in password "'
+             + str(pwd) + '"')
 
     with connection:
         cur = connection.cursor()
-        cur.execute('SELECT email FROM splitpot_users WHERE password LIKE ?', [pwd+'%'])
+        cur.execute('SELECT email FROM splitpot_users WHERE password LIKE ?'
+                    , [pwd + '%'])
         user = cur.fetchone()
 
-        return user[0] if user else None
+        return (user[0] if user else None)
+
+
+def mergeUser(newUser, oldUser):
+    """
+    Merge two given users.
+    """
+
+    log.info('replace "' + oldUser.lower() + '" with "'
+             + newUser.lower() + '"')
+
+    with connection:
+        cur = connection.cursor()
+        if userExists(newUser) and userExists(oldUser):
+            log.info('replacing every "' + oldUser.lower() + '" with "'
+                     + newUser.lower() + ' in events.participants')
+            events = listInvitedEventsFor(oldUser)
+
+            for event in events:
+                oldParticipants = event.participants
+                newParticipants = \
+                    oldParticipants.replace(str(oldUser.lower()),
+                        str(newUser.lower()))
+
+                cur.execute('UPDATE splitpot_events SET participants = ? WHERE participants = ?'
+                            , [newParticipants, oldParticipants])
+
+            log.info('replacing every "' + oldUser.lower() + '" with "'
+                     + newUser.lower() + ' in participants table')
+            cur.execute('UPDATE splitpot_participants SET user = ? WHERE user = ?'
+                        , [newUser.lower(), oldUser.lower()])
+
+            log.info('replacing events where owner is "'
+                     + oldUser.lower() + '" with "' + newUser.lower()
+                     + '"')
+            cur.execute('UPDATE splitpot_events SET owner = ? WHERE owner = ?'
+                        , [newUser.lower(), oldUser.lower()])
+
+            log.info('deleting the user "' + oldUser.lower() + '"')
+            cur.execute('DELETE FROM splitpot_users WHERE email = ?',
+                        [oldUser.lower()])
+
+            return True
+
+    return False
+
 
 def buildTransactionTree():
     """
@@ -438,49 +488,5 @@ def TransactionGraphWriteback(keys):
     with connection:
         cur = connection.curser()
         cur.execute(update)
-
-
-def mergeUser(newUser, oldUser):
-    """
-    Merge to given users.
-    """
-
-    log.info('replace "' + oldUser.lower() + '" with "'
-             + newUser.lower() + '"')
-
-    with connection:
-        cur = connection.cursor()
-        if userExists(newUser) and userExists(oldUser):
-            log.info('replacing every "' + oldUser.lower() + '" with "'
-                     + newUser.lower() + ' in events.participants')
-            events = listInvitedEventsFor(oldUser)
-
-            for event in events:
-                oldParticipants = event.participants
-                newParticipants = \
-                    oldParticipants.replace(str(oldUser.lower()),
-                        str(newUser.lower()))
-
-                cur.execute('UPDATE splitpot_events SET participants = ? WHERE participants = ?'
-                            , [newParticipants, oldParticipants])
-
-            log.info('replacing every "' + oldUser.lower() + '" with "'
-                     + newUser.lower() + ' in participants table')
-            cur.execute('UPDATE splitpot_participants SET user = ? WHERE user = ?'
-                        , [newUser.lower(), oldUser.lower()])
-
-            log.info('replacing events where owner is "'
-                     + oldUser.lower() + '" with "' + newUser.lower()
-                     + '"')
-            cur.execute('UPDATE splitpot_events SET owner = ? WHERE owner = ?'
-                        , [newUser.lower(), oldUser.lower()])
-
-            log.info('deleting the user "' + oldUser.lower() + '"')
-            cur.execute('DELETE FROM splitpot_users WHERE email = ?',
-                        [oldUser.lower()])
-
-            return True
-
-    return False
 
 
