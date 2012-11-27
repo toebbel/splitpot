@@ -128,18 +128,30 @@ def mergeRequest(newEmail, oldEmail, key):
     tmpl = lookup.get_template('merge_request.email')
     SettingsWrapper(oldEmail, 'Account Merge Request',
                     tmpl.render(newEmail=newEmail, oldEmail=oldEmail,
-                    url=RUNNING_URL + 'user/merge?key=' + key))
+                    url=RUNNING_URL + 'user/doMerge?key=' + key))
+
 
 def participantEmail(userId, event):
     assert isinstance(event, Event)
     num_part = len(event.participants) + 1
-    text = lookup.get_template('add_event_participant.email').render(owner = event.owner, total = event.amount, num_participants = num_part, amount = event.amount / num_part)
+    text = lookup.get_template('add_event_participant.email'
+                               ).render(owner=event.owner,
+            total=event.amount, num_participants=num_part,
+            amount=event.amount / num_part)
     if not db.userExists(userId, False):
-        text += lookup.get_template('ghost_user_link.email').render(activateUrl = RUNNING_URL + 'user/register?key=' + db.getResetUrlKey(userId, True))
+        text += lookup.get_template('ghost_user_link.email'
+                                    ).render(activateUrl=RUNNING_URL
+                + 'user/register?key=' + db.getResetUrlKey(userId,
+                True))
     SettingsWrapper(userId, 'New Splitpot Entry', text)
+
 
 def ownerEmail(userId, event):
     assert isinstance(event, Event)
     num_part = len(event.participants) + 1
-    body = lookup.get_template('add_event_owner.email').render(total = event.amount, num_participants = num_part, amount = event.amount / num_part)
+    body = lookup.get_template('add_event_owner.email'
+                               ).render(total=event.amount,
+            num_participants=num_part, amount=event.amount / num_part)
     SettingsWrapper(userId, 'New Splitpot Entry', body)
+
+
