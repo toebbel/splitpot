@@ -1,0 +1,11 @@
+## -*- coding: utf-8 -*-
+<%inherit file="base.html" />
+
+Which e-mail-addresses would you like to add as an alias (separate several aliases with a comma)?<br />
+If the e-mail is already registered (activated or not, doesn't matter), you can also merge those e-mails here: <a href="../merge">Merge E-Mails</a><br /> 
+${feedback}<br />
+
+<form name="alias" action="doAddAlias" method="post">
+    Aliases: <input type="text" name="alias" /><br />
+    <input type="submit" value="submit">
+</form>
