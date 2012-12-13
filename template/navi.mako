@@ -8,7 +8,7 @@
       <span class="icon-bar"></span>
       <span class="icon-bar"></span>
       </a>
-      <a class="brand" href="#">Splitpot</a>
+      <a class="brand" href="${cherrypy.url('/')}">Splitpot</a>
       <div class="nav-collapse collapse">
         <ul class="nav">
         % if getCurrentUserName() != '':
