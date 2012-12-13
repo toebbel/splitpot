@@ -451,9 +451,9 @@ def mergeUser(newUser, oldUser):
 
 def buildTransactionTree():
     """
-     Takes all participation entries with status 'new' and puts them into the Transaction Graph (which is cleard before).
-     Returns a list of tuples with all <eventId, userId> keys, that were taken.
-     """
+    Takes all participation entries with status 'new' and puts them into the Transaction Graph (which is cleard before).
+    Returns a list of tuples with all <eventId, userId> keys, that were taken.
+    """
 
     clearTransactionGraph()
     with connection:
@@ -471,8 +471,8 @@ def buildTransactionTree():
 
 def TransactionGraphWriteback(keys):
     """
-     Bulk update for participant table. Sets all tuples <eventId, userId> in the participants table to status = 'payday'
-     """
+    Bulk update for participant table. Sets all tuples <eventId, userId> in the participants table to status = 'payday'
+    """
 
     update = ''
     for k in keys:
@@ -489,4 +489,15 @@ def TransactionGraphWriteback(keys):
         cur = connection.curser()
         cur.execute(update)
 
-
+def isUserInEvent(email, event):
+    """
+    Check is a given user is in a given event.
+    """
+    log.info('check if "' + email.lower() + '" is in event: "' + str(event) + '"')
+    with connection:
+        if (userExists(email) and getEvent(event) != None):
+            events = listAllEventsFor(email)
+            for curEvent in events:
+                if str(curEvent.id) == str(event):
+                    return True
+            return False

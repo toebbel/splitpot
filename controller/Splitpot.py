@@ -27,8 +27,8 @@ class splitpot_controller(object):
     @require()
     def index(self):
         """
-    [users] Returns the overview of the accounting of the current user. Contains debts and link to overview as well as creation of new events.
-    """
+        [users] Returns the overview of the accounting of the current user. Contains debts and link to overview as well as creation of new events.
+        """
 
         log.info('deliver index')
         tmpl = lookup.get_template('index.html')
@@ -39,19 +39,25 @@ class splitpot_controller(object):
     @cherrypy.expose
     @require()
     def event(self, id):
+        """
+        Return a detail view of a given event, if the user requesting the event was a hoster or a participant.
+        """
+        log.info('deliver event page')
         tmpl = lookup.get_template('event.html')
         if not eventIdRegex.match(id):
             return self.index()
+        elif getEvent(id) == None:
+            return tmpl.render(event=None)
+        elif not isUserInEvent(getCurrentUserName(), id):
+            return tmpl.render(event='denied')
         return tmpl.render(event=getEvent(id))
-
-                      # gives the form for entering a new event
 
     @cherrypy.expose
     @require()
     def add(self):
         """
-    [users] Delivers the "Add-Event form"
-    """
+        [users] Delivers the "Add-Event form"
+        """
 
         log.info('deliver add form')
         return lookup.get_template('add.html').render(feedback='')
@@ -59,8 +65,8 @@ class splitpot_controller(object):
     @cherrypy.expose
     def about(self):
         """
-    [users] Delivers a static page, which is the welcome screen for users, that are not logged in
-    """
+        [users] Delivers a static page, which is the welcome screen for users, that are not logged in
+        """
 
         log.info('deliver about page')
         return lookup.get_template('about.html').render()
