@@ -262,4 +262,14 @@ class splitpot_controller(object):
                                    + '" for further information',
                                    newUser=getCurrentUserName())
 
+    @cherrypy.expose
+    @require()
+    def alias(self):
+        return lookup.get_template('alias.html').render(feedback='')
+
+    @cherrypy.expose
+    @require()
+    def doAddAlias(self, alias=None):
+        return True
+
 
