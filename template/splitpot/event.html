@@ -2,10 +2,13 @@
 <%inherit file="base.html" />
 % if event is None:
   <h2>Event</h2>
-    <p>Sorry - coul not find this event :(</p>
+    <p>Sorry - could not find this event :(</p>
+% elif event == 'denied':
+  <h2>Permission denied</h2>
+    <p>You are not allowed to view this event</p>
 % else:
-  <h2>Meetup from ${event.date} - ${event.amount}€</h2>
-    <p> Event hosted by ${event.owner}</p>
+  <h2>Meetup from ${event.date} | ${event.amount}€</h2>
+    <p>Event hosted by ${event.owner}</p>
     <p>${event.comment}</p>
     <p>Attendants: ${reduce(lambda list, current : '<li>' + resolveNick(current) + '</li>' + list, event.participants, '')}</p>
 % endif

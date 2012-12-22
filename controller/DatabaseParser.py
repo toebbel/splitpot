@@ -22,6 +22,7 @@ DB_FILE = 'resource/splitpotDB_DEV.sqlite'
 SALT_LENGTH = 30
 DEFAULT_PWD_LENGTH = 6
 ACTIVATE_CODE_LEN = 8
+MERGE_KEY_LEN = 16
 
 log = logging.getLogger('appLog')
 
@@ -353,53 +354,60 @@ def getResetUrlKey(email, forGhost=False):
     """
 
     if userExists(email, forGhost):
-        return getPassword(email, forGhost)[:8]
+        return getPassword(email, forGhost)[:ACTIVATE_CODE_LEN]
 
 
-def buildTransactionTree():
+def getMergeUrlKey(newMail, oldMail):
     """
-     Takes all participation entries with status 'new' and puts them into the Transaction Graph (which is cleard before).
-     Returns a list of tuples with all <eventId, userId> keys, that were taken.
-     """
+    Generate a key for merge of two accounts.
+    """
 
-    clearTransactionGraph()
+    log.info('generate key for mergeing user "' + newMail + '" and "'
+             + oldMail + '"')
+    key = ''
+    if userExists(newMail) and userExists(oldMail, True):
+        key += getPassword(newMail)[:MERGE_KEY_LEN / 2]
+        key += getPassword(oldMail, True)[:MERGE_KEY_LEN / 2]
+
+    return key
+
+
+def isValidMergeUrlKey(key):
+    """
+    Check if a given key is a valid key to merge two accounts.
+    """
+
+    log.info('checking if merging key is correct')
+
+    if key != None and len(key) == MERGE_KEY_LEN:
+        newMail = getUserFromPassword(key[:MERGE_KEY_LEN / 2])
+        oldMail = getUserFromPassword(key[MERGE_KEY_LEN / 2:])
+
+        if getMergeUrlKey(newMail, oldMail)[:MERGE_KEY_LEN] == key:
+            return True
+    return False
+
+
+def getUserFromPassword(pwd):
+    """
+    Return the user to which the pwd is part of the whole password.
+    """
+
+    log.info('getting user with following string in password "'
+             + str(pwd) + '"')
+
     with connection:
         cur = connection.cursor()
-        cur.execute("select id, amount, owner, user, tmp.num_parts FROM splitpot_participants, splitpot_events, (SELECT event, count(event) as 'num_parts' FROM splitpot_participants group by event) tmp WHERE splitpot_participants.event = splitpot_events.id;"
-                    )
-        data = cur.fetchall()
-        keys = []
-        for entry in data:
-            keys.append((entry[0], entry[3]))
-            insertEdge(TransactionEdge(entry[3], entry[2], entry[1]
-                       / (entry[4] + 1)))
-    return keys
+        cur.execute('SELECT email FROM splitpot_users WHERE password LIKE ?'
+                    , [pwd + '%'])
+        user = cur.fetchone()
 
-
-def TransactionGraphWriteback(keys):
-    """
-     Bulk update for participant table. Sets all tuples <eventId, userId> in the participants table to status = 'payday'
-     """
-
-    update = ''
-    for k in keys:
-        update += ' OR (event = ' + keys[0] + " AND user = '" + keys[1] \
-            + "')"
-    if len(update) == 0:
-        app.log('empty transaction graph - no write back')
-        return
-    update = \
-        "UPDATE splitpot_participants SET status = 'payday' WHERE " \
-        + update[3:] + ';'
-    app.log('transactiongraph Writeback: ' + update)
-    with connection:
-        cur = connection.curser()
-        cur.execute(update)
+        return (user[0] if user else None)
 
 
 def mergeUser(newUser, oldUser):
     """
-    Merge to given users.
+    Merge two given users.
     """
 
     log.info('replace "' + oldUser.lower() + '" with "'
@@ -454,3 +462,55 @@ def resolveNick(userId):
         return "unknown user"
 
 
+def buildTransactionTree():
+    """
+    Takes all participation entries with status 'new' and puts them into the Transaction Graph (which is cleard before).
+    Returns a list of tuples with all <eventId, userId> keys, that were taken.
+    """
+
+    clearTransactionGraph()
+    with connection:
+        cur = connection.cursor()
+        cur.execute("select id, amount, owner, user, tmp.num_parts FROM splitpot_participants, splitpot_events, (SELECT event, count(event) as 'num_parts' FROM splitpot_participants group by event) tmp WHERE splitpot_participants.event = splitpot_events.id;"
+                    )
+        data = cur.fetchall()
+        keys = []
+        for entry in data:
+            keys.append((entry[0], entry[3]))
+            insertEdge(TransactionEdge(entry[3], entry[2], entry[1]
+                       / (entry[4] + 1)))
+    return keys
+
+
+def TransactionGraphWriteback(keys):
+    """
+    Bulk update for participant table. Sets all tuples <eventId, userId> in the participants table to status = 'payday'
+    """
+
+    update = ''
+    for k in keys:
+        update += ' OR (event = ' + keys[0] + " AND user = '" + keys[1] \
+            + "')"
+    if len(update) == 0:
+        app.log('empty transaction graph - no write back')
+        return
+    update = \
+        "UPDATE splitpot_participants SET status = 'payday' WHERE " \
+        + update[3:] + ';'
+    app.log('transactiongraph Writeback: ' + update)
+    with connection:
+        cur = connection.curser()
+        cur.execute(update)
+
+def isUserInEvent(email, event):
+    """
+    Check is a given user is in a given event.
+    """
+    log.info('check if "' + email.lower() + '" is in event: "' + str(event) + '"')
+    with connection:
+        if (userExists(email) and getEvent(event) != None):
+            events = listAllEventsFor(email)
+            for curEvent in events:
+                if str(curEvent.id) == str(event):
+                    return True
+            return False

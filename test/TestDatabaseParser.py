@@ -175,65 +175,90 @@ class TestDatabaseParser(unittest.TestCase):
                          TransactionEdge('userB@0xabc.de',
                          'userA@0xabc.de', 4))
 
-        def testGetEvent(self):
-            registerUser('userA@0xabc.de', 'A', '123456')
-            id = insertEvent('userA@0xabc.de', '10.4.2013', 101.12,
-                             ['tobstu@gmail.com'], 'comment')
-            self.assertEqual(getEvent(id + 1), None)
-            print str(getEvent(id))
-            self.assertEqual(str(getEvent(id)), str(Event(
-                id=id,
-                owner='userA@0xabc.de',
-                date='10.4.2013',
-                amount=101.12,
-                participants=['tobstu@gmail.com'],
-                comment='comment',
-                )))
+    def testGetEvent(self):
+        activateUser('userA@0xabc.de', 'A', '123456', True)
+        id = insertEvent('userA@0xabc.de', '10.4.2013', 101.12,
+                         ['tobstu@gmail.com'], 'comment')
+        self.assertEqual(getEvent(id + 1), None)
+        print str(getEvent(id))
+        self.assertEqual(str(getEvent(id)), str(Event(
+            id=id,
+            owner='userA@0xabc.de',
+            date='10.4.2013',
+            amount=101.12,
+            participants=['tobstu@gmail.com'],
+            comment='comment',
+            )))
 
-        def testMergeUser(self):
-            registerUser('jobs@0xabc.de', 'Steve Jobs', 'apple')
-            registerUser('gates@0xabc.de', 'Bill Gates', 'microsoft')
-            registerUser('buffet@0xabc.de', 'Warren Buffet', 'billion')
-            id = insertEvent('jobs@0xabc.de', '2012-02-20', 21.22,
-                             ['gates@0xabc.de', 'buffet@0xabc.de'],
-                             'Dinner with my besties')
-            insertEvent('gates@0xabc.de', '2012-12-20', 1.22,
-                        ['buffet@0xabc.de'], 'Dinner with my besties')
+    def testMergeUser(self):
+        activateUser('jobs@0xabc.de', 'Steve Jobs', 'apple', True)
+        activateUser('gates@0xabc.de', 'Bill Gates', 'microsoft', True)
+        activateUser('buffet@0xabc.de', 'Warren Buffet', 'billion',
+                     True)
+        id = insertEvent('jobs@0xabc.de', '2012-02-20', 21.22,
+                         ['gates@0xabc.de', 'buffet@0xabc.de'],
+                         'Dinner with my besties')
+        insertEvent('gates@0xabc.de', '2012-12-20', 1.22,
+                    ['buffet@0xabc.de'], 'Dinner with my besties')
 
-            self.assertFalse(mergeUser('sinofsky@0xabc.de',
-                             'jobs@0xabc.de'))
+        self.assertFalse(mergeUser('sinofsky@0xabc.de', 'jobs@0xabc.de'
+                         ))
 
-                                 # sinofski doesn't exist
+                             # sinofski doesn't exist
 
-            self.assertTrue(mergeUser('gates@0xabc.de', 'jobs@0xabc.de'
-                            ))
+        self.assertTrue(mergeUser('gates@0xabc.de', 'jobs@0xabc.de'))
 
-            self.assertNotEqual(str(getEvent(id)), str(Event(
-                id=id,
-                owner='jobs@0xabc.de',
-                date='2012-02-20',
-                amount=21.22,
-                participants=['gates@0xabc.de', 'buffet@0xabc.de'],
-                comment='Dinner with my besties',
-                )))
+        self.assertNotEqual(str(getEvent(id)), str(Event(
+            id=id,
+            owner='jobs@0xabc.de',
+            date='2012-02-20',
+            amount=21.22,
+            participants=['gates@0xabc.de', 'buffet@0xabc.de'],
+            comment='Dinner with my besties',
+            )))
 
-            self.assertEqual(str(getEvent(id)), str(Event(
-                id=id,
-                owner='gates@0xabc.de',
-                date='2012-02-20',
-                amount=21.22,
-                participants=['gates@0xabc.de', 'buffet@0xabc.de'],
-                comment='Dinner with my besties',
-                )))
+        self.assertEqual(str(getEvent(id)), str(Event(
+            id=id,
+            owner='gates@0xabc.de',
+            date='2012-02-20',
+            amount=21.22,
+            participants=['gates@0xabc.de', 'buffet@0xabc.de'],
+            comment='Dinner with my besties',
+            )))
 
-            self.assertEqual(str(getEvent(id + 1)), str(Event(
-                id=id + 1,
-                owner='gates@0xabc.de',
-                date='2012-12-20',
-                amount=1.22,
-                participants=['buffet@0xabc.de'],
-                comment='Dinner with my besties',
-                )))
+        self.assertEqual(str(getEvent(id + 1)), str(Event(
+            id=id + 1,
+            owner='gates@0xabc.de',
+            date='2012-12-20',
+            amount=1.22,
+            participants=['buffet@0xabc.de'],
+            comment='Dinner with my besties',
+            )))
+
+    def testMergeUrlKey(self):
+        activateUser('jobs@0xabc.de', 'Steve Jobs', 'apple', True)
+        activateUser('gates@0xabc.de', 'Bill Gates', 'microsoft', True)
+        merge = getMergeUrlKey('jobs@0xabc.de', 'gates@0xabc.de')
+        self.assertTrue(len(merge) == 16)
+        self.assertTrue(isValidMergeUrlKey(merge))
+
+    def testGetUserFromPassword(self):
+        activateUser('jobs@0xabc.de', 'Steve Jobs', 'apple', True)
+        pwd = getPassword('jobs@0xabc.de')
+        self.assertIsNone(getUserFromPassword('aerafe'))
+        self.assertEqual('jobs@0xabc.de', getUserFromPassword(pwd[:3]))
+
+    def testIsUserInEvent(self):
+        activateUser('jobs@0xabc.de', 'Steve Jobs', 'apple', True)
+        activateUser('buffet@0xabc.de', 'Warren Buffet', 'billion',
+                     True)
+        activateUser('gates@0xabc.de', 'Bill Gates', 'microsoft', True)
+        id = insertEvent('jobs@0xabc.de', '12-12-2012', 1.00,
+                         ['gates@0xabc.de'], 'BFFs')
+        self.assertFalse(isUserInEvent('buffet@0xabc.de', id))
+        self.assertTrue(isUserInEvent('jobs@0xabc.de', id))
+        self.assertTrue(isUserInEvent('gates@0xabc.de', id))
+
 
 
 if __name__ == '__main__':
