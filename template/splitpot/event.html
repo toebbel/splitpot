@@ -7,6 +7,6 @@
   <h2>Meetup from ${event.date} - ${event.amount}€</h2>
     <p> Event hosted by ${event.owner}</p>
     <p>${event.comment}</p>
-    <p>Attendants: ${reduce(lambda list, current : '<li>' + current + '</li>' + list, event.participants, '')}</p>
+    <p>Attendants: ${reduce(lambda list, current : '<li>' + resolveNick(current) + '</li>' + list, event.participants, '')}</p>
 % endif
 
