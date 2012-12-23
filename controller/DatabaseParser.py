@@ -441,6 +441,18 @@ def mergeUser(newUser, oldUser):
             cur.execute('UPDATE splitpot_events SET owner = ? WHERE owner = ?'
                         , [newUser.lower(), oldUser.lower()])
 
+            log.info('replacing autocomplete entries from "'
+                     + oldUser.lower() + '" to "' + newUser.lower()
+                     + '"')
+            cur.execute('UPDATE splitpot_autocomplete SET [from] = ? WHERE [from] = ?'
+                        , [newUser.lower(), oldUser.lower()])
+
+            log.info('removing all autocomplete entries that are pointing to "'
+                      + oldUser.lower() + '"') #TODO maybe leave this entries as they are (references to an alias)
+
+            cur.execute('DELETE FROM splitpot_autocomplete WHERE [to] = ?'
+                        , [oldUser.lower()])
+
             log.info('deleting the user "' + oldUser.lower() + '"')
             cur.execute('DELETE FROM splitpot_users WHERE email = ?',
                         [oldUser.lower()])
@@ -519,30 +531,33 @@ def isUserInEvent(email, event):
             for curEvent in events:
                 if str(curEvent.id) == str(event):
                     return True
-            return 
+            return
 
 
 def addAutocompleteEntry(fromUser, toUser):
     """
     Adds a visibility conection from fromUser to toUser, if it doesn't exist yet. No checks if user exists. Returns true if connection was created, false if it already existed
     """
+
     with connection:
         cur = connection.cursor()
         cur.execute("SELECT count([to]) FROM splitpot_autocomplete WHERE [from] = '"
                      + fromUser + "' AND [to] = '" + toUser + "';")
         num = cur.fetchone()[0]
         if num == 0:
-            log.info('create autocomplete entry from ' + fromUser + ' to ' + toUser)
+            log.info('create autocomplete entry from ' + fromUser
+                     + ' to ' + toUser)
             cur.execute("INSERT INTO splitpot_autocomplete VALUES('"
                         + fromUser + "', '" + toUser + "');")
             return True
-        return False 
+        return False
 
 
 def getAutocompleteUser(fromUser, term):
     """
     Returns all emails that are visible for the fromUser id, that start with the given term (email or name). No checks against sql injection here
     """
+
     reply = []
     with connection:
         cur = connection.cursor()
@@ -552,7 +567,8 @@ def getAutocompleteUser(fromUser, term):
 
         data = cur.fetchall()
         for r in data:
-            reply.append({'value': r[0], 'name': (r[1] + " (" + r[0] + ")")})
+            reply.append({'value': r[0], 'name': r[1] + ' (' + r[0]
+                         + ')'})
     return json.dumps(reply)
 
 
