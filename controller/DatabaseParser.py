@@ -448,7 +448,7 @@ def mergeUser(newUser, oldUser):
                         , [newUser.lower(), oldUser.lower()])
 
             log.info('removing all autocomplete entries that are pointing to "'
-                      + oldUser.lower() + '"') #TODO maybe leave this entries as they are (references to an alias)
+                      + oldUser.lower() + '"')  # TODO maybe leave this entries as they are (references to an alias)
 
             cur.execute('DELETE FROM splitpot_autocomplete WHERE [to] = ?'
                         , [oldUser.lower()])
@@ -542,13 +542,13 @@ def addAutocompleteEntry(fromUser, toUser):
     with connection:
         cur = connection.cursor()
         cur.execute("SELECT count([to]) FROM splitpot_autocomplete WHERE [from] = '"
-                     + fromUser + "' AND [to] = '" + toUser + "';")
+                     + fromUser.lower() + "' AND [to] = '" + toUser.lower() + "';")
         num = cur.fetchone()[0]
         if num == 0:
             log.info('create autocomplete entry from ' + fromUser
                      + ' to ' + toUser)
             cur.execute("INSERT INTO splitpot_autocomplete VALUES('"
-                        + fromUser + "', '" + toUser + "');")
+                        + fromUser.lower() + "', '" + toUser.lower() + "');")
             return True
         return False
 
