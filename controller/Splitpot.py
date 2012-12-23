@@ -42,6 +42,7 @@ class splitpot_controller(object):
         """
         Return a detail view of a given event, if the user requesting the event was a hoster or a participant.
         """
+
         log.info('deliver event page')
         tmpl = lookup.get_template('event.html')
         if not eventIdRegex.match(id):
@@ -118,6 +119,8 @@ class splitpot_controller(object):
                 log.info('participant: ' + curParticipant
                          + ' is not registered yet, registering now.')
                 registerUser(curParticipant)
+
+            addAutocompleteEntry(getCurrentUserName(), curParticipant)
 
         log.info('Add ' + amount + ' Euro to ' + str(othersList)
                  + ', comment: ' + comment)

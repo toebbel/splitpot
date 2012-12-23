@@ -43,6 +43,7 @@ def clear():
         cur.execute('DELETE FROM splitpot_participants')
         cur.execute('DELETE FROM splitpot_events')
         cur.execute('DELETE FROM splitpot_users')
+        cur.execute('DELETE FROM splitpot_autocomplete')
 
 
 def updateLogin(email, newPassword):
@@ -448,18 +449,20 @@ def mergeUser(newUser, oldUser):
 
     return False
 
+
 def resolveNick(userId):
     log.info('resolve nick ' + str(userId))
-    if(userExists(userId, True)):
+    if userExists(userId, True):
         result = userId
-        if(userExists(userId, False)):
+        if userExists(userId, False):
             with connection:
                 cur = connection.cursor()
-                cur.execute("SELECT name from splitpot_users where email = '" + userId + "';")
+                cur.execute("SELECT name from splitpot_users where email = '"
+                             + userId + "';")
                 result = cur.fetchone()[0]
         return result
     else:
-        return "unknown user"
+        return 'unknown user'
 
 
 def buildTransactionTree():
@@ -502,15 +505,54 @@ def TransactionGraphWriteback(keys):
         cur = connection.curser()
         cur.execute(update)
 
+
 def isUserInEvent(email, event):
     """
     Check is a given user is in a given event.
     """
-    log.info('check if "' + email.lower() + '" is in event: "' + str(event) + '"')
+
+    log.info('check if "' + email.lower() + '" is in event: "'
+             + str(event) + '"')
     with connection:
-        if (userExists(email) and getEvent(event) != None):
+        if userExists(email) and getEvent(event) != None:
             events = listAllEventsFor(email)
             for curEvent in events:
                 if str(curEvent.id) == str(event):
                     return True
-            return False
+            return 
+
+
+def addAutocompleteEntry(fromUser, toUser):
+    """
+    Adds a visibility conection from fromUser to toUser, if it doesn't exist yet. No checks if user exists. Returns true if connection was created, false if it already existed
+    """
+    with connection:
+        cur = connection.cursor()
+        cur.execute("SELECT count([to]) FROM splitpot_autocomplete WHERE [from] = '"
+                     + fromUser + "' AND [to] = '" + toUser + "';")
+        num = cur.fetchone()[0]
+        if num == 0:
+            log.info('create autocomplete entry from ' + fromUser + ' to ' + toUser)
+            cur.execute("INSERT INTO splitpot_autocomplete VALUES('"
+                        + fromUser + "', '" + toUser + "');")
+            return True
+        return False 
+
+
+def getAutocompleteUser(fromUser, term):
+    """
+    Returns all emails that are visible for the fromUser id, that start with the given term (email or name). No checks against sql injection here
+    """
+    reply = []
+    with connection:
+        cur = connection.cursor()
+        cur.execute("select [to] as 'value', name from splitpot_autocomplete, splitpot_users where splitpot_users.email = splitpot_autocomplete.[to] AND ([to] LIKE '"
+                     + term + "%' OR name LIKE '" + term
+                    + "%') and [from] = '" + fromUser + "';")
+
+        data = cur.fetchall()
+        for r in data:
+            reply.append({'value': r[0], 'name': (r[1] + " (" + r[0] + ")")})
+    return json.dumps(reply)
+
+

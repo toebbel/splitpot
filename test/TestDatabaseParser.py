@@ -8,7 +8,7 @@ from datetime import datetime
 sys.path.append('controller/')
 
 from DatabaseParser import *
-
+import json
 
 class TestDatabaseParser(unittest.TestCase):
 
@@ -18,12 +18,15 @@ class TestDatabaseParser(unittest.TestCase):
         """
 
         clear()
+
     def testResolveNick(self):
-        self.assertEqual(resolveNick('awesome@0xabc.de'), "unknown user")
-        registerUser("awesome@0xabc.de")
-        self.assertEqual(resolveNick("awesome@0xabc.de"), "awesome@0xabc.de")
-        activateUser("awesome@0xabc.de", "nick", "123456")
-        self.assertEqual(resolveNick("awesome@0xabc.de"), "nick")
+        self.assertEqual(resolveNick('awesome@0xabc.de'), 'unknown user'
+                         )
+        registerUser('awesome@0xabc.de')
+        self.assertEqual(resolveNick('awesome@0xabc.de'),
+                         'awesome@0xabc.de')
+        activateUser('awesome@0xabc.de', 'nick', '123456')
+        self.assertEqual(resolveNick('awesome@0xabc.de'), 'nick')
 
     def testVerifyLoginOnEmptyDb(self):
         self.assertFalse(verifyLogin('test@0xabc.de', 'asfelkj'))
@@ -44,11 +47,16 @@ class TestDatabaseParser(unittest.TestCase):
         self.assertTrue(userExists('test@0xabc.de'))
 
         self.assertFalse(activateUser('test@0xabc.de', 'test2', '765432'
-                         ))  # an activated user can't be activated a second time
+                         ))
+
+                             # an activated user can't be activated a second time
 
         registerUser('ghost@test.de')
         self.assertTrue(activateUser('ghost@test.de', 'ghosty', '123456'
-                        ))  # activate a ghost user
+                        ))
+
+                            # activate a ghost user
+
         self.assertTrue(userExists('ghost@test.de'))  # User should be found in "normal" users
 
     def testListEvents(self):
@@ -259,7 +267,28 @@ class TestDatabaseParser(unittest.TestCase):
         self.assertTrue(isUserInEvent('jobs@0xabc.de', id))
         self.assertTrue(isUserInEvent('gates@0xabc.de', id))
 
+    def testAutocomplete(self):
+        #on empty DB
+        self.assertEqual(getAutocompleteUser("cookiemonster@sesamstreet.xxx", "a"), json.dumps([]))
+        #multiple users but no visibility
+        registerUser("cookiemonster@sesamstreet.xxx")
+        activateUser("awesome@0xabc.de", "awesome", "awesome", True)
+        activateUser("martin@0xabc.de", "martin", "martin", True)
 
+        #add single visibility
+        self.assertEqual(getAutocompleteUser("cookiemonster@sesamstreet.xxx", "awe"), json.dumps([]))
+        self.assertTrue(addAutocompleteEntry("cookiemonster@sesamstreet.xxx", "awesome@0xabc.de"))
+        self.assertEqual(getAutocompleteUser("cookiemonster@sesamstreet.xxx", "awe"), json.dumps([{'value': "awesome@0xabc.de", 'name': "awesome (awesome@0xabc.de)"}]))
+        self.assertEqual(getAutocompleteUser("awesome@0xabc.de", "coo"), json.dumps([]))
+        self.assertEqual(getAutocompleteUser("martin@0xabc.de", "aw"), json.dumps([]))
 
+        #add duble visibility
+        self.assertFalse(addAutocompleteEntry("cookiemonster@sesamstreet.xxx", "awesome@0xabc.de"))
+
+        #two different visibility connections
+        self.assertTrue(addAutocompleteEntry("cookiemonster@sesamstreet.xxx", "martin@0xabc.de"))
+
+        self.assertEqual(getAutocompleteUser("cookiemonster@sesamstreet.xxx", "awe"), json.dumps([{'value': "awesome@0xabc.de", 'name': "awesome (awesome@0xabc.de)"}]))
+        self.assertEqual(getAutocompleteUser("cookiemonster@sesamstreet.xxx", "m"), json.dumps([{'value': "martin@0xabc.de", 'name': "martin (martin@0xabc.de)"}]))
 if __name__ == '__main__':
     unittest.main()

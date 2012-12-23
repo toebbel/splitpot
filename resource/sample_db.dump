@@ -32,4 +32,9 @@ INSERT INTO "splitpot_users" VALUES('tobstu@0xabc.de','tobstu@0xabc.de',1,'oAjnx
 INSERT INTO "splitpot_users" VALUES('martin@0xabc.de','martin@0xabc.de',1,'B7YpMo2w','B7YpMo2w');
 DELETE FROM sqlite_sequence;
 INSERT INTO "sqlite_sequence" VALUES('splitpot_events',55);
+CREATE TABLE "splitpot_autocomplete" (
+"from" TEXT REFERENCES "splitpot_users"("email") NOT NULL,
+"to" TEXT REFERENCES "splitpot_users"("email") NOT NULL
+);
+
 COMMIT;
