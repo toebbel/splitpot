@@ -10,6 +10,7 @@ sys.path.append('controller/')
 from DatabaseParser import *
 import json
 
+
 class TestDatabaseParser(unittest.TestCase):
 
     def setUp(self):
@@ -63,7 +64,7 @@ class TestDatabaseParser(unittest.TestCase):
         activateUser('a', 'alpha', '1', True)
         activateUser('b', 'beta', '2', True)
         activateUser('c', 'charlie', '3', True)
-        date_a = datetime.now
+        date_a = datetime.datetime.now
         id_a = insertEvent('a', '1.4.2013', 10, ['b'], 'Event1')
         print listEvents()
         self.assertEqual(listEvents(), [(
@@ -185,14 +186,14 @@ class TestDatabaseParser(unittest.TestCase):
 
     def testGetEvent(self):
         activateUser('userA@0xabc.de', 'A', '123456', True)
-        id = insertEvent('userA@0xabc.de', '10.4.2013', 101.12,
+        id = insertEvent('userA@0xabc.de', '10-04-2013', 101.12,
                          ['tobstu@gmail.com'], 'comment')
         self.assertEqual(getEvent(id + 1), None)
         print str(getEvent(id))
         self.assertEqual(str(getEvent(id)), str(Event(
             id=id,
             owner='userA@0xabc.de',
-            date='10.4.2013',
+            date='10-04-2013',
             amount=101.12,
             participants=['tobstu@gmail.com'],
             comment='comment',
@@ -203,10 +204,10 @@ class TestDatabaseParser(unittest.TestCase):
         activateUser('gates@0xabc.de', 'Bill Gates', 'microsoft', True)
         activateUser('buffet@0xabc.de', 'Warren Buffet', 'billion',
                      True)
-        id = insertEvent('jobs@0xabc.de', '2012-02-20', 21.22,
+        id = insertEvent('jobs@0xabc.de', '20-12-2012', 21.22,
                          ['gates@0xabc.de', 'buffet@0xabc.de'],
                          'Dinner with my besties')
-        insertEvent('gates@0xabc.de', '2012-12-20', 1.22,
+        insertEvent('gates@0xabc.de', '20-12-2012', 1.22,
                     ['buffet@0xabc.de'], 'Dinner with my besties')
 
         self.assertFalse(mergeUser('sinofsky@0xabc.de', 'jobs@0xabc.de'
@@ -219,7 +220,7 @@ class TestDatabaseParser(unittest.TestCase):
         self.assertNotEqual(str(getEvent(id)), str(Event(
             id=id,
             owner='jobs@0xabc.de',
-            date='2012-02-20',
+            date='20-12-2012',
             amount=21.22,
             participants=['gates@0xabc.de', 'buffet@0xabc.de'],
             comment='Dinner with my besties',
@@ -228,7 +229,7 @@ class TestDatabaseParser(unittest.TestCase):
         self.assertEqual(str(getEvent(id)), str(Event(
             id=id,
             owner='gates@0xabc.de',
-            date='2012-02-20',
+            date='20-12-2012',
             amount=21.22,
             participants=['gates@0xabc.de', 'buffet@0xabc.de'],
             comment='Dinner with my besties',
@@ -237,7 +238,7 @@ class TestDatabaseParser(unittest.TestCase):
         self.assertEqual(str(getEvent(id + 1)), str(Event(
             id=id + 1,
             owner='gates@0xabc.de',
-            date='2012-12-20',
+            date='20-12-2012',
             amount=1.22,
             participants=['buffet@0xabc.de'],
             comment='Dinner with my besties',
@@ -268,27 +269,51 @@ class TestDatabaseParser(unittest.TestCase):
         self.assertTrue(isUserInEvent('gates@0xabc.de', id))
 
     def testAutocomplete(self):
-        #on empty DB
-        self.assertEqual(getAutocompleteUser("cookiemonster@sesamstreet.xxx", "a"), json.dumps([]))
-        #multiple users but no visibility
-        registerUser("cookiemonster@sesamstreet.xxx")
-        activateUser("awesome@0xabc.de", "awesome", "awesome", True)
-        activateUser("martin@0xabc.de", "martin", "martin", True)
 
-        #add single visibility
-        self.assertEqual(getAutocompleteUser("cookiemonster@sesamstreet.xxx", "awe"), json.dumps([]))
-        self.assertTrue(addAutocompleteEntry("cookiemonster@sesamstreet.xxx", "awesome@0xabc.de"))
-        self.assertEqual(getAutocompleteUser("cookiemonster@sesamstreet.xxx", "awe"), json.dumps([{'value': "awesome@0xabc.de", 'name': "awesome (awesome@0xabc.de)"}]))
-        self.assertEqual(getAutocompleteUser("awesome@0xabc.de", "coo"), json.dumps([]))
-        self.assertEqual(getAutocompleteUser("martin@0xabc.de", "aw"), json.dumps([]))
+        # on empty DB
 
-        #add duble visibility
-        self.assertFalse(addAutocompleteEntry("cookiemonster@sesamstreet.xxx", "awesome@0xabc.de"))
+        self.assertEqual(getAutocompleteUser('cookiemonster@sesamstreet.xxx'
+                         , 'a'), json.dumps([]))
 
-        #two different visibility connections
-        self.assertTrue(addAutocompleteEntry("cookiemonster@sesamstreet.xxx", "martin@0xabc.de"))
+        # multiple users but no visibility
 
-        self.assertEqual(getAutocompleteUser("cookiemonster@sesamstreet.xxx", "awe"), json.dumps([{'value': "awesome@0xabc.de", 'name': "awesome (awesome@0xabc.de)"}]))
-        self.assertEqual(getAutocompleteUser("cookiemonster@sesamstreet.xxx", "m"), json.dumps([{'value': "martin@0xabc.de", 'name': "martin (martin@0xabc.de)"}]))
+        registerUser('cookiemonster@sesamstreet.xxx')
+        activateUser('awesome@0xabc.de', 'awesome', 'awesome', True)
+        activateUser('martin@0xabc.de', 'martin', 'martin', True)
+
+        # add single visibility
+
+        self.assertEqual(getAutocompleteUser('cookiemonster@sesamstreet.xxx'
+                         , 'awe'), json.dumps([]))
+        self.assertTrue(addAutocompleteEntry('cookiemonster@sesamstreet.xxx'
+                        , 'awesome@0xabc.de'))
+        self.assertEqual(getAutocompleteUser('cookiemonster@sesamstreet.xxx'
+                         , 'awe'),
+                         json.dumps([{'value': 'awesome@0xabc.de',
+                         'name': 'awesome (awesome@0xabc.de)'}]))
+        self.assertEqual(getAutocompleteUser('awesome@0xabc.de', 'coo'
+                         ), json.dumps([]))
+        self.assertEqual(getAutocompleteUser('martin@0xabc.de', 'aw'),
+                         json.dumps([]))
+
+        # add duble visibility
+
+        self.assertFalse(addAutocompleteEntry('cookiemonster@sesamstreet.xxx'
+                         , 'awesome@0xabc.de'))
+
+        # two different visibility connections
+
+        self.assertTrue(addAutocompleteEntry('cookiemonster@sesamstreet.xxx'
+                        , 'martin@0xabc.de'))
+
+        self.assertEqual(getAutocompleteUser('cookiemonster@sesamstreet.xxx'
+                         , 'awe'),
+                         json.dumps([{'value': 'awesome@0xabc.de',
+                         'name': 'awesome (awesome@0xabc.de)'}]))
+        self.assertEqual(getAutocompleteUser('cookiemonster@sesamstreet.xxx'
+                         , 'm'), json.dumps([{'value': 'martin@0xabc.de'
+                         , 'name': 'martin (martin@0xabc.de)'}]))
+
+
 if __name__ == '__main__':
     unittest.main()

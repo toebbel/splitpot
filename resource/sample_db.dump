@@ -8,9 +8,9 @@ CREATE TABLE "splitpot_events" (
 "participants" TEXT,
 "comment" TEXT
 );
-INSERT INTO "splitpot_events" VALUES(53,'awesome@0xabc.de','2012-11-17',123.32,'["tobstu@0xabc.de"]','test');
-INSERT INTO "splitpot_events" VALUES(54,'awesome@0xabc.de','2012-11-17',321,'["martin@0xabc.de"]','test2');
-INSERT INTO "splitpot_events" VALUES(55,'awesome@0xabc.de','2012-11-17',7891,'["martin@0xabc.de", "tobstu@0xabc.de"]','blub');
+INSERT INTO "splitpot_events" VALUES(53,'awesome@0xabc.de','17-11-2012',123.32,'["tobstu@0xabc.de"]','test');
+INSERT INTO "splitpot_events" VALUES(54,'awesome@0xabc.de','17-11-2012',321,'["martin@0xabc.de"]','test2');
+INSERT INTO "splitpot_events" VALUES(55,'awesome@0xabc.de','17-11-2012',7891,'["martin@0xabc.de", "tobstu@0xabc.de"]','blub');
 CREATE TABLE "splitpot_participants" (
 "user" TEXT REFERENCES "splitpot_users"("email") NOT NULL,
 "event" INTEGER REFERENCES "splitpot_participants"("ID") NOT NULL,

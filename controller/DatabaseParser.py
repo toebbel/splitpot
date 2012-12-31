@@ -11,6 +11,7 @@ import random
 import hashlib
 import logging
 import json
+import datetime
 
 sys.path.append('utils/')
 from Encryption import *
@@ -23,6 +24,7 @@ SALT_LENGTH = 30
 DEFAULT_PWD_LENGTH = 6
 ACTIVATE_CODE_LEN = 8
 MERGE_KEY_LEN = 16
+DATEFORMAT = '%d-%m-%Y'
 
 log = logging.getLogger('appLog')
 
@@ -116,7 +118,7 @@ def listHostingEventsFor(user):
             events.append(Event(
                 id=curEvent[0],
                 owner=str(user),
-                date=curEvent[1],
+                date=datetime.datetime.strptime(curEvent[1], DATEFORMAT),
                 amount=curEvent[2],
                 participants=json.loads(curEvent[3]),
                 comment=curEvent[4],
@@ -141,7 +143,7 @@ def listInvitedEventsFor(user):
             events.append(Event(
                 id=curEvent[0],
                 owner=curEvent[1],
-                date=curEvent[2],
+                date=datetime.datetime.strptime(curEvent[2], DATEFORMAT),
                 amount=-curEvent[3],
                 participants=curEvent[4],
                 comment=curEvent[5],
@@ -174,7 +176,7 @@ def getEvent(id):
             return Event(
                 id=id,
                 owner=str(e[0]),
-                date=e[1],
+                date=datetime.datetime.strptime(e[1], DATEFORMAT),
                 amount=e[2],
                 participants=json.loads(e[3]),
                 comment=e[4],
@@ -194,6 +196,9 @@ def insertEvent(
     The 'participants' table contains the IDs of the participants
     as a list in JSON format.
     """
+
+    if type(date) is datetime.date:
+        date = date.strptime(DATEFORMAT),
 
     log.info('Owner: ' + owner + ', date: ' + str(date) + ', amount: '
              + str(amount) + ', participants: ' + str(participants)
@@ -542,13 +547,15 @@ def addAutocompleteEntry(fromUser, toUser):
     with connection:
         cur = connection.cursor()
         cur.execute("SELECT count([to]) FROM splitpot_autocomplete WHERE [from] = '"
-                     + fromUser.lower() + "' AND [to] = '" + toUser.lower() + "';")
+                     + fromUser.lower() + "' AND [to] = '"
+                    + toUser.lower() + "';")
         num = cur.fetchone()[0]
         if num == 0:
             log.info('create autocomplete entry from ' + fromUser
                      + ' to ' + toUser)
             cur.execute("INSERT INTO splitpot_autocomplete VALUES('"
-                        + fromUser.lower() + "', '" + toUser.lower() + "');")
+                        + fromUser.lower() + "', '" + toUser.lower()
+                        + "');")
             return True
         return False
 
