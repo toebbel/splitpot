@@ -12,4 +12,4 @@ emailRegex = \
 emailAutocompleteRegex = re.compile("\A[a-zA-Z0-9_.+@]*\Z")
 eventIdRegex = re.compile("\A[0-9]*\Z")
 activatenCode = re.compile("\A[0-9a-zA-Z]*\Z")
-amountRegex = re.compile("\A[0-9]+(\.[0-9]{2})?\Z")
+amountRegex = re.compile("\A[0-9]+(\.[0-9][0-9]?)?\Z")
