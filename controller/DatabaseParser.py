@@ -118,7 +118,8 @@ def listHostingEventsFor(user):
             events.append(Event(
                 id=curEvent[0],
                 owner=str(user),
-                date=datetime.datetime.strptime(curEvent[1], DATEFORMAT),
+                date=datetime.datetime.strptime(curEvent[1],
+                        DATEFORMAT),
                 amount=curEvent[2],
                 participants=json.loads(curEvent[3]),
                 comment=curEvent[4],
@@ -143,7 +144,8 @@ def listInvitedEventsFor(user):
             events.append(Event(
                 id=curEvent[0],
                 owner=curEvent[1],
-                date=datetime.datetime.strptime(curEvent[2], DATEFORMAT),
+                date=datetime.datetime.strptime(curEvent[2],
+                        DATEFORMAT),
                 amount=-curEvent[3],
                 participants=curEvent[4],
                 comment=curEvent[5],
@@ -198,7 +200,7 @@ def insertEvent(
     """
 
     if type(date) is datetime.date:
-        date = date.strptime(DATEFORMAT),
+        date = date.strftime(DATEFORMAT)
 
     log.info('Owner: ' + owner + ', date: ' + str(date) + ', amount: '
              + str(amount) + ', participants: ' + str(participants)

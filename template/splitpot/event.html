@@ -8,9 +8,19 @@
   <h2>Permission denied</h2>
     <p>You are not allowed to view this event</p>
 % else:
-  <h2>Meetup from ${event.date} | ${event.amount}€</h2>
-    <p>Event hosted by ${resolveNick(event.owner)}</p>
-    <p>${event.comment}</p>
-    <p>Attendants: ${reduce(lambda list, current : '<li>' + resolveNick(current) + '</li>' + list, event.participants, '')}</p>
+  <h2>Meetup from ${event.date.strftime("%a, %d %b %y")} | ${event.amount}€</h2>
+    <p>
+        Event hosted by <a href="mailto:${event.owner}">${resolveNick(event.owner)}</a>.
+        Each one has to pay ${event.amount / float(len(event.participants) + 1)}
+    </p>
+    <p>
+        <blockquote>
+            ${event.comment}
+        </blockquote>
+    </p>
+    <p>
+    Attendants: ${reduce(lambda list, current : '<li><a href="mailto:' + current + '">' + resolveNick(current) + '</a></li>' + list, event.participants, '')}</p>
+        
+        
 % endif
 
