@@ -58,22 +58,30 @@ def SettingsWrapper(to, subject, body):
     """
 
     settingsFile = open('resource/mail.settings')
-    settings = {'host': 'localhost', 'sender': 'splitpot@0xabc.de', 'port': 25, 'timeout': 1}
+    settings = {
+        'host': 'localhost',
+        'sender': 'splitpot@0xabc.de',
+        'port': 25,
+        'timeout': 1,
+        }
     for l in settingsFile.readlines():
         if not (l.startswith('#') or l.strip() == ''):
             key = l[:l.find(':')].lower()
-            val = l[(l.find(':') + 1):].strip()
+            val = l[l.find(':') + 1:].strip()
             settings[key] = val
     settingsFile.close()
     msg = MIMEText(body)
-    msg['From'] = settings['sender'] 
+    msg['From'] = settings['sender']
     msg['To'] = to
     msg['Subject'] = subject
 
     log.info('sending mail to "' + to + '" with subject: "' + subject
-            + '" and body "' + body + '" via "' + settings['host'] + ':' + settings['port'] + '"')
+             + '" and body "' + body + '" via "' + settings['host']
+             + ':' + settings['port'] + '"')
 
-    server = smtplib.SMTP(host = settings['host'], port = int(settings['port']), timeout = float(settings['timeout']))
+    server = smtplib.SMTP(host=settings['host'],
+                          port=int(settings['port']),
+                          timeout=float(settings['timeout']))
     if not settings['user'] == '':
         if settings['encryption'].lower() == 'yes':
             server.ehlo()
@@ -83,16 +91,16 @@ def SettingsWrapper(to, subject, body):
     server.sendmail(settings['sender'], [to], msg.as_string())
     server.quit()
 
-def signupConfirm(email, key):
+
+def signupConfirm(email):
     """
-    Sends the mail, that contains the activation url
+    Sends the mail, that welcomes the user 
     """
 
-    log.info('sending signup confirmation to ' + email + ': ' + key)
+    log.info('sending signup confirmation to ' + email)
     tmpl = lookup.get_template('signup_confirmation.email')
     SettingsWrapper(email, 'Signup Confirmation',
-                    tmpl.render(url=RUNNING_URL + '/user/confirm?key='
-                    + key))
+                    tmpl.render(url=RUNNING_URL))
 
 
 def forgotConfirmation(email, key):
