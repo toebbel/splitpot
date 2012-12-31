@@ -147,7 +147,7 @@ def listInvitedEventsFor(user):
                 date=datetime.datetime.strptime(curEvent[2],
                         DATEFORMAT),
                 amount=-curEvent[3],
-                participants=curEvent[4],
+                participants=json.loads(curEvent[4]),
                 comment=curEvent[5],
                 ))
 
@@ -493,7 +493,7 @@ def buildTransactionTree():
     clearTransactionGraph()
     with connection:
         cur = connection.cursor()
-        cur.execute("select id, amount, owner, user, tmp.num_parts FROM splitpot_participants, splitpot_events, (SELECT event, count(event) as 'num_parts' FROM splitpot_participants group by event) tmp WHERE splitpot_participants.event = splitpot_events.id;"
+        cur.execute("select id, amount, owner, user, tmp.num_parts FROM splitpot_participants, splitpot_events, (SELECT event, count(event) as 'num_parts' FROM splitpot_participants group by event) tmp WHERE splitpot_participants.event = splitpot_events.id AND splitpot_participants.status != 'payday';"
                     )
         data = cur.fetchall()
         keys = []

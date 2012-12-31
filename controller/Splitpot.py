@@ -137,7 +137,7 @@ class splitpot_controller(object):
         Email.ownerEmail(getCurrentUserName(), event)
 
         tmpl = lookup.get_template('index.html')
-        return tmpl.render(good_news="created event :)")
+        return tmpl.render(good_news='created event :)')
 
     @cherrypy.expose
     @require()
@@ -154,9 +154,11 @@ class splitpot_controller(object):
         events = listAllEventsFor(getCurrentUserName())
         for event in events:
             if event.amount < 0:
-                totalDebts += event.amount
+                totalDebts += event.amount / float(len(event.participants) + 1)
+                log.info("add debt " + str(event))
+                log.info("=>" + str(totalDebts))
             else:
-                totalEarnings += event.amount
+                totalEarnings += event.amount - event.amount / float(len(event.participants) + 1)
         return tmpl.render(debts=totalDebts,
                            others_debts=totalEarnings, entries=events)
 
