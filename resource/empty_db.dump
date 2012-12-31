@@ -1,0 +1,30 @@
+PRAGMA foreign_keys=OFF;
+BEGIN TRANSACTION;
+CREATE TABLE "splitpot_events" (
+"ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+"owner" TEXT NOT NULL,
+"date" TEXT NOT NULL,
+"amount" INTEGER NOT NULL,
+"participants" TEXT,
+"comment" TEXT
+);
+CREATE TABLE "splitpot_participants" (
+"user" TEXT REFERENCES "splitpot_users"("email") NOT NULL,
+"event" INTEGER REFERENCES "splitpot_participants"("ID") NOT NULL,
+"status" TEXT NOT NULL
+);
+CREATE TABLE "splitpot_users" (
+"email" TEXT PRIMARY KEY NOT NULL UNIQUE,
+"name" TEXT NOT NULL,
+"registered" INTEGER NOT NULL,
+"salt" TEXT NOT NULL,
+"password" TEXT NOT NULL UNIQUE
+);
+INSERT INTO "splitpot_users" VALUES('awesome@0xabc.de','Mr. Awesome',0,'tzPHQT2FIWJp3K9JrCtz5OLDIijfeQ','aa21d7ca5af3b12e26233b9ee3490abd1c99040629e2b28dedc9d8091ea6878d');
+DELETE FROM sqlite_sequence;
+CREATE TABLE "splitpot_autocomplete" (
+"from" TEXT REFERENCES "splitpot_users"("email") NOT NULL,
+"to" TEXT REFERENCES "splitpot_users"("email") NOT NULL
+);
+
+COMMIT;
