@@ -57,12 +57,31 @@ def SettingsWrapper(to, subject, body):
     Sends mail using sendMail-method. Adds the required parameters like host & sender from the config file
     """
 
-    # TODO read from config file and provide login data
+    settingsFile = open('resource/mail.settings')
+    settings = {'host': 'localhost', 'sender': 'splitpot@0xabc.de', 'port': 25, 'timeout': 1}
+    for l in settingsFile.readlines():
+        if not (l.startswith('#') or l.strip() == ''):
+            key = l[:l.find(':')].lower()
+            val = l[(l.find(':') + 1):].strip()
+            settings[key] = val
+    settingsFile.close()
+    msg = MIMEText(body)
+    msg['From'] = settings['sender'] 
+    msg['To'] = to
+    msg['Subject'] = subject
 
     log.info('sending mail to "' + to + '" with subject: "' + subject
-             + '" and body "' + body + '"')
-    sendMail('localhost', 'splitpot@0xabc.de', to, subject, body)
+            + '" and body "' + body + '" via "' + settings['host'] + ':' + settings['port'] + '"')
 
+    server = smtplib.SMTP(host = settings['host'], port = int(settings['port']), timeout = float(settings['timeout']))
+    if not settings['user'] == '':
+        if settings['encryption'].lower() == 'yes':
+            server.ehlo()
+            server.starttls()
+            server.ehlo()
+        server.login(settings['user'], settings['password'])
+    server.sendmail(settings['sender'], [to], msg.as_string())
+    server.quit()
 
 def signupConfirm(email, key):
     """
@@ -137,7 +156,7 @@ def participantEmail(userId, event):
     text = lookup.get_template('add_event_participant.email'
                                ).render(owner=event.owner,
             total=event.amount, num_participants=num_part,
-            amount=event.amount / num_part)
+            amount=event.amount / float(num_part))
     if not db.userExists(userId, False):
         text += lookup.get_template('ghost_user_link.email'
                                     ).render(activateUrl=RUNNING_URL
