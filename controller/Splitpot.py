@@ -61,7 +61,7 @@ class splitpot_controller(object):
         """
 
         log.info('deliver add form')
-        return lookup.get_template('add.html').render(feedback='')
+        return lookup.get_template('add.html').render()
 
     @cherrypy.expose
     def about(self):
@@ -99,21 +99,22 @@ class splitpot_controller(object):
         tmpl = lookup.get_template('add.html')
         if not amountRegex.match(amount):
             log.info('mal formed amount')
-            return tmpl.render(feedback='Amount is mal formed. Please correct & try again'
+            return tmpl.render(bad_news='Amount is mal formed. Please correct & try again'
                                )
 
         for other in othersList:
             if not emailRegex.match(other):
                 log.info('Email: ' + str(other) + ' is malformed.')
-                return tmpl.render(feedback='Email ' + other
+                return tmpl.render(bad_news='Email ' + other
                                    + ' is mal formed. Please correct')
-            if other == getCurrentUserName(): #TODO check if user adds himself via alias (issue 23)
-                log.info("user tried to add himself to participants")
-                return tmpl.render(feedback="You can't add yourself to the list of participants")    
+            if other == getCurrentUserName():  # TODO check if user adds himself via alias (issue 23)
+                log.info('user tried to add himself to participants')
+                return tmpl.render(bad_news="You can't add yourself to the list of participants"
+                                   )
 
         if not entryCommentRegex.match(comment):
             log.info('Comment is malformed.')
-            return tmpl.render(feedback='Comment is malformed. Plase correct & try again'
+            return tmpl.render(bad_news='Comment is malformed. Plase correct & try again'
                                )
 
         for curParticipant in othersList:
@@ -135,7 +136,8 @@ class splitpot_controller(object):
             Email.participantEmail(participant, event)
         Email.ownerEmail(getCurrentUserName(), event)
 
-        return self.index()
+        tmpl = lookup.get_template('index.html')
+        return tmpl.render(good_news="created event :)")
 
     @cherrypy.expose
     @require()
@@ -195,7 +197,7 @@ class splitpot_controller(object):
     def merge(self):
         tmpl = lookup.get_template('merge.html')
 
-        return tmpl.render(feedback='', newUser=getCurrentUserName())
+        return tmpl.render(newUser=getCurrentUserName())
 
     @cherrypy.expose
     @require()
@@ -219,7 +221,7 @@ class splitpot_controller(object):
             else:
                 log.warning('couldn\'t merge "' + newUser + '" and "'
                             + oldUser + '" for some unexpected reason')
-                return tmpl.render(feedback='Oh no! Something went wrong. Please try again later.'
+                return tmpl.render(bad_news='Oh no! Something went wrong. Please try again later.'
                                    , newUser=getCurrentUserName())
         else:
 
@@ -250,15 +252,15 @@ class splitpot_controller(object):
                         errors = \
                             '<li>Can\'t merge two same accounts.</li>'
             if not errors == '':
-                return tmpl.render(feedback='<ul>' + errors + '</ul>',
+                return tmpl.render(bad_news='<ul>' + errors + '</ul>',
                                    newUser=getCurrentUserName())
             else:
                 mergeKey = getMergeUrlKey(getCurrentUserName(), email)
                 Email.mergeRequest(getCurrentUserName(), email, (),
                                    mergeKey)
 
-                return tmpl.render(feedback='An email has be sent to "'
-                                   + email.lower()
+                return tmpl.render(good_news='An email has be sent to "'
+                                    + email.lower()
                                    + '" for further information',
                                    newUser=getCurrentUserName())
 

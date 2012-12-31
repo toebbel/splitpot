@@ -8,7 +8,17 @@
 	<%include file="navi.mako"/>
     
 	<div class="container">
-		<p>
+        % if bad_news:
+        <div class="bad_news">
+            ${bad_news}
+        </div>
+        % endif
+        % if good_news:
+        <div class="good_news">
+            ${good_news}
+        </div>
+        %endif
+        <p>
 		      ${self.body()}
 		</p>
 	</div>

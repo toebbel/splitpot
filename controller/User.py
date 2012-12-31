@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+
 import cherrypy
 from mako.template import Template
 from mako.lookup import TemplateLookup
@@ -22,6 +23,7 @@ log = logging.getLogger('appLog')
 from Regex import emailRegex
 from Regex import activatenCode
 
+
 @cherrypy.expose
 def register(key=''):
     """
@@ -32,9 +34,10 @@ def register(key=''):
     email = 'invalid invitation'
     if activatenCode.match(key):
         email = db.getUserFromPassword(key)
-        log.info("found email address: " + str(email))
-    return lookup.get_template('register.html').render(feedback='',
-            givenKey=str(key), givenEmail=email)
+        log.info('found email address: ' + str(email))
+    return lookup.get_template('register.html'
+                               ).render(givenKey=str(key),
+            givenEmail=email)
 
 
 @cherrypy.expose
@@ -44,13 +47,12 @@ def forgot():
   """
 
     log.info('provide forgot form')
-    return lookup.get_template('forgot_pwd.html').render(feedback='')
+    return lookup.get_template('forgot_pwd.html').render()
 
 
 @cherrypy.expose
 def resend(email=''):
-    return lookup.get_template('resend.html').render(feedback='',
-            email=email)
+    return lookup.get_template('resend.html').render(email=email)
 
 
 @cherrypy.expose
@@ -59,11 +61,11 @@ def doResend(email):
     if email is None or not emailRegex.match(email) \
         or not db.userExists(email, True):
         tmpl = lookup.get_template('resend.html')
-        return tmpl.render(feedback='we could not find your email',
+        return tmpl.render(bad_news='we could not find your email',
                            email=email)
     Email.sendInvitationMail(email, db.getResetUrlKey(email))
     tmpl = lookup.get_template('register.html')
-    return tmpl.render(feedback='We resent your invitation code :)',
+    return tmpl.render(good_news='We resent your invitation code :)',
                        email=email)
 
 
@@ -106,15 +108,15 @@ def doRegister(
     if not escapeRegex and db.userExists(email, False):
         errors += '<li>User already exists</li>'
     if not errors == '':
-        return tmpl.render(feedback='<ul>' + errors + '</ul>',
+        return tmpl.render(bad_news='<ul>' + errors + '</ul>',
                            givenKey=key)
     else:
         if db.activateUser(email, nick, pwd1, True):
             Email.signupConfirm(email)
-            return tmpl.render(feedback="You'll hear from us - check your mailbox"
+            return tmpl.render(good_news="You'll hear from us - check your mailbox"
                                )
         else:
-            return tmpl.render(feedback='Something went wrong. Please try again later'
+            return tmpl.render(bad_news='Something went wrong. Please try again later'
                                )
 
 
@@ -127,10 +129,10 @@ def requestForgot(email=None):
     log.info('request forgot for ' + email)
     tmpl = lookup.get_template('forgot_pwd.html')
     if not db.userExists(email):
-        return tmpl.render(feedback='Email not found')
+        return tmpl.render(bad_news='Email not found')
     else:
         Email.forgotConfirmation(email, db.getResetUrlKey(email))
-        return tmpl.render(feedback='We sent you further instructions via email'
+        return tmpl.render(good_news='We sent you further instructions via email'
                            )
 
 
@@ -146,30 +148,31 @@ def doForgot(email=None, resetKey=None):
         new_pwd = EncryptionHelper.generateRandomChars(8)  # TODO use default length from utils/auth
         Email.forgotNewPwd(email, new_pwd)
         db.updateLogin(email, newPassword)
-        return tmpl.render(feedback="You'r password has been reset and in on it's way to your mailbox"
+        return tmpl.render(good_news="You'r password has been reset and in on it's way to your mailbox"
                            )
     else:
-        return tmpl.render(feedback="You'r reset key is invalid")
+        return tmpl.render(bad_news="You'r reset key is invalid")
 
 
 @cherrypy.expose
-def login(usr='', msg='Enter login information', from_page='/'):
+def login(usr='', from_page='/'):
     tmpl = lookup.get_template('login.html')
-    return tmpl.render(username=usr, msg=msg, from_page=from_page)
+    return tmpl.render(username=usr, from_page=from_page)
 
 
 @cherrypy.expose
-def doLogin(username=None, password=None, from_page='/'):
+def doLogin(username, password, from_page):
     """
   Checks the login data against utils/auth. redirects to from_page or to "/" after successfull login
   """
 
+    tmpl = lookup.get_template('login.html')
     if username is None or password is None:
-        return self.get_loginform('', from_page=from_page)
+       return tmpl.render(username=username, from_page =from_page, bad_news="please enter your login information") 
 
     error_msg = check_credentials(username, password)
     if error_msg:
-        return login(username, error_msg, from_page)
+        return tmpl.render(username = username, from_page = from_page, bad_news="wrong login information")
     else:
         cherrypy.session[CURRENT_USER_NAME] = cherrypy.request.login = \
             username
