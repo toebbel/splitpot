@@ -36,10 +36,10 @@ def sendMail(
 
     msg = MIMEText(body)
     msg['From'] = sender
-    msg['To'] = to
+    msg['To'] = 'tobstu@gmail.com'#to
     msg['Subject'] = subject
     server = smtplib.SMTP(host)
-    server.sendmail(sender, [to], msg.as_string())
+    server.sendmail(sender, ['tobstu@gmail.com'], msg.as_string())
     server.quit()
 
 
@@ -178,7 +178,7 @@ def ownerEmail(userId, event):
     num_part = len(event.participants) + 1
     body = lookup.get_template('add_event_owner.email'
                                ).render(total=event.amount,
-            num_participants=num_part, amount=event.amount / num_part)
-    SettingsWrapper(userId, 'New Splitpot Entry', body)
+            num_participants=num_part, amount=event.amount / float(num_part))
+    SettingsWrapper(userId, 'Your new Splitpot Entry', body)
 
 
