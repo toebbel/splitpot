@@ -1,5 +1,4 @@
 Hi,
-Hi,
 
 ${owner} has just added new expenses: ${total}Eur in total, divided by ${num_participants}, which makes ${amount} for you.
 We've added this expenses to your list. You'll receive another mail on payday.
