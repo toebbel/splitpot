@@ -1,22 +1,31 @@
 ## -*- coding: utf-8 -*-
 <%inherit file="base.html" />
-
+<%! from Auth import getCurrentUserName %>
+<%! from DatabaseParser import resolveNick %>
 Your debts: ${debts}€ <br />
 Others owe you: ${others_debts}€ <br />
 <hr />
 <table>
   <tr>
-    <td>Date</td>
-    <td>Amount</td>
-    <td>Details</td>
+      <td>Date</td>
+      <td>Host</td>
+      <td>Amount</td>
+      <td>Details</td>
   </tr>
   % for x in entries:
     <tr>
       <td>
-        ${x.date}
+          ${x.date.strftime("%d %b")}
       </td>
       <td>
-        ${x.amount}
+          % if x.owner == getCurrentUserName():
+              ${"you"} 
+          % else:
+              ${resolveNick(x.owner)}
+          % endif
+      </td>
+      <td>
+        ${x.amount}€
       </td>
       <td>
         <a href="/../event/${x.id}">more</a>
