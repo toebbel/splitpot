@@ -1,143 +1,150 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 import unittest
 import sys
 
 sys.path.append('utils/')
 from TransactionGraph import *
-sys.path.append('model/')
 from UserNodeModel import UserNode
 from TransactionEdgeModel import TransactionEdge
+
 
 class TestTransactionGraph(unittest.TestCase):
 
     def setUp(self):
-        graphNodes.clear()
-        graphEdges.clear()
+        """
+        Called before *each* testcase. We want to operate on a fresh database
+        """
+
+        clearTransactionGraph()
 
     def testInsertNode(self):
-        insertNode(UserNode(123))
-        self.assertTrue(cmpDicts(graphNodes, {123: UserNode(123)}))
-        self.assertTrue(cmpDicts(graphEdges, {}))
-    
+        insertNode(UserNode('a'))
+        self.assertEqual(1, len(graphNodes))
+
     def testInsertEdge(self):
-        edge = TransactionEdge(123, 321, 22.1)
-        insertEdge(edge)
-        self.assertTrue(cmpDicts(graphNodes, {123: UserNode(123), 321: UserNode(321)}))
-        self.assertTrue(cmpDicts(graphEdges, {edge.keyify(): edge}))
 
-    def testGetPaths(self):
-        edgeA = TransactionEdge(0, 1, 1)
-        edgeB = TransactionEdge(1, 2, 1)
-        edgeC = TransactionEdge(0, 3, 1)
-        edgeD = TransactionEdge(2, 4, 1)
-        edgeE = TransactionEdge(1, 3, 1)
-        insertEdge(edgeA)
-        insertEdge(edgeB)
-        insertEdge(edgeC)
-        insertEdge(edgeD)
-        insertEdge(edgeE)
-        self.assertEqual([[0]], getPaths(0, 0))
-        self.assertEqual([[0, 1, 2, 4]], getPaths(0, 4))
-        self.assertEqual([], getPaths(4, 0))
-        res = getPaths(0, 3)
-        self.assertTrue([[0, 3], [0, 1, 3]] == res or res == [[0, 1, 3], [0, 3]])
+        # edge creates nodes
 
-    def testGetCycle(self):
+        e = TransactionEdge('a', 'b', 10)
+        insertEdge(e)
+        self.assertEqual({'a': UserNode('a'), 'b': UserNode('b')},
+                         graphNodes)
+        self.assertEqual({e.keyify(): e}, graphEdges)
+        self.assertEqual({'b': e}, graphNodes['a'].outgoing)
+        self.assertEqual({'a': e}, graphNodes['b'].incoming)
+
+        # doesn't create new nodes if not neseccary
+
+        e2 = TransactionEdge('b', 'c', 5)
+        insertEdge(e2)
+        self.assertEqual({'a': UserNode('a'), 'b': UserNode('b'),
+                         'c': UserNode('c')}, graphNodes)
+        self.assertEqual({e.keyify(): e, e2.keyify(): e2}, graphEdges)
+        self.assertEqual({'b': e}, graphNodes['a'].outgoing)
+        self.assertEqual({'a': e}, graphNodes['b'].incoming)
+        self.assertEqual({'c': e2}, graphNodes['b'].outgoing)
+        self.assertEqual({'b': e2}, graphNodes['c'].incoming)
+
+        # adding of existing edges increases their amount
+
+        e3 = TransactionEdge('b', 'c', 2)
+        insertEdge(e3)
+        self.assertDictEqual({e.keyify(): e, e2.keyify(): e2},
+                             graphEdges)
+        self.assertEqual(7, graphEdges[e3.keyify()].amount)
+        self.assertEqual(7, e2.amount)
+        self.assertEqual({'c': e2}, graphNodes['b'].outgoing)
+        self.assertEqual({'b': e2}, graphNodes['c'].incoming)
+
+    def testGetPath_noncyclic(self):
+        insertEdge(TransactionEdge('a', 'b', 1))
+        insertEdge(TransactionEdge('b', 'c', 2))
+        insertEdge(TransactionEdge('b', 'e', 3))
+        insertEdge(TransactionEdge('d', 'c', 4))
+
+        p1 = getPaths('a', 'c')
+        self.assertEqual(1, len(p1))
+        self.assertEqual([graphNodes['a'], graphNodes['b'], graphNodes['c']], p1[0])
+
+        p2 = getPaths('a', 'd')
+        self.assertEqual(0, len(p2))
+        self.assertEqual([], p2)
+
+        p3 = getPaths('a', 'e')
+        self.assertEqual(1, len(p3))
+        self.assertEqual([graphNodes['a'], graphNodes['b'], graphNodes['e']], p3[0])
+
+        #a => e = a -> b -> e + a -> f -> e
+        insertEdge(TransactionEdge('a', 'f', 5))
+        insertEdge(TransactionEdge('f', 'e', 6))
+
+        p4 = getPaths('a', 'e')
+        self.assertEqual(2, len(p4))
+        self.assertEqual([graphNodes['a'], graphNodes['b'], graphNodes['e']], p4[0])
+        self.assertEqual([graphNodes['a'], graphNodes['f'], graphNodes['e']], p4[1])
+
+
+    def testGetPaths_cyclic(self):
         insertEdge(TransactionEdge('a', 'b', 1))
         insertEdge(TransactionEdge('b', 'c', 1))
-        insertEdge(TransactionEdge('c', 'a', 1))
+        insertEdge(TransactionEdge('a', 'd', 1))
+        insertEdge(TransactionEdge('d', 'a', 1))
+        insertEdge(TransactionEdge('d', 'c', 1))
+        insertEdge(TransactionEdge('c', 'd', 1))
         insertEdge(TransactionEdge('c', 'b', 1))
-        self.assertEqual([[graphNodes['a'], graphNodes['b'], graphNodes['c'], graphNodes['a']]], getCycles('a'))
-        subA = [graphNodes['b'], graphNodes['c'], graphNodes['b']]
-        subB = [graphNodes['b'], graphNodes['c'], graphNodes['a'], graphNodes['b']]
-        res = getCycles('b')
-        self.assertTrue(res == [subA, subB] or res == [subB, subA])
+
+        p1 = getPaths('a', 'c')
+        self.assertEquals(2, len(p1))
+        self.assertEquals([graphNodes['a'], graphNodes['b'], graphNodes['c']], p1[0])
+        self.assertEquals([graphNodes['a'], graphNodes['d'], graphNodes['c']], p1[1])
+
 
     def testAmountOf(self):
         insertEdge(TransactionEdge('a', 'b', 1))
         insertEdge(TransactionEdge('b', 'c', 2))
-        insertEdge(TransactionEdge('c', 'a', 5))
-        insertEdge(TransactionEdge('a', 'd', 3))
-        insertEdge(TransactionEdge('d', 'a', 4))
-        insertEdge(TransactionEdge('c', 'b', 3))
-        self.assertRaises(ValueError, amountOf, (['d', 'b'])) #amount of nonexistent path
-        self.assertEqual(amountOf(['a', 'b', 'c']), 1)
-        self.assertEqual(amountOf(['a', 'b', 'c', 'a']), 1)
-        self.assertEqual(amountOf(['a', 'b', 'c', 'b', 'c', 'a', 'd', 'a']), 1)
-        self.assertEqual(amountOf(['a', 'd', 'a']), 3)
-        self.assertEqual(amountOf(['a']), 0)
+        insertEdge(TransactionEdge('a', 'f', 3))
+        insertEdge(TransactionEdge('a', 'b', 11))
 
-    def testPathToEdgeSequence(self):
-        self.assertEqual([], pathToEdgeSequence([]))
-        self.assertEqual([], pathToEdgeSequence(['a']))
-        e1 = TransactionEdge('a', 'b', 0).keyify()
-        self.assertEqual([e1], pathToEdgeSequence(['a', 'b']))
-        e2 = TransactionEdge('b', 'c', 0).keyify()
-        self.assertEqual([e1, e2], pathToEdgeSequence(['a', 'b', 'c']))
+        self.assertEquals(12, amountOf(['a', 'b']))
+        self.assertEquals(2, amountOf(['b', 'c']))
+        self.assertEquals(2, amountOf(['a', 'b', 'c']))
+        self.assertEquals(0, amountOf(['a']))
 
-    def testMinimize(self):
-        e1 = TransactionEdge('a', 'b', 1)
-        e2 = TransactionEdge('b', 'c', 2)
-        e3 = TransactionEdge('c', 'a', 5)
-        e4 = TransactionEdge('a', 'd', 3)
-        e5 = TransactionEdge('d', 'a', 4)
-        e6 = TransactionEdge('c', 'b', 3)
-        insertEdge(e1)
-        insertEdge(e2)
-        insertEdge(e3)
-        insertEdge(e4)
-        insertEdge(e5)
-        insertEdge(e6)
-        minimizePath(['a', 'd', 'a'])
-        self.assertEquals(e4.amount, 0)
-        self.assertEquals(e5.amount, 1)
-        
-        minimizePath(['a', 'd', 'a']) # call again: should change nothing
-        self.assertEquals(e4.amount, 0)
-        self.assertEquals(e5.amount, 1)
-        
-        self.assertRaises(RuntimeError, minimizePath, (['a', 'b', 'c', 'b', 'c', 'a']))#should change nothing!
-        self.assertEquals(e1.amount, 1)
-        self.assertEquals(e2.amount, 2)
-        self.assertEquals(e3.amount, 5)
+    def testGetCycle(self):
+        insertEdge(TransactionEdge('a', 'b', 1))
+        insertEdge(TransactionEdge('b', 'c', 1))
+        insertEdge(TransactionEdge('a', 'd', 1))
+        insertEdge(TransactionEdge('d', 'a', 1))
+        insertEdge(TransactionEdge('d', 'c', 1))
+        insertEdge(TransactionEdge('c', 'd', 1))
+        insertEdge(TransactionEdge('c', 'b', 1))
 
-        minimizePath(['a', 'b', 'c', 'a'])
-        self.assertEquals(e1.amount, 0)
-        self.assertEquals(e2.amount, 1)
-        self.assertEquals(e3.amount, 4)
+        c1 = getCycles('a')
+        self.assertEqual(2, len(c1))
+        self.assertEqual([graphNodes['a'], graphNodes['b'], graphNodes['c'], graphNodes['d'], graphNodes['a']], c1[0])
+        self.assertEqual([graphNodes['a'], graphNodes['d'], graphNodes['a']], c1[1])
 
-        self.assertRaises(RuntimeError, minimizePath, (['a', 'b']))
+        c2 = getCycles('d')
+        self.assertEqual(3, len(c2))
+        self.assertEqual([graphNodes['d'], graphNodes['a'], graphNodes['b'], graphNodes['c'], graphNodes['d']], c2[0])
+        self.assertEqual([graphNodes['d'], graphNodes['a'], graphNodes['d']], c2[1])
+        self.assertEqual([graphNodes['d'], graphNodes['c'], graphNodes['d']], c2[2])
 
-    def testRemoveUnusedEdges(self):
-        e1 = TransactionEdge('a', 'b', 0)
-        e2 = TransactionEdge('b', 'c', 2)
-        e3 = TransactionEdge('c', 'a', 5)
-        e4 = TransactionEdge('a', 'd', 0)
-        e5 = TransactionEdge('d', 'a', 4)
-        e6 = TransactionEdge('c', 'b', 0)
-        insertEdge(e1)
-        insertEdge(e2)
-        insertEdge(e3)
-        insertEdge(e4)
-        insertEdge(e5)
-        insertEdge(e6)
-        self.assertTrue(removeUnusedEdges())
-        self.assertNotIn(e1.keyify(), graphEdges.keys())
-        self.assertIn(e2.keyify(), graphEdges.keys())
-        self.assertIn(e3.keyify(), graphEdges.keys())
-        self.assertNotIn(e4.keyify(), graphEdges.keys())
-        self.assertIn(e5.keyify(), graphEdges.keys())
-        self.assertNotIn(e6.keyify(), graphEdges.keys())
-        self.assertFalse(removeUnusedEdges())
+    def testGetAllCycles(self):
+        insertEdge(TransactionEdge('a', 'b', 1))
+        insertEdge(TransactionEdge('b', 'c', 1))
+        insertEdge(TransactionEdge('c', 'a', 1))
+        insertEdge(TransactionEdge('c', 'b', 1))
+        insertEdge(TransactionEdge('c', 'a', 1))
 
+        c = getAllCycles()
+        print c
+        self.assertEquals(5, len(c))
+        self.assertEquals(([graphNodes['a'], graphNodes['b'], graphNodes['c'], graphNodes['a']], 1), c[0])
+        self.assertEquals(([graphNodes['c'], graphNodes['a'], graphNodes['b'], graphNodes['c']], 1), c[1])
+        self.assertEquals(([graphNodes['c'], graphNodes['b'], graphNodes['c']], 1), c[2])
 
-def cmpDicts(a, b):
-    if a.keys() != b.keys():
-        print "a has different keys than B: " + str(a.keys()) + " vs. " + str(b.keys())
-        return False
-    for k in a.keys():
-        if b[k] != a[k]:
-            print "element with key " + k + " are different: " + a[k] + " vs. " + b[k]
-            return False
-    return True
 if __name__ == '__main__':
-  unittest.main()
+    unittest.main()
