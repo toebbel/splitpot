@@ -149,7 +149,7 @@ def minimizePath(path):
     Runs through a cycle and lowers the amount by the min. amount in the cycle.
 
     Path HAS to be a cycle. if not -> RuntimeError
-    No edge can be twice in the path, othweise -> Runtime Error
+    No edge other than the start-end-node can be twice in the path, othweise -> Runtime Error
     """
 
     if path[0] != path[len(path) - 1]:
@@ -164,7 +164,7 @@ def minimizePath(path):
             raise RuntimeError('minimized edge ' + head
                                + ' in the same path already before! Possible loss of money'
                                )
-        accepted.insert(0, head)
+        accepted.append(head)
 
     amount = amountOf(path)
     if amount == 0:

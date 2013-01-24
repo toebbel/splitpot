@@ -156,6 +156,50 @@ class TestTransactionGraph(unittest.TestCase):
         self.assertEquals(([graphNodes['a'], graphNodes['c'], graphNodes['a']], 1), c[0])
         self.assertEquals(([graphNodes['a'], graphNodes['b'], graphNodes['c'], graphNodes['a']], 1), c[1])
         self.assertEquals(([graphNodes['b'], graphNodes['c'], graphNodes['b']], 1), c[2])
+    
+    def testMinimizePath(self):
+        e_ab = TransactionEdge('a', 'b', 2)
+        e_bc = TransactionEdge('b', 'c', 11.2)
+        e_ca = TransactionEdge('c', 'a', 5)
+        e_dc = TransactionEdge('d', 'c', 2)
+        e_be = TransactionEdge('b', 'e', 2)
+        e_ed = TransactionEdge('e', 'd', 3)
+        e_cb = TransactionEdge('c', 'b', 10)
+        e_db = TransactionEdge('d', 'b', 2)
+        insertEdge(e_ab)
+        insertEdge(e_bc)
+        insertEdge(e_ca)
+        insertEdge(e_dc)
+        insertEdge(e_be)
+        insertEdge(e_ed)
+        insertEdge(e_cb)
+        insertEdge(e_db)
+        a = graphNodes['a']
+        b = graphNodes['b']
+        c = graphNodes['c']
+        d = graphNodes['d']
+        e = graphNodes['e']
 
+        c1 = [a, b, c, a]
+        c2 = [b, c, b]
+        c3 = [b, e, d, b]
+
+        minimizePath(c1)
+        self.assertEquals(e_ab.amount, 0)
+        self.assertEquals(e_bc.amount, 9.2)
+        self.assertEquals(e_ca.amount, 3)
+
+        #the others edges should not be affected (just check one):
+        self.assertEquals(e_be.amount, 2)
+
+        minimizePath(c2)
+        self.assertEquals(e_bc.amount, 0)
+        self.assertTrue(e_cb.amount - 0.8 < 0.000001)
+
+        minimizePath(c3)
+        self.assertEquals(e_db.amount, 0)
+        self.assertEquals(e_be.amount, 0)
+        self.assertEquals(e_ed.amount, 1)
+        
 if __name__ == '__main__':
     unittest.main()
