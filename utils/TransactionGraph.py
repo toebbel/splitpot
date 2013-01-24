@@ -84,12 +84,16 @@ def getAllCycles():
     Returns all cycles in the graph and their amount as tuple <cycle, amount>
     """
 
-    result = []
+    cycles = []
     for n in graphNodes.keys():
         tmp = getCycles(n)
         for c in tmp:
-            if not c in result:
-                result.append((c, amountOf(c)))
+            norm = normalizeCycle(c)
+            if not norm in cycles:
+                cycles.append(norm)
+    result = []
+    for c in cycles:
+        result.append((c, amountOf(c)))
     return result
 
 

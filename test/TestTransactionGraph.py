@@ -149,14 +149,13 @@ class TestTransactionGraph(unittest.TestCase):
         insertEdge(TransactionEdge('b', 'c', 1))
         insertEdge(TransactionEdge('c', 'a', 1))
         insertEdge(TransactionEdge('c', 'b', 1))
-        insertEdge(TransactionEdge('c', 'a', 1))
+        insertEdge(TransactionEdge('a', 'c', 1))
 
         c = getAllCycles()
-        print c
-        self.assertEquals(5, len(c))
-        self.assertEquals(([graphNodes['a'], graphNodes['b'], graphNodes['c'], graphNodes['a']], 1), c[0])
-        self.assertEquals(([graphNodes['c'], graphNodes['a'], graphNodes['b'], graphNodes['c']], 1), c[1])
-        self.assertEquals(([graphNodes['c'], graphNodes['b'], graphNodes['c']], 1), c[2])
+        self.assertEquals(3, len(c))
+        self.assertEquals(([graphNodes['a'], graphNodes['c'], graphNodes['a']], 1), c[0])
+        self.assertEquals(([graphNodes['a'], graphNodes['b'], graphNodes['c'], graphNodes['a']], 1), c[1])
+        self.assertEquals(([graphNodes['b'], graphNodes['c'], graphNodes['b']], 1), c[2])
 
 if __name__ == '__main__':
     unittest.main()
