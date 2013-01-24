@@ -107,9 +107,10 @@ class splitpot_controller(object):
                 log.info('Email: ' + str(other) + ' is malformed.')
                 return tmpl.render(feedback='Email ' + other
                                    + ' is mal formed. Please correct')
-            if other == getCurrentUserName(): #TODO check if user adds himself via alias (issue 23)
-                log.info("user tried to add himself to participants")
-                return tmpl.render(feedback="You can't add yourself to the list of participants")    
+            if other == getCurrentUserName():  # TODO check if user adds himself via alias (issue 23)
+                log.info('user tried to add himself to participants')
+                return tmpl.render(feedback="You can't add yourself to the list of participants"
+                                   )
 
         if not entryCommentRegex.match(comment):
             log.info('Comment is malformed.')
@@ -254,8 +255,7 @@ class splitpot_controller(object):
                                    newUser=getCurrentUserName())
             else:
                 mergeKey = getMergeUrlKey(getCurrentUserName(), email)
-                Email.mergeRequest(getCurrentUserName(), email, (),
-                                   mergeKey)
+                Email.mergeRequest(getCurrentUserName(), email, mergeKey)
 
                 return tmpl.render(feedback='An email has be sent to "'
                                    + email.lower()
