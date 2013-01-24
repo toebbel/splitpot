@@ -258,8 +258,7 @@ class splitpot_controller(object):
                                    newUser=getCurrentUserName())
             else:
                 mergeKey = getMergeUrlKey(getCurrentUserName(), email)
-                Email.mergeRequest(getCurrentUserName(), email, (),
-                                   mergeKey)
+                Email.mergeRequest(getCurrentUserName(), email, mergeKey)
 
                 return tmpl.render(good_news='An email has be sent to "'
                                     + email.lower()

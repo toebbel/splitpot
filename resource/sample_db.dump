@@ -25,9 +25,10 @@ CREATE TABLE "splitpot_users" (
 "name" TEXT NOT NULL,
 "registered" INTEGER NOT NULL,
 "salt" TEXT NOT NULL,
-"password" TEXT NOT NULL UNIQUE
+"password" TEXT NOT NULL
 );
 INSERT INTO "splitpot_users" VALUES('awesome@0xabc.de','Mr. Awesome',0,'tzPHQT2FIWJp3K9JrCtz5OLDIijfeQ','aa21d7ca5af3b12e26233b9ee3490abd1c99040629e2b28dedc9d8091ea6878d');
+INSERT INTO "splitpot_users" VALUES('magic@0xabc.de','Mr. Magic',0,'tzPHQT2FIWJp3K9JrCtz5OLDIijfeQ','aa21d7ca5af3b12e26233b9ee3490abd1c99040629e2b28dedc9d8091ea6878d');
 INSERT INTO "splitpot_users" VALUES('tobstu@0xabc.de','tobstu@0xabc.de',1,'oAjnxBPD','oAjnxBPD');
 INSERT INTO "splitpot_users" VALUES('martin@0xabc.de','martin@0xabc.de',1,'B7YpMo2w','B7YpMo2w');
 DELETE FROM sqlite_sequence;
