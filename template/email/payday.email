@@ -1,4 +1,5 @@
-<%inherit file="base.email"%>
+## -*- coding: utf-8 -*-
+<%inherit file="base.email" />
 
 It's Payday!
 You know what this means: Everybody pays his debts and hopefully gets a lot of money :)
@@ -8,12 +9,12 @@ Others owe you: ${inDebts}.
 
 Please transfer money to the following people:
 % for c in outPayments:
-    * ${c.amount} to ${c.toUserId}
+    * ${c.amount} to ${c.toUser}
 % endfor
 
 You will get money from these people:
 % for c in inPayments:
-    * ${c.amount} from ${t.fromUserId}
+    * ${c.amount} from ${c.fromUser}
 % endfor
 
 You can see all the events from the lsat month on the website.

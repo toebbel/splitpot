@@ -510,18 +510,18 @@ def TransactionGraphWriteback(keys):
     """
 
     update = ''
-    for k in keys:
-        update += ' OR (event = ' + keys[0] + " AND user = '" + keys[1] \
+    for event, usr in keys:
+        update += ' OR (event = ' + str(event) + " AND user = '" + usr \
             + "')"
     if len(update) == 0:
-        app.log('empty transaction graph - no write back')
+        log.info('empty transaction graph - no write back')
         return
     update = \
         "UPDATE splitpot_participants SET status = 'payday' WHERE " \
         + update[3:] + ';'
-    app.log('transactiongraph Writeback: ' + update)
+    log.info('transactiongraph Writeback: ' + update)
     with connection:
-        cur = connection.curser()
+        cur = connection.cursor()
         cur.execute(update)
 
 

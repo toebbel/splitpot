@@ -154,15 +154,17 @@ class splitpot_controller(object):
         events = listAllEventsFor(getCurrentUserName())
         for event in events:
             if event.amount < 0:
-                totalDebts += event.amount / float(len(event.participants) + 1)
-                log.info("add debt " + str(event))
-                log.info("=>" + str(totalDebts))
+                totalDebts += event.amount \
+                    / float(len(event.participants) + 1)
+                log.info('add debt ' + str(event))
+                log.info('=>' + str(totalDebts))
             else:
-                totalEarnings += event.amount - event.amount / float(len(event.participants) + 1)
+                totalEarnings += event.amount - event.amount \
+                    / float(len(event.participants) + 1)
         return tmpl.render(debts=totalDebts,
                            others_debts=totalEarnings, entries=events)
 
-    def payday():
+    def payday(self):
         log.info('PayDay! Build Transactiongraph')
         keys = buildTransactionTree()
 
@@ -185,12 +187,22 @@ class splitpot_controller(object):
         for userId in graphNodes.keys():
             incoming = 0
             outgoing = 0
+            incomingTransactions = []
+            outgoingTransactions = []
             for i in graphNodes[userId].incoming:
-                incoming += i.amount
+                edge = graphEdges[graphNodes[userId].incoming[i].keyify()]
+                if edge.amount > 0:
+                    incoming += edge.amount
+                    incomingTransactions.append(edge)
+                    print str(edge)
             for o in graphNodes[userId].outgoing:
-                outgoing += o.amount
-            payday(userId, graphNodes[userId].incoming,
-                   graphNodes[userId].outgoing, incoming, outgoing)
+                edge = graphEdges[graphNodes[userId].outgoing[o].keyify()]
+                if edge.amount > 0:
+                    outgoing += edge.amount
+                    outgoingTransactions.append(edge)
+                    print str(edge)
+
+            Email.payday(userId, incomingTransactions, outgoingTransactions, incoming, outgoing)
         log.info('writing graphBack')
         TransactionGraphWriteback(keys)
 
@@ -258,7 +270,8 @@ class splitpot_controller(object):
                                    newUser=getCurrentUserName())
             else:
                 mergeKey = getMergeUrlKey(getCurrentUserName(), email)
-                Email.mergeRequest(getCurrentUserName(), email, mergeKey)
+                Email.mergeRequest(getCurrentUserName(), email,
+                                   mergeKey)
 
                 return tmpl.render(good_news='An email has be sent to "'
                                     + email.lower()

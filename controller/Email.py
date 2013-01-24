@@ -36,7 +36,7 @@ def sendMail(
 
     msg = MIMEText(body)
     msg['From'] = sender
-    msg['To'] = 'tobstu@gmail.com'#to
+    msg['To'] = 'tobstu@gmail.com'  # to
     msg['Subject'] = subject
     server = smtplib.SMTP(host)
     server.sendmail(sender, ['tobstu@gmail.com'], msg.as_string())
@@ -141,7 +141,7 @@ def payday(
 
     # SettingsWrapper(email, "Payday!", tmpl.render(InPayments,outPayments, inDebt, outDebt)) #TODO enough data or more?
 
-    print tmpl.render(InPayments, outPayments, inDebt, outDebt)
+    print tmpl.render(inPayments = inPayments, outPayments = outPayments, inDebts = inDebt, outDebts = outDebt)
 
 
 def mergeRequest(newEmail, oldEmail, key):
@@ -178,7 +178,8 @@ def ownerEmail(userId, event):
     num_part = len(event.participants) + 1
     body = lookup.get_template('add_event_owner.email'
                                ).render(total=event.amount,
-            num_participants=num_part, amount=event.amount / float(num_part))
+            num_participants=num_part, amount=event.amount
+            / float(num_part))
     SettingsWrapper(userId, 'Your new Splitpot Entry', body)
 
 
