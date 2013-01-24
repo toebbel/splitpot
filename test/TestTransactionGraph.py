@@ -132,6 +132,18 @@ class TestTransactionGraph(unittest.TestCase):
         self.assertEqual([graphNodes['d'], graphNodes['a'], graphNodes['d']], c2[1])
         self.assertEqual([graphNodes['d'], graphNodes['c'], graphNodes['d']], c2[2])
 
+    def testNormalizeCycle(self):
+        insertNode(UserNode('a'))
+        insertNode(UserNode('b'))
+        insertNode(UserNode('c'))
+        a = graphNodes['a']
+        b = graphNodes['b']
+        c = graphNodes['c']
+        self.assertEqual([a, b, c, a], normalizeCycle([a, b, c, a]))
+        self.assertEqual([a, b, c, a], normalizeCycle([b, c, a, b]))
+        self.assertEqual([a, b, c, a], normalizeCycle([c, a, b, c]))
+    
+    
     def testGetAllCycles(self):
         insertEdge(TransactionEdge('a', 'b', 1))
         insertEdge(TransactionEdge('b', 'c', 1))
