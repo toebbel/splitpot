@@ -17,3 +17,7 @@
     color: #4F8A10;
     background-color: #DFF2BF;
 }
+
+.customButton {
+    width: 200px !important;
+}
