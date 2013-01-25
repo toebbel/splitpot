@@ -1,6 +1,9 @@
+## -*- coding: utf-8 -*-
+<%inherit file="base.email" />
+
 Hi,
 
-${owner} has just added new expenses: ${total}Eur in total, divided by ${num_participants}, which makes ${amount} for you.
+${owner} has just added new expenses: ${total}€ in total, divided by ${num_participants}, which makes ${amount}€ for you.
 We've added this expenses to your list. You'll receive another mail on payday.
 
 Greetings
