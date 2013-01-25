@@ -2,4 +2,5 @@
 
 Hi,
 You've requested a new password. To confirm this request, click on this url:
-  http://0xabc.de/splitpot/${url}
+
+${url}
