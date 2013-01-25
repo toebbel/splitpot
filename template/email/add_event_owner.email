@@ -1,4 +1,5 @@
-Hi,
+## -*- coding: utf-8 -*-
+<%inherit file="base.email" />
 
 You have just added new expenses: ${total}Eur in total, divided by ${num_participants}, which makes ${amount} for you (including you).
 

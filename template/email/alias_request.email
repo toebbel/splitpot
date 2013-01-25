@@ -1,8 +1,6 @@
 ## -*- coding: utf-8 -*-
 <%inherit file="base.email" />
 
-Hi,
-
 an alias request has been sent to us.
 Please confirm that you really wish to add this address as an alias to ${oldEmail}, by clicking on following link:
 

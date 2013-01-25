@@ -1,4 +1,5 @@
-<%inherit file="base.email"%>
+## -*- coding: utf-8 -*-
+<%inherit file="base.email" />
 
 Hi,
 this is your brand-new password: ${pwd}
