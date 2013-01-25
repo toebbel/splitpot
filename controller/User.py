@@ -109,7 +109,7 @@ def doRegister(
         errors += '<li>User already exists</li>'
     if not errors == '':
         return tmpl.render(bad_news='<ul>' + errors + '</ul>',
-                           givenKey=key, givenEmail = email)
+                           givenKey=key, givenEmail=email)
     else:
         if db.activateUser(email, nick, pwd1, True):
             Email.signupConfirm(email)
@@ -143,11 +143,11 @@ def doForgot(email=None, resetKey=None):
   """
 
     log.info('forgot ' + email + ', key ' + resetKey)
-    tmpl = lookup.get_template('forgot.html')
-    if db.isValidResetUrl(email, resetKey):
-        new_pwd = EncryptionHelper.generateRandomChars(8)  # TODO use default length from utils/auth
+    tmpl = lookup.get_template('forgot_pwd.html')
+    if db.isValidResetUrlKey(email, resetKey):
+        new_pwd = Encryption.generateRandomChars(8)  # TODO use default length from utils/auth
         Email.forgotNewPwd(email, new_pwd)
-        db.updateLogin(email, newPassword)
+        db.updateLogin(email, new_pwd)
         return tmpl.render(good_news="You'r password has been reset and in on it's way to your mailbox"
                            )
     else:
