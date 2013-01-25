@@ -39,7 +39,7 @@ def sendMail(
     msg['To'] = 'tobstu@gmail.com'  # to
     msg['Subject'] = subject
     server = smtplib.SMTP(host)
-    server.sendmail(sender, ['tobstu@gmail.com'], msg.as_string())
+    server.sendmail(sender, to, msg.as_string())
     server.quit()
 
 
@@ -82,7 +82,7 @@ def SettingsWrapper(to, subject, body):
     server = smtplib.SMTP(host=settings['host'],
                           port=int(settings['port']),
                           timeout=float(settings['timeout']))
-    if settings.containsKey('user') and  not settings['user'] == '':
+    if settings.containsKey('user') and not settings['user'] == '':
         if settings['encryption'].lower() == 'yes':
             server.ehlo()
             server.starttls()
@@ -157,6 +157,20 @@ def mergeRequest(newEmail, oldEmail, key):
     SettingsWrapper(oldEmail, 'Account Merge Request',
                     tmpl.render(newEmail=newEmail, oldEmail=oldEmail,
                     url=RUNNING_URL + 'user/doMerge?key=' + key))
+
+
+def aliasRequest(currentUser, aliasUser, key):
+    """
+    Send a confirmation mail to the mail address that is going to be added as alias.
+    """
+
+    log.info('sending an alias confirmation link to "'
+             + aliasUser.lower() + '"')
+
+    tmpl = lookup.get_template('alias_request.email')
+    SettingsWrapper(aliasUser, 'Add Alias Request',
+                    tmpl.render(oldEmail=currentUser, url=RUNNING_URL
+                    + 'user/doAddAlias?key=' + key))
 
 
 def participantEmail(userId, event):

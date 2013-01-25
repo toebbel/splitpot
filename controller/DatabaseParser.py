@@ -370,7 +370,7 @@ def getMergeUrlKey(newMail, oldMail):
     Generate a key for merge of two accounts.
     """
 
-    log.info('generate key for mergeing user "' + newMail + '" and "'
+    log.info('generate key for merging user "' + newMail + '" and "'
              + oldMail + '"')
     key = ''
     if userExists(newMail) and userExists(oldMail, True):
@@ -390,8 +390,7 @@ def isValidMergeUrlKey(key):
     if key != None and len(key) == MERGE_KEY_LEN:
         newMail = getUserFromPassword(key[:MERGE_KEY_LEN / 2])
         oldMail = getUserFromPassword(key[MERGE_KEY_LEN / 2:])
-
-        if getMergeUrlKey(newMail, oldMail)[:MERGE_KEY_LEN] == key:
+        if newMail != None and oldMail != None:
             return True
     return False
 
@@ -423,7 +422,7 @@ def mergeUser(newUser, oldUser):
 
     with connection:
         cur = connection.cursor()
-        if userExists(newUser) and userExists(oldUser):
+        if userExists(newUser, True) and userExists(oldUser, True):
             log.info('replacing every "' + oldUser.lower() + '" with "'
                      + newUser.lower() + ' in events.participants')
             events = listInvitedEventsFor(oldUser)
@@ -436,6 +435,10 @@ def mergeUser(newUser, oldUser):
 
                 cur.execute('UPDATE splitpot_events SET participants = ? WHERE participants = ?'
                             , [newParticipants, oldParticipants])
+
+            log.info('replacing all aliases')
+            cur.execute('UPDATE splitpot_aliases SET user = ? WHERE user = ?'
+                        , [newUser.lower(), oldUser.lower()])
 
             log.info('replacing every "' + oldUser.lower() + '" with "'
                      + newUser.lower() + ' in participants table')
@@ -469,6 +472,65 @@ def mergeUser(newUser, oldUser):
     return False
 
 
+def addAlias(mainUser, alias):
+    """
+    Add alias to given user.
+    """
+
+    log.info('add ' + alias.lower() + ' as alias to '
+             + mainUser.lower())
+
+    with connection:
+        cur = connection.cursor()
+        if userExists(mainUser):
+            cur.execute('INSERT INTO splitpot_aliases VALUES(?,?)',
+                        (mainUser.lower(), alias.lower()))
+        return True
+
+    return False
+
+
+def resolveAlias(alias):
+    """
+    Get main user from alias.
+    """
+
+    log.info('get main user for ' + alias.lower())
+
+    with connection:
+        cur = connection.cursor()
+        cur.execute('SELECT user FROM splitpot_aliases WHERE alias = ?'
+                    , [alias.lower()])
+
+        result = cur.fetchone()
+        if result != None:
+            if len(result) > 0:
+                return result[0]
+
+    return None
+
+
+def aliasUserExists(alias, mainMail=None):
+    """
+    Checks if an alias already exists.
+    """
+
+    log.info('checks if ' + alias.lower() + ' exists as an alias')
+    exists = ''
+    with connection:
+        cur = connection.cursor()
+        if mainMail != None:
+            cur.execute('SELECT COUNT(*) FROM splitpot_aliases WHERE alias = ? AND user = ?'
+                        , [alias.lower(), mainMail.lower()])
+            exists = cur.fetchone()[0]
+        else:
+            cur.execute('SELECT COUNT(*) FROM splitpot_aliases WHERE alias = ?'
+                        , [alias.lower()])
+            exists = cur.fetchone()[0]
+
+    return (False if exists == 0 else True)
+
+
 def resolveNick(userId):
     log.info('resolve nick ' + str(userId))
     if userExists(userId, True):
@@ -500,8 +562,8 @@ def buildTransactionTree():
         for entry in data:
             keys.append((entry[0], entry[3]))
             e = TransactionEdge(entry[3], entry[2], entry[1]
-                       / (entry[4] + 1))
-            print "insert " + str(e)
+                                / (entry[4] + 1))
+            print 'insert ' + str(e)
             insertEdge(e)
     return keys
 
@@ -512,7 +574,7 @@ def TransactionGraphWriteback(keys):
     """
 
     update = ''
-    for event, usr in keys:
+    for (event, usr) in keys:
         update += ' OR (event = ' + str(event) + " AND user = '" + usr \
             + "')"
     if len(update) == 0:
