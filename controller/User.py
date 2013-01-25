@@ -109,7 +109,7 @@ def doRegister(
         errors += '<li>User already exists</li>'
     if not errors == '':
         return tmpl.render(bad_news='<ul>' + errors + '</ul>',
-                           givenKey=key)
+                           givenKey=key, givenEmail = email)
     else:
         if db.activateUser(email, nick, pwd1, True):
             Email.signupConfirm(email)
@@ -168,11 +168,14 @@ def doLogin(username, password, from_page):
 
     tmpl = lookup.get_template('login.html')
     if username is None or password is None:
-       return tmpl.render(username=username, from_page =from_page, bad_news="please enter your login information") 
+        return tmpl.render(username=username, from_page=from_page,
+                           bad_news='please enter your login information'
+                           )
 
     error_msg = check_credentials(username, password)
     if error_msg:
-        return tmpl.render(username = username, from_page = from_page, bad_news="wrong login information")
+        return tmpl.render(username=username, from_page=from_page,
+                           bad_news='wrong login information')
     else:
         cherrypy.session[CURRENT_USER_NAME] = cherrypy.request.login = \
             username
