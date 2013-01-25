@@ -82,7 +82,7 @@ def SettingsWrapper(to, subject, body):
     server = smtplib.SMTP(host=settings['host'],
                           port=int(settings['port']),
                           timeout=float(settings['timeout']))
-    if "user" in settings and not settings['user'] == '':
+    if 'user' in settings and not settings['user'] == '':
         if settings['encryption'].lower() == 'yes':
             server.ehlo()
             server.starttls()
@@ -112,7 +112,7 @@ def forgotConfirmation(email, key):
     tmpl = lookup.get_template('forgot_confirmation.email')
     SettingsWrapper(email, 'Password Reset',
                     tmpl.render(url=RUNNING_URL
-                    + '/user/forgot_form?key=' + key))
+                    + 'user/forgot_form?key=' + key))
 
 
 def forgotNewPwd(email, pwd):
