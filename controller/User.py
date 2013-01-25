@@ -168,13 +168,13 @@ def doLogin(username, password):
 
     tmpl = lookup.get_template('login.html')
     if username is None or password is None:
-        return tmpl.render(username=username, from_page=from_page,
+        return tmpl.render(username=username,
                            bad_news='please enter your login information'
                            )
 
     error_msg = check_credentials(username, password)
     if error_msg:
-        return tmpl.render(username=username, from_page=from_page,
+        return tmpl.render(username=username,
                            bad_news='wrong login information')
     else:
         cherrypy.session[CURRENT_USER_NAME] = cherrypy.request.login = \
