@@ -11,6 +11,7 @@
 # app specific
 log/app.log
 resource/splitpotDB_DEV.sqlite
+resource/splitpotDB.sqlite
 resource/cherry.conf
 resource/app.conf
 
