@@ -1,6 +1,7 @@
 ## -*- coding: utf-8 -*-
+<%! import cherrypy %>
 <%inherit file="base.html" />
 
-<a href="/add">add</a><br />
-<a href="/list">list</a><br />
-<a href="/merge">merge</a>
+<a href="${cherrypy.url('add')}">add</a><br />
+<a href="${cherrypy.url('list')}">list</a><br />
+<a href="${cherrypy.url('merge')}">merge</a>
