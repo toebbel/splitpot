@@ -493,14 +493,16 @@ def buildTransactionTree():
     clearTransactionGraph()
     with connection:
         cur = connection.cursor()
-        cur.execute("select id, amount, owner, user, tmp.num_parts FROM splitpot_participants, splitpot_events, (SELECT event, count(event) as 'num_parts' FROM splitpot_participants group by event) tmp WHERE splitpot_participants.event = splitpot_events.id AND splitpot_participants.status != 'payday';"
+        cur.execute("select id, amount, owner, user, tmp.num_parts FROM splitpot_participants, splitpot_events, (SELECT event, count(event) as 'num_parts' FROM splitpot_participants group by event) tmp WHERE splitpot_participants.event = splitpot_events.id AND tmp.event = splitpot_participants.event AND splitpot_participants.status != 'payday';"
                     )
         data = cur.fetchall()
         keys = []
         for entry in data:
             keys.append((entry[0], entry[3]))
-            insertEdge(TransactionEdge(entry[3], entry[2], entry[1]
-                       / (entry[4] + 1)))
+            e = TransactionEdge(entry[3], entry[2], entry[1]
+                       / (entry[4] + 1))
+            print "insert " + str(e)
+            insertEdge(e)
     return keys
 
 
