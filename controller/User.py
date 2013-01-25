@@ -155,13 +155,13 @@ def doForgot(email=None, resetKey=None):
 
 
 @cherrypy.expose
-def login(usr='', from_page='/'):
+def login(usr=''):
     tmpl = lookup.get_template('login.html')
-    return tmpl.render(username=usr, from_page=from_page)
+    return tmpl.render(username=usr)
 
 
 @cherrypy.expose
-def doLogin(username, password, from_page):
+def doLogin(username, password):
     """
   Checks the login data against utils/auth. redirects to from_page or to "/" after successfull login
   """
@@ -179,11 +179,11 @@ def doLogin(username, password, from_page):
     else:
         cherrypy.session[CURRENT_USER_NAME] = cherrypy.request.login = \
             username
-        raise cherrypy.HTTPRedirect(from_page or '/')
+        raise cherrypy.HTTPRedirect(cherrypy.url('/'))
 
 
 @cherrypy.expose
-def logout(from_page='/'):
+def logout():
     """
     Destroys complete Session and redirects to about page or from_page, if given
     """
@@ -193,4 +193,4 @@ def logout(from_page='/'):
     sess[CURRENT_USER_NAME] = None
     if username:
         cherrypy.request.login = None
-    raise cherrypy.HTTPRedirect(from_page or '/about')
+    raise cherrypy.HTTPRedirect(cherrypy.url('/about'))

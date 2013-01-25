@@ -1,8 +1,7 @@
 <%inherit file="base.html" />
 
-<form method="post" action="/user/doLogin">
-  <input type="hidden" name="from_page" value="${from_page}" />
-  Username: <input type="text" name="username" value="${username}" /><br />
+<form method="post" action="doLogin">
+  Username: <input type="text" name="username" value="${username or ""}" /><br />
   Password: <input type="password" name="password" /><br />
   <input type="submit" value="Log in" />
 </form>
