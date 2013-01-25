@@ -147,7 +147,7 @@ def doForgot(email=None, resetKey=None):
     if db.isValidResetUrlKey(email, resetKey):
         new_pwd = Encryption.generateRandomChars(8)  # TODO use default length from utils/auth
         Email.forgotNewPwd(email, new_pwd)
-        db.updateLogin(email, newPassword)
+        db.updateLogin(email, new_pwd)
         return tmpl.render(good_news="You'r password has been reset and in on it's way to your mailbox"
                            )
     else:
