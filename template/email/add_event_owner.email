@@ -3,8 +3,8 @@
 
 Hi,
 
-You have just added new expenses: ${("%.2f" % total)}Eur in total, divided by ${num_participants},
-which makes ${("%.2f" % amount)}Eur for you (including you).
+you have just added new expenses: ${("%.2f" % total).replace('.', ',')}Eur in total, divided by ${num_participants},
+which makes ${("%.2f" % amount).replace('.', ',')}Eur for you (including you).
 
 We've added this expenses to your list. You'll receive another mail on payday.
 
