@@ -7,15 +7,15 @@ Add you expenses, that you made for others.
     <table>
         <tr>
             <td>Amount</td>
-            <td><input type="text" name="amount" /></td>
+            <td><input type="text" name="amount" value="${amount or ""}" /></td>
         </tr>
         <tr>
             <td>Comment:</td>
-            <td><textarea name="comment" rows="4" cols="30"></textarea></td>
+            <td><textarea name="comment" rows="4" cols="30">${comment or ""}</textarea></td>
         </tr>
         <tr>
             <td>Others:</td>
-            <td><input type="text" name="others" id="others" /></td>
+            <td><input type="text" name="others" id="others" value="${others or ""}"/></td>
         </tr>
         <tr>
             <td></td>

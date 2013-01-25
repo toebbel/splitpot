@@ -99,23 +99,24 @@ class splitpot_controller(object):
         tmpl = lookup.get_template('add.html')
         if not amountRegex.match(amount):
             log.info('mal formed amount')
-            return tmpl.render(bad_news='Amount is mal formed. Please correct & try again'
-                               )
+            return tmpl.render(bad_news='Amount is mal formed. Please correct & try again', comment = comment, others = others)
+        
+        if float(amount) <= 0:
+            log.info("amount <= 0")
+            return tmpl.render(bad_news='Amount has to be greater than zero ;)', comment = comment, others = others)
 
         for other in othersList:
             if not emailRegex.match(other):
                 log.info('Email: ' + str(other) + ' is malformed.')
                 return tmpl.render(bad_news='Email ' + other
-                                   + ' is mal formed. Please correct')
+                                   + ' is mal formed. Please correct', comment = comment, others = others, amount = amount)
             if other == getCurrentUserName():  # TODO check if user adds himself via alias (issue 23)
                 log.info('user tried to add himself to participants')
-                return tmpl.render(bad_news="You can't add yourself to the list of participants"
-                                   )
+                return tmpl.render(bad_news="You can't add yourself to the list of participants", comment = comment, others = others, amount = amount)
 
         if not entryCommentRegex.match(comment):
             log.info('Comment is malformed.')
-            return tmpl.render(bad_news='Comment is malformed. Plase correct & try again'
-                               )
+            return tmpl.render(bad_news='Comment is malformed. Plase correct & try again', comment = comment, others = others, amount = amount)
 
         for curParticipant in othersList:
             if not userExists(curParticipant, True):
@@ -190,19 +191,22 @@ class splitpot_controller(object):
             incomingTransactions = []
             outgoingTransactions = []
             for i in graphNodes[userId].incoming:
-                edge = graphEdges[graphNodes[userId].incoming[i].keyify()]
+                edge = \
+                    graphEdges[graphNodes[userId].incoming[i].keyify()]
                 if edge.amount > 0:
                     incoming += edge.amount
                     incomingTransactions.append(edge)
                     print str(edge)
             for o in graphNodes[userId].outgoing:
-                edge = graphEdges[graphNodes[userId].outgoing[o].keyify()]
+                edge = \
+                    graphEdges[graphNodes[userId].outgoing[o].keyify()]
                 if edge.amount > 0:
                     outgoing += edge.amount
                     outgoingTransactions.append(edge)
                     print str(edge)
 
-            Email.payday(userId, incomingTransactions, outgoingTransactions, incoming, outgoing)
+            Email.payday(userId, incomingTransactions,
+                         outgoingTransactions, incoming, outgoing)
         log.info('writing graphBack')
         TransactionGraphWriteback(keys)
 
