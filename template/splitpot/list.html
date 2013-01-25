@@ -1,5 +1,6 @@
 ## -*- coding: utf-8 -*-
 <%inherit file="base.html" />
+<%! import cherrypy %>
 <%! from Auth import getCurrentUserName %>
 <%! from DatabaseParser import resolveNick %>
 Your debts: ${debts}€ <br />
@@ -28,7 +29,7 @@ Others owe you: ${others_debts}€ <br />
         ${x.amount}€
       </td>
       <td>
-        <a href="/../event/${x.id}">more</a>
+	      <a href="${cherrypy.url('event/' + str(x.id))}">more</a>
       </td>
     </tr>
   % endfor
