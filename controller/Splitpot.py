@@ -112,9 +112,13 @@ class splitpot_controller(object):
                                    + ' is mal formed. Please correct',
                                    comment=comment, others=others,
                                    amount=amount)
-                if other == getCurrentUserName() or resolveAlias(other) == getCurrentUserName():
-                    log.info('user tried to add himself to participants')
-                    return tmpl.render(bad_news="You can't add yourself to the list of participants", comment=comment, others=others, amount=amount)
+                if other == getCurrentUserName() or resolveAlias(other) \
+                    == getCurrentUserName():
+                    log.info('user tried to add himself to participants'
+                             )
+                    return tmpl.render(bad_news="You can't add yourself to the list of participants"
+                            , comment=comment, others=others,
+                            amount=amount)
 
         if not entryCommentRegex.match(comment):
             log.info('Comment is malformed.')

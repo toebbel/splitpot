@@ -36,7 +36,7 @@ def sendMail(
 
     msg = MIMEText(body)
     msg['From'] = sender
-    msg['To'] = 'tobstu@gmail.com'  # to
+    msg['To'] = to
     msg['Subject'] = subject
     server = smtplib.SMTP(host)
     server.sendmail(sender, to, msg.as_string())
