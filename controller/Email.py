@@ -82,7 +82,7 @@ def SettingsWrapper(to, subject, body):
     server = smtplib.SMTP(host=settings['host'],
                           port=int(settings['port']),
                           timeout=float(settings['timeout']))
-    if settings.containsKey('user') and not settings['user'] == '':
+    if "user" in settings and not settings['user'] == '':
         if settings['encryption'].lower() == 'yes':
             server.ehlo()
             server.starttls()
