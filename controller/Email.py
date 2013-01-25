@@ -82,7 +82,7 @@ def SettingsWrapper(to, subject, body):
     server = smtplib.SMTP(host=settings['host'],
                           port=int(settings['port']),
                           timeout=float(settings['timeout']))
-    if "user" in settings and not settings['user'] == '':
+    if 'user' in settings and not settings['user'] == '':
         if settings['encryption'].lower() == 'yes':
             server.ehlo()
             server.starttls()
@@ -170,7 +170,7 @@ def aliasRequest(currentUser, aliasUser, key):
     tmpl = lookup.get_template('alias_request.email')
     SettingsWrapper(aliasUser, 'Add Alias Request',
                     tmpl.render(oldEmail=currentUser, url=RUNNING_URL
-                    + 'user/doAddAlias?key=' + key))
+                    + 'doAddAlias?key=' + key))
 
 
 def participantEmail(userId, event):
