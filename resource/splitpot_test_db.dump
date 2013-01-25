@@ -1,0 +1,58 @@
+PRAGMA foreign_keys=OFF;
+BEGIN TRANSACTION;
+CREATE TABLE "splitpot_events" (
+"ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+"owner" TEXT NOT NULL,
+"date" TEXT NOT NULL,
+"amount" INTEGER NOT NULL,
+"participants" TEXT,
+"comment" TEXT
+);
+INSERT INTO "splitpot_events" VALUES(1,'awesome@0xabc.de','24-01-2013',10.2,'["mail@tobiassturm.de"]','');
+INSERT INTO "splitpot_events" VALUES(2,'awesome@0xabc.de','24-01-2013',0,'["info@tobiassturm.de"]','');
+INSERT INTO "splitpot_events" VALUES(3,'info@tobiassturm.de','24-01-2013',4,'["awesome@0xabc.de"]','');
+INSERT INTO "splitpot_events" VALUES(4,'mail@tobiassturm.de','24-01-2013',14,'["info@tobiassturm.de"]','');
+INSERT INTO "splitpot_events" VALUES(5,'mail@tobiassturm.de','24-01-2013',2,'["awesome@0xabc.de"]','');
+INSERT INTO "splitpot_events" VALUES(6,'info@tobiassturm.de','24-01-2013',4.3,'["contact@tobiassturm.de"]','');
+INSERT INTO "splitpot_events" VALUES(7,'contact@tobiassturm.de','24-01-2013',4.3,'["kontakt@tobiassturm.de"]','');
+INSERT INTO "splitpot_events" VALUES(8,'kontakt@tobiassturm.de','24-01-2013',6,'["info@tobiassturm.de"]','');
+CREATE TABLE "splitpot_participants" (
+"user" TEXT REFERENCES "splitpot_users"("email") NOT NULL,
+"event" INTEGER REFERENCES "splitpot_participants"("ID") NOT NULL,
+"status" TEXT NOT NULL
+);
+INSERT INTO "splitpot_participants" VALUES('mail@tobiassturm.de',1,'new');
+INSERT INTO "splitpot_participants" VALUES('info@tobiassturm.de',2,'new');
+INSERT INTO "splitpot_participants" VALUES('awesome@0xabc.de',3,'new');
+INSERT INTO "splitpot_participants" VALUES('info@tobiassturm.de',4,'new');
+INSERT INTO "splitpot_participants" VALUES('awesome@0xabc.de',5,'new');
+INSERT INTO "splitpot_participants" VALUES('contact@tobiassturm.de',6,'new');
+INSERT INTO "splitpot_participants" VALUES('kontakt@tobiassturm.de',7,'new');
+INSERT INTO "splitpot_participants" VALUES('info@tobiassturm.de',8,'new');
+CREATE TABLE "splitpot_users" (
+"email" TEXT PRIMARY KEY NOT NULL UNIQUE,
+"name" TEXT NOT NULL,
+"registered" INTEGER NOT NULL,
+"salt" TEXT NOT NULL,
+"password" TEXT NOT NULL UNIQUE
+);
+INSERT INTO "splitpot_users" VALUES('awesome@0xabc.de','Mr. Awesome',0,'tzPHQT2FIWJp3K9JrCtz5OLDIijfeQ','aa21d7ca5af3b12e26233b9ee3490abd1c99040629e2b28dedc9d8091ea6878d');
+INSERT INTO "splitpot_users" VALUES('mail@tobiassturm.de','mail',0,'JimvMHfp0yadzL2IDHuDWdAqwOgvlg','c601b16c587ea30f72f9c46971060bf257b09a64cae4b2f48b2bd4811bc2ee40');
+INSERT INTO "splitpot_users" VALUES('info@tobiassturm.de','info',0,'VRdslI2lmwKVQtmvvEacc9OrmAww3D','451dbe2651cb5502be3ca260038d97112cd9b0b2d789db6b04b24078a46878d9');
+INSERT INTO "splitpot_users" VALUES('contact@tobiassturm.de','contact',0,'OZuTqNjQf10vP8QCL5xZGs7KgiK31n','dcfe6f111ee0e460701180e715680821d72e67c49f6ac05517579cc0c8d94b30');
+INSERT INTO "splitpot_users" VALUES('kontakt@tobiassturm.de','kontakt',0,'Wz1ojj3qm24GuALRVYc2CmCEv363bJ','0c70cd68825f36fd74ff410a73ab7d9dde8760a7e99bf7be190478974cd701e1');
+CREATE TABLE "splitpot_autocomplete" (
+"from" TEXT REFERENCES "splitpot_users"("email") NOT NULL,
+"to" TEXT REFERENCES "splitpot_users"("email") NOT NULL
+);
+INSERT INTO "splitpot_autocomplete" VALUES('awesome@0xabc.de','mail@tobiassturm.de');
+INSERT INTO "splitpot_autocomplete" VALUES('awesome@0xabc.de','info@tobiassturm.de');
+INSERT INTO "splitpot_autocomplete" VALUES('info@tobiassturm.de','awesome@0xabc.de');
+INSERT INTO "splitpot_autocomplete" VALUES('mail@tobiassturm.de','info@tobiassturm.de');
+INSERT INTO "splitpot_autocomplete" VALUES('mail@tobiassturm.de','awesome@0xabc.de');
+INSERT INTO "splitpot_autocomplete" VALUES('info@tobiassturm.de','contact@tobiassturm.de');
+INSERT INTO "splitpot_autocomplete" VALUES('contact@tobiassturm.de','kontakt@tobiassturm.de');
+INSERT INTO "splitpot_autocomplete" VALUES('kontakt@tobiassturm.de','info@tobiassturm.de');
+DELETE FROM sqlite_sequence;
+INSERT INTO "sqlite_sequence" VALUES('splitpot_events',8);
+COMMIT;
