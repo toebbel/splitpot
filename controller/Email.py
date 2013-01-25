@@ -82,7 +82,7 @@ def SettingsWrapper(to, subject, body):
     server = smtplib.SMTP(host=settings['host'],
                           port=int(settings['port']),
                           timeout=float(settings['timeout']))
-    if not settings['user'] == '':
+    if settings.containsKey('user') and  not settings['user'] == '':
         if settings['encryption'].lower() == 'yes':
             server.ehlo()
             server.starttls()
@@ -141,7 +141,8 @@ def payday(
 
     # SettingsWrapper(email, "Payday!", tmpl.render(InPayments,outPayments, inDebt, outDebt)) #TODO enough data or more?
 
-    print tmpl.render(inPayments = inPayments, outPayments = outPayments, inDebts = inDebt, outDebts = outDebt)
+    print tmpl.render(inPayments=inPayments, outPayments=outPayments,
+                      inDebts=inDebt, outDebts=outDebt)
 
 
 def mergeRequest(newEmail, oldEmail, key):
