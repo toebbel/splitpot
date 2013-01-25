@@ -309,7 +309,7 @@ class splitpot_controller(object):
         Return the template for adding alias.
         """
 
-        return lookup.get_template('alias.html').render(feedback='')
+        return lookup.get_template('alias.html').render()
 
     @cherrypy.expose
     @require()
@@ -340,7 +340,7 @@ class splitpot_controller(object):
                 log.warning('couldn\'t alias/merge "' + newUser
                             + '" and "' + oldUser
                             + '" for some unexpected reason')
-                return tmpl.render(feedback='Oh no! Something went wrong. Please try again later.'
+                return tmpl.render(bad_news='Oh no! Something went wrong. Please try again later.'
                                    , newUser=getCurrentUserName())
         elif alias is not None:
             log.info('alias is not not')
@@ -359,7 +359,7 @@ class splitpot_controller(object):
                             + ' is already an alias for someone else</li>'
 
             if not errors == '':
-                return tmpl.render(feedback='<ul>' + errors + '</ul>')
+                return tmpl.render(bad_news='<ul>' + errors + '</ul>')
             else:
 
                 info = ''
@@ -378,10 +378,10 @@ class splitpot_controller(object):
                             + user.lower() \
                             + '" for further information</li>'
 
-                return tmpl.render(feedback=info)
+                return tmpl.render(good_news=info)
         else:
 
-            return tmpl.render(feedback='Nothing to add to aliases list'
+            return tmpl.render(good_news='Nothing to add to aliases list'
                                )
 
 

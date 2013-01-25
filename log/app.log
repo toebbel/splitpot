@@ -1,1 +1,153 @@
  
+[25/01/2013 04:47:29] DatabaseParser       INFO       connecting to database...
+[25/01/2013 04:47:29] DatabaseParser       INFO       connecting to database...
+[25/01/2013 04:47:29] App                  INFO       Splitpot started
+[25/01/2013 04:47:40] DatabaseParser       INFO       check if email: awesome@0xabc.de exists. isGhost?False
+[25/01/2013 04:47:40] DatabaseParser       INFO       verify user and given password
+[25/01/2013 04:47:40] Splitpot             INFO       deliver index
+[25/01/2013 04:47:53] Splitpot             INFO       Get all events for awesome@0xabc.de
+[25/01/2013 04:47:53] DatabaseParser       INFO       list all events for "awesome@0xabc.de"
+[25/01/2013 04:47:53] DatabaseParser       INFO       list all hosting events for 'awesome@0xabc.de'
+[25/01/2013 04:47:53] DatabaseParser       INFO       list all invited to events for 'awesome@0xabc.de'
+[25/01/2013 04:47:55] Splitpot             INFO       deliver event page
+[25/01/2013 04:47:55] DatabaseParser       INFO       retrieve event 53
+[25/01/2013 04:47:55] DatabaseParser       INFO       check if "awesome@0xabc.de" is in event: "53"
+[25/01/2013 04:47:55] DatabaseParser       INFO       check if email: awesome@0xabc.de exists. isGhost?False
+[25/01/2013 04:47:55] DatabaseParser       INFO       retrieve event 53
+[25/01/2013 04:47:55] DatabaseParser       INFO       list all events for "awesome@0xabc.de"
+[25/01/2013 04:47:55] DatabaseParser       INFO       list all hosting events for 'awesome@0xabc.de'
+[25/01/2013 04:47:55] DatabaseParser       INFO       list all invited to events for 'awesome@0xabc.de'
+[25/01/2013 04:47:55] DatabaseParser       INFO       retrieve event 53
+[25/01/2013 04:47:55] DatabaseParser       INFO       resolve nick awesome@0xabc.de
+[25/01/2013 04:47:55] DatabaseParser       INFO       check if email: awesome@0xabc.de exists. isGhost?True
+[25/01/2013 04:47:55] DatabaseParser       INFO       check if email: awesome@0xabc.de exists. isGhost?False
+[25/01/2013 04:47:55] DatabaseParser       INFO       resolve nick tobstu@0xabc.de
+[25/01/2013 04:47:55] DatabaseParser       INFO       check if email: tobstu@0xabc.de exists. isGhost?True
+[25/01/2013 04:47:55] DatabaseParser       INFO       check if email: tobstu@0xabc.de exists. isGhost?False
+[25/01/2013 04:48:00] Splitpot             INFO       deliver index
+[25/01/2013 04:49:02] Splitpot             INFO       deliver index
+[25/01/2013 04:49:25] Splitpot             INFO       deliver index
+[25/01/2013 04:49:29] Splitpot             INFO       Get all events for awesome@0xabc.de
+[25/01/2013 04:49:29] DatabaseParser       INFO       list all events for "awesome@0xabc.de"
+[25/01/2013 04:49:29] DatabaseParser       INFO       list all hosting events for 'awesome@0xabc.de'
+[25/01/2013 04:49:29] DatabaseParser       INFO       list all invited to events for 'awesome@0xabc.de'
+[25/01/2013 04:49:30] Splitpot             INFO       deliver event page
+[25/01/2013 04:49:30] DatabaseParser       INFO       retrieve event 53
+[25/01/2013 04:49:30] DatabaseParser       INFO       check if "awesome@0xabc.de" is in event: "53"
+[25/01/2013 04:49:30] DatabaseParser       INFO       check if email: awesome@0xabc.de exists. isGhost?False
+[25/01/2013 04:49:30] DatabaseParser       INFO       retrieve event 53
+[25/01/2013 04:49:30] DatabaseParser       INFO       list all events for "awesome@0xabc.de"
+[25/01/2013 04:49:30] DatabaseParser       INFO       list all hosting events for 'awesome@0xabc.de'
+[25/01/2013 04:49:30] DatabaseParser       INFO       list all invited to events for 'awesome@0xabc.de'
+[25/01/2013 04:49:30] DatabaseParser       INFO       retrieve event 53
+[25/01/2013 04:49:30] DatabaseParser       INFO       resolve nick awesome@0xabc.de
+[25/01/2013 04:49:30] DatabaseParser       INFO       check if email: awesome@0xabc.de exists. isGhost?True
+[25/01/2013 04:49:30] DatabaseParser       INFO       check if email: awesome@0xabc.de exists. isGhost?False
+[25/01/2013 04:49:30] DatabaseParser       INFO       resolve nick tobstu@0xabc.de
+[25/01/2013 04:49:30] DatabaseParser       INFO       check if email: tobstu@0xabc.de exists. isGhost?True
+[25/01/2013 04:49:30] DatabaseParser       INFO       check if email: tobstu@0xabc.de exists. isGhost?False
+[25/01/2013 04:49:33] Splitpot             INFO       deliver about page
+[25/01/2013 04:49:37] DatabaseParser       INFO       check if email: awesome@0xabc.de exists. isGhost?False
+[25/01/2013 04:49:37] DatabaseParser       INFO       verify user and given password
+[25/01/2013 04:49:37] Splitpot             INFO       deliver index
+[25/01/2013 04:51:59] Splitpot             INFO       merge "tobstu@googlemail.com" with "awesome@0xabc.de"
+[25/01/2013 04:51:59] DatabaseParser       INFO       check if email: tobstu@googlemail.com exists. isGhost?True
+[25/01/2013 04:51:59] DatabaseParser       INFO       check if email: awesome@0xabc.de exists. isGhost?False
+[25/01/2013 04:51:59] DatabaseParser       INFO       list all events for "awesome@0xabc.de"
+[25/01/2013 04:51:59] DatabaseParser       INFO       list all hosting events for 'awesome@0xabc.de'
+[25/01/2013 04:51:59] DatabaseParser       INFO       list all invited to events for 'awesome@0xabc.de'
+[25/01/2013 04:52:02] Splitpot             INFO       deliver index
+[25/01/2013 04:52:13] Splitpot             INFO       deliver index
+[25/01/2013 04:53:04] DatabaseParser       INFO       connecting to database...
+[25/01/2013 04:53:04] DatabaseParser       INFO       connecting to database...
+[25/01/2013 04:53:04] App                  INFO       Splitpot started
+[25/01/2013 04:53:13] DatabaseParser       INFO       connecting to database...
+[25/01/2013 04:53:13] DatabaseParser       INFO       connecting to database...
+[25/01/2013 04:53:13] App                  INFO       Splitpot started
+[25/01/2013 04:53:58] DatabaseParser       INFO       connecting to database...
+[25/01/2013 04:53:58] DatabaseParser       INFO       connecting to database...
+[25/01/2013 04:53:58] App                  INFO       Splitpot started
+[25/01/2013 05:01:49] DatabaseParser       INFO       check if email: awesome@0xabc.de exists. isGhost?False
+[25/01/2013 05:01:49] DatabaseParser       INFO       verify user and given password
+[25/01/2013 05:01:49] Splitpot             INFO       deliver index
+[25/01/2013 05:04:03] Splitpot             INFO       merge "safd" with "awesome@0xabc.de"
+[25/01/2013 05:04:03] DatabaseParser       INFO       check if email: awesome@0xabc.de exists. isGhost?False
+[25/01/2013 05:04:03] DatabaseParser       INFO       list all events for "awesome@0xabc.de"
+[25/01/2013 05:04:03] DatabaseParser       INFO       list all hosting events for 'awesome@0xabc.de'
+[25/01/2013 05:04:03] DatabaseParser       INFO       list all invited to events for 'awesome@0xabc.de'
+[25/01/2013 05:04:09] Splitpot             INFO       merge "sdfa#asdf" with "awesome@0xabc.de"
+[25/01/2013 05:04:09] DatabaseParser       INFO       check if email: awesome@0xabc.de exists. isGhost?False
+[25/01/2013 05:04:09] DatabaseParser       INFO       list all events for "awesome@0xabc.de"
+[25/01/2013 05:04:09] DatabaseParser       INFO       list all hosting events for 'awesome@0xabc.de'
+[25/01/2013 05:04:09] DatabaseParser       INFO       list all invited to events for 'awesome@0xabc.de'
+[25/01/2013 05:04:15] Splitpot             INFO       merge "maritn@dinh.asde" with "awesome@0xabc.de"
+[25/01/2013 05:04:15] DatabaseParser       INFO       check if email: maritn@dinh.asde exists. isGhost?True
+[25/01/2013 05:04:15] DatabaseParser       INFO       check if email: awesome@0xabc.de exists. isGhost?False
+[25/01/2013 05:04:15] DatabaseParser       INFO       list all events for "awesome@0xabc.de"
+[25/01/2013 05:04:15] DatabaseParser       INFO       list all hosting events for 'awesome@0xabc.de'
+[25/01/2013 05:04:15] DatabaseParser       INFO       list all invited to events for 'awesome@0xabc.de'
+[25/01/2013 05:04:24] Splitpot             INFO       Get all events for awesome@0xabc.de
+[25/01/2013 05:04:24] DatabaseParser       INFO       list all events for "awesome@0xabc.de"
+[25/01/2013 05:04:24] DatabaseParser       INFO       list all hosting events for 'awesome@0xabc.de'
+[25/01/2013 05:04:24] DatabaseParser       INFO       list all invited to events for 'awesome@0xabc.de'
+[25/01/2013 05:04:27] Splitpot             INFO       deliver event page
+[25/01/2013 05:04:27] DatabaseParser       INFO       retrieve event 53
+[25/01/2013 05:04:27] DatabaseParser       INFO       check if "awesome@0xabc.de" is in event: "53"
+[25/01/2013 05:04:27] DatabaseParser       INFO       check if email: awesome@0xabc.de exists. isGhost?False
+[25/01/2013 05:04:27] DatabaseParser       INFO       retrieve event 53
+[25/01/2013 05:04:27] DatabaseParser       INFO       list all events for "awesome@0xabc.de"
+[25/01/2013 05:04:27] DatabaseParser       INFO       list all hosting events for 'awesome@0xabc.de'
+[25/01/2013 05:04:27] DatabaseParser       INFO       list all invited to events for 'awesome@0xabc.de'
+[25/01/2013 05:04:27] DatabaseParser       INFO       retrieve event 53
+[25/01/2013 05:04:27] DatabaseParser       INFO       resolve nick awesome@0xabc.de
+[25/01/2013 05:04:27] DatabaseParser       INFO       check if email: awesome@0xabc.de exists. isGhost?True
+[25/01/2013 05:04:27] DatabaseParser       INFO       check if email: awesome@0xabc.de exists. isGhost?False
+[25/01/2013 05:04:27] DatabaseParser       INFO       resolve nick tobstu@0xabc.de
+[25/01/2013 05:04:27] DatabaseParser       INFO       check if email: tobstu@0xabc.de exists. isGhost?True
+[25/01/2013 05:04:27] DatabaseParser       INFO       check if email: tobstu@0xabc.de exists. isGhost?False
+[25/01/2013 05:04:42] Splitpot             INFO       deliver add form
+[25/01/2013 05:04:52] Splitpot             INFO       deliver index
+[25/01/2013 05:04:53] Splitpot             INFO       deliver index
+[25/01/2013 05:04:53] Splitpot             INFO       deliver index
+[25/01/2013 05:04:55] Splitpot             INFO       deliver add form
+[25/01/2013 05:05:21] Splitpot             INFO       deliver add form
+[25/01/2013 05:05:56] DatabaseParser       INFO       check if email: awesome@0xabc.de exists. isGhost?False
+[25/01/2013 05:05:56] DatabaseParser       INFO       verify user and given password
+[25/01/2013 05:05:56] Splitpot             INFO       deliver index
+[25/01/2013 05:06:03] Splitpot             INFO       Get all events for awesome@0xabc.de
+[25/01/2013 05:06:03] DatabaseParser       INFO       list all events for "awesome@0xabc.de"
+[25/01/2013 05:06:03] DatabaseParser       INFO       list all hosting events for 'awesome@0xabc.de'
+[25/01/2013 05:06:03] DatabaseParser       INFO       list all invited to events for 'awesome@0xabc.de'
+[25/01/2013 05:06:07] Splitpot             INFO       deliver event page
+[25/01/2013 05:06:07] DatabaseParser       INFO       retrieve event 53
+[25/01/2013 05:06:07] DatabaseParser       INFO       check if "awesome@0xabc.de" is in event: "53"
+[25/01/2013 05:06:07] DatabaseParser       INFO       check if email: awesome@0xabc.de exists. isGhost?False
+[25/01/2013 05:06:07] DatabaseParser       INFO       retrieve event 53
+[25/01/2013 05:06:07] DatabaseParser       INFO       list all events for "awesome@0xabc.de"
+[25/01/2013 05:06:07] DatabaseParser       INFO       list all hosting events for 'awesome@0xabc.de'
+[25/01/2013 05:06:07] DatabaseParser       INFO       list all invited to events for 'awesome@0xabc.de'
+[25/01/2013 05:06:07] DatabaseParser       INFO       retrieve event 53
+[25/01/2013 05:06:07] DatabaseParser       INFO       resolve nick awesome@0xabc.de
+[25/01/2013 05:06:07] DatabaseParser       INFO       check if email: awesome@0xabc.de exists. isGhost?True
+[25/01/2013 05:06:07] DatabaseParser       INFO       check if email: awesome@0xabc.de exists. isGhost?False
+[25/01/2013 05:06:07] DatabaseParser       INFO       resolve nick tobstu@0xabc.de
+[25/01/2013 05:06:07] DatabaseParser       INFO       check if email: tobstu@0xabc.de exists. isGhost?True
+[25/01/2013 05:06:07] DatabaseParser       INFO       check if email: tobstu@0xabc.de exists. isGhost?False
+[25/01/2013 05:06:15] Splitpot             INFO       deliver event page
+[25/01/2013 05:06:15] DatabaseParser       INFO       retrieve event 54
+[25/01/2013 05:06:15] DatabaseParser       INFO       check if "awesome@0xabc.de" is in event: "54"
+[25/01/2013 05:06:15] DatabaseParser       INFO       check if email: awesome@0xabc.de exists. isGhost?False
+[25/01/2013 05:06:15] DatabaseParser       INFO       retrieve event 54
+[25/01/2013 05:06:15] DatabaseParser       INFO       list all events for "awesome@0xabc.de"
+[25/01/2013 05:06:15] DatabaseParser       INFO       list all hosting events for 'awesome@0xabc.de'
+[25/01/2013 05:06:15] DatabaseParser       INFO       list all invited to events for 'awesome@0xabc.de'
+[25/01/2013 05:06:15] DatabaseParser       INFO       retrieve event 54
+[25/01/2013 05:06:15] DatabaseParser       INFO       resolve nick awesome@0xabc.de
+[25/01/2013 05:06:15] DatabaseParser       INFO       check if email: awesome@0xabc.de exists. isGhost?True
+[25/01/2013 05:06:15] DatabaseParser       INFO       check if email: awesome@0xabc.de exists. isGhost?False
+[25/01/2013 05:06:15] DatabaseParser       INFO       resolve nick martin@0xabc.de
+[25/01/2013 05:06:15] DatabaseParser       INFO       check if email: martin@0xabc.de exists. isGhost?True
+[25/01/2013 05:06:15] DatabaseParser       INFO       check if email: martin@0xabc.de exists. isGhost?False
+[25/01/2013 05:15:29] DatabaseParser       INFO       check if email: awesome@0xabc.de exists. isGhost?False
+[25/01/2013 05:15:29] DatabaseParser       INFO       verify user and given password
+[25/01/2013 05:15:29] Splitpot             INFO       deliver index
