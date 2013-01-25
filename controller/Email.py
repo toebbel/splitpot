@@ -112,7 +112,7 @@ def forgotConfirmation(email, key):
     tmpl = lookup.get_template('forgot_confirmation.email')
     SettingsWrapper(email, 'Password Reset',
                     tmpl.render(url=RUNNING_URL
-                    + 'user/forgot_form?key=' + key))
+                    + 'user/doForgot?email=' + emai + '&key=' + key))
 
 
 def forgotNewPwd(email, pwd):
