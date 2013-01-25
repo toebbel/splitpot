@@ -19,7 +19,7 @@ from TransactionGraph import *
 sys.path.append('model/')
 from Event import Event
 
-DB_FILE = 'resource/splitpotDB_DEV.sqlite'
+DB_FILE = 'resource/splitpotDB.sqlite'
 SALT_LENGTH = 30
 DEFAULT_PWD_LENGTH = 6
 ACTIVATE_CODE_LEN = 8
