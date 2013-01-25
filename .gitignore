@@ -11,6 +11,8 @@
 # app specific
 log/app.log
 resource/splitpotDB_DEV.sqlite
+resource/cherry.conf
+resource/app.conf
 
 # Packages
 *.egg
