@@ -334,7 +334,7 @@ class splitpot_controller(object):
 
             if mergeUser(mainMail, alias):
                 addAlias(mainMail, alias)
-                return self.index(good_news='Your alias has been added')
+                return tmpl.render(good_news='Your alias has been added')
             else:
                 log.warning('couldn\'t alias/merge "' + newUser
                             + '" and "' + oldUser
