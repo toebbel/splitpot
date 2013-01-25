@@ -137,21 +137,50 @@ def requestForgot(email=None):
 
 
 @cherrypy.expose
-def doForgot(email=None, resetKey=None):
+def forgot_reenter(email=None, resetKey=None):
     """
   Processes the confirmed reset of a pwd (user clicke on link in email). Generates new password and sends it via mail
   """
 
     log.info('forgot ' + email + ', key ' + resetKey)
-    tmpl = lookup.get_template('forgot_pwd.html')
-    if db.isValidResetUrlKey(email, resetKey):
-        new_pwd = Encryption.generateRandomChars(8)  # TODO use default length from utils/auth
-        Email.forgotNewPwd(email, new_pwd)
-        db.updateLogin(email, new_pwd)
-        return tmpl.render(good_news="You'r password has been reset and in on it's way to your mailbox"
+    tmpl = lookup.get_template('forgot_pwd_reenter.html')
+    if not emailRegex.match(email):
+        return tmpl.render(bad_news="your email is invalid")
+
+    if activatenCode.match(resetKey) and db.isValidResetUrlKey(email, resetKey):
+        return tmpl.render(good_news="Choose your new password.", email=email, resetKey=resetKey
                            )
     else:
-        return tmpl.render(bad_news="You'r reset key is invalid")
+        return tmpl.render(bad_news="You'r reset key is invalid :'-(")
+
+
+@cherrypy.expose
+def forgot_doReenter(email = None, resetKey = None, pwd1 = None, pwd2 = None):
+    tmpl = lookup.get_template('forgot_pwd_reenter.html')
+
+    if not emailRegex.match(email):
+        return tmpl.render(bad_news="Your email is invalid.", resetKey = resetKey, email = email)
+    
+    if email is None:
+        return tmpl.render(bad_news="please enter your emai!", resetKey = resetKey)
+
+    if pwd1 is None:
+        return tmpl.render(bad_news="please enter a password!", resetKey = resetKey, email = email)
+
+    if pwd1 != pwd2:
+        return tmpl.render(bad_news="you have to enter the same password twice ;)", resetKey = resetKey, email = email)
+
+    if resetKey is None:
+        return tmpl.render(bad_news="You have to enter a reset key")
+
+    if str(pwd1).__len__() < 6:
+        return tmpl.render(bad_news="your password is too short", resetKey = resetKey, email = email)
+
+    if not activatenCode.match(resetKey) or not db.isValidResetUrlKey(email, resetKey):
+        return tmpl.render(good_news="Your reset key is invalid or has expired.", resetKey = resetKey, email = email)
+    
+    db.updateLogin(email, pwd1)
+    return tmpl.render(good_news="You'r password has been set successfully")
 
 
 @cherrypy.expose

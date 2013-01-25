@@ -1,0 +1,16 @@
+<%inherit file="base.html" />
+
+
+<form action="forgot_doReenter" method="post">
+  <p>
+    <label for="email">Email:</label>
+    <input type="text" name="email" value="${email or ''}" /><br />
+    <label for="resetKey"/>Resetkey</label>
+    <input type=text" name="resetKey" value="${resetKey or ''}" />
+    <label for="pwd1">Password:</label>
+    <input type="password" name="pwd1" />
+    <label for="pwd2">Repeat:</label>
+    <input type="password" name="pwd2" />
+    <input type="submit" value="Send" />
+  </p>
+</form>
