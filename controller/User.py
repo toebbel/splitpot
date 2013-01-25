@@ -179,7 +179,7 @@ def doLogin(username, password, from_page):
     else:
         cherrypy.session[CURRENT_USER_NAME] = cherrypy.request.login = \
             username
-        raise cherrypy.HTTPRedirect(from_page or '/')
+        raise cherrypy.HTTPRedirect(from_page or cherrypy.url('/'))
 
 
 @cherrypy.expose

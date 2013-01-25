@@ -23,5 +23,5 @@ root = splitpot_controller()
 root.user = User
 root.autocomplete = autocomplete 
 
-cherrypy.quickstart(root, config='resource/app.cfg')
+cherrypy.quickstart(root, '/splitpot', config='resource/app.cfg')
 log.info('Splitpot stopped')
