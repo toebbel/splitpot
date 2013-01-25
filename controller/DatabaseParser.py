@@ -448,6 +448,19 @@ def mergeUser(newUser, oldUser):
 
     return False
 
+def resolveNick(userId):
+    log.info('resolve nick ' + str(userId))
+    if(userExists(userId, True)):
+        result = userId
+        if(userExists(userId, False)):
+            with connection:
+                cur = connection.cursor()
+                cur.execute("SELECT name from splitpot_users where email = '" + userId + "';")
+                result = cur.fetchone()[0]
+        return result
+    else:
+        return "unknown user"
+
 
 def buildTransactionTree():
     """
