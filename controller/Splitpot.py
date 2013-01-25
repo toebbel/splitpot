@@ -34,8 +34,6 @@ class splitpot_controller(object):
         tmpl = lookup.get_template('index.html')
         return tmpl.render(debts=12.2, others_debts=0.2, entries=[])
 
-                      # TODO ensure that users can only see events, they are participating/hosting
-
     @cherrypy.expose
     @require()
     def event(self, id):
@@ -107,7 +105,7 @@ class splitpot_controller(object):
                 log.info('Email: ' + str(other) + ' is malformed.')
                 return tmpl.render(feedback='Email ' + other
                                    + ' is mal formed. Please correct')
-            if other == getCurrentUserName():  # TODO check if user adds himself via alias (issue 23)
+            if other == getCurrentUserName() or resolveAlias(other) == getCurrentUserName():  # TODO check if user adds himself via alias (issue 23)
                 log.info('user tried to add himself to participants')
                 return tmpl.render(feedback="You can't add yourself to the list of participants"
                                    )
@@ -118,11 +116,19 @@ class splitpot_controller(object):
                                )
 
         for curParticipant in othersList:
-            if not userExists(curParticipant, True):
+            if not userExists(curParticipant, True) and resolveAlias(curParticipant) == None:
                 tmpPassword = generateRandomChars(DEFAULT_PWD_LENGTH)
                 log.info('participant: ' + curParticipant
                          + ' is not registered yet, registering now.')
                 registerUser(curParticipant)
+
+            if resolveAlias(curParticipant) != None:
+                log.info('found an alias in participant\'s list, replace with main user')
+                log.info(othersList)
+                log.info(resolveAlias(curParticipant))
+                othersList = [resolveAlias(curParticipant) if x==curParticipant else x for x in othersList]
+                curParticipant = resolveAlias(curParticipant)
+                log.info('main user: ' + str(curParticipant))
 
             addAutocompleteEntry(getCurrentUserName(), curParticipant)
 
@@ -200,7 +206,11 @@ class splitpot_controller(object):
 
     @cherrypy.expose
     @require()
-    def doMerge(self, email=None, key=None):
+    def doMerge(
+        self,
+        email=None,
+        key=None,
+        ):
         """
     Merge two accounts together. Will send a confirmation mail to the to-be-merged email.
     """
@@ -209,17 +219,17 @@ class splitpot_controller(object):
 
         errors = ''
         if key is not None and isValidMergeUrlKey(key):
-            newUser = getPassword(newMail)[:MERGE_KEY_LEN / 2]
-            oldUser = getPassword(oldMail, True)[:MERGE_KEY_LEN / 2]
 
-            log.info('valid merging key, merging "' + newUser
-                     + '" and "' + oldUser + '" now')
+            newMail = getUserFromPassword(key[:8])
+            oldMail = getUserFromPassword(key[8:])
 
-            if mergeUser(newUser, oldUser):
+            log.info('valid merging key, merging "' + newMail
+                     + '" and "' + oldMail + '" now')
+            if mergeUser(newMail, oldMail):
                 return self.index()
             else:
-                log.warning('couldn\'t merge "' + newUser + '" and "'
-                            + oldUser + '" for some unexpected reason')
+                log.warning('couldn\'t merge "' + newMail + '" and "'
+                            + oldMail + '" for some unexpected reason')
                 return tmpl.render(feedback='Oh no! Something went wrong. Please try again later.'
                                    , newUser=getCurrentUserName())
         else:
@@ -255,21 +265,90 @@ class splitpot_controller(object):
                                    newUser=getCurrentUserName())
             else:
                 mergeKey = getMergeUrlKey(getCurrentUserName(), email)
-                Email.mergeRequest(getCurrentUserName(), email, mergeKey)
+                Email.mergeRequest(getCurrentUserName(), email,
+                                   mergeKey)
 
-                return tmpl.render(feedback='An email has be sent to "'
-                                   + email.lower()
+                return tmpl.render(feedback='An email has been sent to "'
+                                    + email.lower()
                                    + '" for further information',
                                    newUser=getCurrentUserName())
 
     @cherrypy.expose
     @require()
     def alias(self):
+        """
+        Return the template for adding alias.
+        """
+
         return lookup.get_template('alias.html').render(feedback='')
 
     @cherrypy.expose
     @require()
-    def doAddAlias(self, alias=None):
-        return True
+    def doAddAlias(
+        self,
+        alias=None,
+        mainMail=None,
+        key=None,
+        ):
+        """
+        Add an alias to this account.
+        """
+
+        tmpl = lookup.get_template('alias.html')
+        errors = ''
+
+        if key is not None and isValidMergeUrlKey(key):
+            mainMail = getUserFromPassword(key[:8])
+            alias = getUserFromPassword(key[8:])
+
+            log.info('valid alias key, add "' + alias
+                     + '" as alias to "' + mainMail)
+
+            if mergeUser(mainMail, alias):
+                addAlias(mainMail, alias)
+                return self.index()
+            else:
+                log.warning('couldn\'t alias/merge "' + newUser
+                            + '" and "' + oldUser
+                            + '" for some unexpected reason')
+                return tmpl.render(feedback='Oh no! Something went wrong. Please try again later.'
+                                   , newUser=getCurrentUserName())
+        elif alias is not None:
+            log.info('alias is not not')
+
+            alias = [x.strip() for x in alias.split(',')]
+            for user in alias:
+                if emailRegex.match(user) == None:
+                    errors += '<li>' + user + ' is invalid</li>'
+                else:
+
+                    if userExists(user, True):
+                        errors += '<li>' + user \
+                            + ' already exists, use <a href="../merge">Merge E-Mails</a> instead</li>'
+                    elif aliasUserExists(user):
+                        errors += '<li>' + user + ' is already an alias for someone else</li>'
+
+            if not errors == '':
+                return tmpl.render(feedback='<ul>' + errors + '</ul>')
+            else:
+
+                info = ''
+                for user in alias:
+                    if activateUser(user, 'Alias for ' + user, 'random'
+                                    , True):
+                        log.info('register ' + user + ' for the purpose of adding as alias')
+                        aliasKey = getMergeUrlKey(getCurrentUserName(), user)
+
+                        Email.aliasRequest(getCurrentUserName(), user,
+                                aliasKey)
+                        info += '<li>An email has been sent to "' \
+                            + user.lower() \
+                            + '" for further information</li>'
+
+                return tmpl.render(feedback=info)
+        else:
+
+            return tmpl.render(feedback='Nothing to add to aliases list'
+                               )
 
 

@@ -36,10 +36,10 @@ def sendMail(
 
     msg = MIMEText(body)
     msg['From'] = sender
-    msg['To'] = 'tobstu@gmail.com'#to
+    msg['To'] = to
     msg['Subject'] = subject
     server = smtplib.SMTP(host)
-    server.sendmail(sender, ['tobstu@gmail.com'], msg.as_string())
+    server.sendmail(sender, to, msg.as_string())
     server.quit()
 
 
@@ -158,6 +158,20 @@ def mergeRequest(newEmail, oldEmail, key):
                     url=RUNNING_URL + 'user/doMerge?key=' + key))
 
 
+def aliasRequest(currentUser, aliasUser, key):
+    """
+    Send a confirmation mail to the mail address that is going to be added as alias.
+    """
+
+    log.info('sending an alias confirmation link to "'
+             + aliasUser.lower() + '"')
+
+    tmpl = lookup.get_template('alias_request.email')
+    SettingsWrapper(aliasUser, 'Add Alias Request',
+                    tmpl.render(oldEmail=currentUser, url=RUNNING_URL
+                    + 'user/doAddAlias?key=' + key))
+
+
 def participantEmail(userId, event):
     assert isinstance(event, Event)
     num_part = len(event.participants) + 1
@@ -178,7 +192,8 @@ def ownerEmail(userId, event):
     num_part = len(event.participants) + 1
     body = lookup.get_template('add_event_owner.email'
                                ).render(total=event.amount,
-            num_participants=num_part, amount=event.amount / float(num_part))
+            num_participants=num_part, amount=event.amount
+            / float(num_part))
     SettingsWrapper(userId, 'Your new Splitpot Entry', body)
 
 
