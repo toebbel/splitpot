@@ -144,7 +144,7 @@ def doForgot(email=None, resetKey=None):
 
     log.info('forgot ' + email + ', key ' + resetKey)
     tmpl = lookup.get_template('forgot_pwd.html')
-    if db.isValidResetUrl(email, resetKey):
+    if db.isValidResetUrlKey(email, resetKey):
         new_pwd = EncryptionHelper.generateRandomChars(8)  # TODO use default length from utils/auth
         Email.forgotNewPwd(email, new_pwd)
         db.updateLogin(email, newPassword)
