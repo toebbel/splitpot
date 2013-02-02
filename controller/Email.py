@@ -4,7 +4,7 @@
 import cherrypy
 from mako.template import Template
 from mako.lookup import TemplateLookup
-lookup = TemplateLookup(directories=['template/email', 'template'])
+lookup = TemplateLookup(directories=['template/email', 'template'], input_encoding='utf-8')
 
 import string
 import smtplib
@@ -70,7 +70,7 @@ def SettingsWrapper(to, subject, body):
             val = l[l.find(':') + 1:].strip()
             settings[key] = val
     settingsFile.close()
-    msg = MIMEText(body)
+    msg = MIMEText(body, "plain", "utf-8")
     msg['From'] = settings['sender']
     msg['To'] = to
     msg['Subject'] = subject
@@ -111,8 +111,9 @@ def forgotConfirmation(email, key):
     log.info('sending a forgot-pwd-conf-key to ' + email + ': ' + key)
     tmpl = lookup.get_template('forgot_confirmation.email')
     SettingsWrapper(email, 'Password Reset',
-                    tmpl.render(url=RUNNING_URL + 'user/forgot_reenter?email='
-                     + email + '&resetKey=' + key))
+                    tmpl.render(url=RUNNING_URL
+                    + 'user/forgot_reenter?email=' + email
+                    + '&resetKey=' + key))
 
 
 def forgotNewPwd(email, pwd):
@@ -179,7 +180,7 @@ def participantEmail(userId, event):
     text = lookup.get_template('add_event_participant.email'
                                ).render(owner=event.owner,
             total=event.amount, num_participants=num_part,
-            amount=event.amount / float(num_part))
+            amount=event.amount / float(num_part), nick = db.resolveNick(userId), event_url = RUNNING_URL + 'event/' + str(event.id))
     if not db.userExists(userId, False):
         text += lookup.get_template('ghost_user_link.email'
                                     ).render(activateUrl=RUNNING_URL
@@ -194,7 +195,7 @@ def ownerEmail(userId, event):
     body = lookup.get_template('add_event_owner.email'
                                ).render(total=event.amount,
             num_participants=num_part, amount=event.amount
-            / float(num_part))
+            / float(num_part), comment=event.comment, nick = db.resolveNick(event.owner), event_url = RUNNING_URL + 'event/' + str(event.id))
     SettingsWrapper(userId, 'Your new Splitpot Entry', body)
 
 
