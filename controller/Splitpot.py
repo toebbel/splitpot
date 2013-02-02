@@ -32,7 +32,7 @@ class splitpot_controller(object):
 
         log.info('deliver index')
         tmpl = lookup.get_template('index.html')
-        return tmpl.render(debts=12.2, others_debts=0.2, entries=[])
+        return tmpl.render()
 
     @cherrypy.expose
     @require()
@@ -334,7 +334,8 @@ class splitpot_controller(object):
 
             if mergeUser(mainMail, alias):
                 addAlias(mainMail, alias)
-                return tmpl.render(good_news='Your alias has been added')
+                return tmpl.render(good_news='Your alias has been added'
+                                   )
             else:
                 log.warning('couldn\'t alias/merge "' + newUser
                             + '" and "' + oldUser
