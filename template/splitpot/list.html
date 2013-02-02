@@ -3,8 +3,8 @@
 <%! import cherrypy %>
 <%! from Auth import getCurrentUserName %>
 <%! from DatabaseParser import resolveNick %>
-Your debts: ${debts}€ <br />
-Others owe you: ${others_debts}€ <br />
+Your debts: ${("%.2f" % debts).replace('.', ',')}€ <br />
+Others owe you: ${("%.2f" % others_debts).replace('.',',')}€ <br />
 <hr />
 <table>
   <tr>
