@@ -92,7 +92,7 @@ def doRegister(
             "<li>You have to provide a registration key(<a href='resend?email=" \
             + str(email) + "'>resend</a>)</li>"
     if emailRegex.match(email) == None:
-        errors += "<li>You'r email is invalid</li>"
+        errors += "<li>Your email is invalid</li>"
         escapeRegex = True
     if not escapeRegex and not db.isValidResetUrlKey(email, key, True):
         errors += \
@@ -102,7 +102,7 @@ def doRegister(
         errors += \
             '<li>Please enter a nick, with a minimum length of 3</li>'
     if str(pwd1).__len__() < 6:
-        errors += "<li>You'r password is too short</li>"
+        errors += "<li>Your password is too short</li>"
     if not pwd1 == pwd2:
         errors += '<li>Passwort repition incorrect</li>'
     if not escapeRegex and db.userExists(email, False):
@@ -145,42 +145,56 @@ def forgot_reenter(email=None, resetKey=None):
     log.info('forgot ' + email + ', key ' + resetKey)
     tmpl = lookup.get_template('forgot_pwd_reenter.html')
     if not emailRegex.match(email):
-        return tmpl.render(bad_news="your email is invalid")
+        return tmpl.render(bad_news='your email is invalid')
 
-    if activatenCode.match(resetKey) and db.isValidResetUrlKey(email, resetKey):
-        return tmpl.render(good_news="Choose your new password.", email=email, resetKey=resetKey
-                           )
+    if activatenCode.match(resetKey) and db.isValidResetUrlKey(email,
+            resetKey):
+        return tmpl.render(good_news='Choose your new password.',
+                           email=email, resetKey=resetKey)
     else:
-        return tmpl.render(bad_news="You'r reset key is invalid :'-(")
+        return tmpl.render(bad_news="Your reset key is invalid :'-(")
 
 
 @cherrypy.expose
-def forgot_doReenter(email = None, resetKey = None, pwd1 = None, pwd2 = None):
+def forgot_doReenter(
+    email=None,
+    resetKey=None,
+    pwd1=None,
+    pwd2=None,
+    ):
     tmpl = lookup.get_template('forgot_pwd_reenter.html')
 
     if not emailRegex.match(email):
-        return tmpl.render(bad_news="Your email is invalid.", resetKey = resetKey, email = email)
-    
+        return tmpl.render(bad_news='Your email is invalid.',
+                           resetKey=resetKey, email=email)
+
     if email is None:
-        return tmpl.render(bad_news="please enter your emai!", resetKey = resetKey)
+        return tmpl.render(bad_news='please enter your emai!',
+                           resetKey=resetKey)
 
     if pwd1 is None:
-        return tmpl.render(bad_news="please enter a password!", resetKey = resetKey, email = email)
+        return tmpl.render(bad_news='please enter a password!',
+                           resetKey=resetKey, email=email)
 
     if pwd1 != pwd2:
-        return tmpl.render(bad_news="you have to enter the same password twice ;)", resetKey = resetKey, email = email)
+        return tmpl.render(bad_news='you have to enter the same password twice ;)'
+                           , resetKey=resetKey, email=email)
 
     if resetKey is None:
-        return tmpl.render(bad_news="You have to enter a reset key")
+        return tmpl.render(bad_news='You have to enter a reset key')
 
     if str(pwd1).__len__() < 6:
-        return tmpl.render(bad_news="your password is too short", resetKey = resetKey, email = email)
+        return tmpl.render(bad_news='your password is too short',
+                           resetKey=resetKey, email=email)
 
-    if not activatenCode.match(resetKey) or not db.isValidResetUrlKey(email, resetKey):
-        return tmpl.render(good_news="Your reset key is invalid or has expired.", resetKey = resetKey, email = email)
-    
+    if not activatenCode.match(resetKey) \
+        or not db.isValidResetUrlKey(email, resetKey):
+        return tmpl.render(good_news='Your reset key is invalid or has expired.'
+                           , resetKey=resetKey, email=email)
+
     db.updateLogin(email, pwd1)
-    return tmpl.render(good_news="You'r password has been set successfully")
+    return tmpl.render(good_news="You'r password has been set successfully"
+                       )
 
 
 @cherrypy.expose
