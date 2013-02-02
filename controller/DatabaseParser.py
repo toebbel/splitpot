@@ -160,7 +160,7 @@ def listAllEventsFor(user):
     """
 
     log.info('list all events for "' + user.lower() + '"')
-    return listHostingEventsFor(user) + listInvitedEventsFor(user)
+    return sorted(listHostingEventsFor(user) + listInvitedEventsFor(user), key = lambda e: e.date, reverse=True)
 
 
 def getEvent(id):
