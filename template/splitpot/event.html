@@ -1,6 +1,7 @@
 ## -*- coding: utf-8 -*-
 <%inherit file="base.html" />
 <%! from DatabaseParser import resolveNick %>
+<%! import hashlib %>
 % if event is None:
   <h2>Event</h2>
     <p>Sorry - could not find this event :(</p>
@@ -10,17 +11,24 @@
 % else:
   <h2>Meetup from ${event.date.strftime("%a, %d %b %y")} | ${("%.2f" % event.amount).replace('.', ',')}€</h2>
     <p>
-        Event hosted by <a href="mailto:${event.owner}">${resolveNick(event.owner)}</a>.
+    Event hosted by ${user(event.owner)}.
         Each one has to pay ${event.amount / float(len(event.participants) + 1)}
     </p>
-    <p>
         <blockquote>
             ${event.comment}
         </blockquote>
-    </p>
     <p>
-    Attendants: ${reduce(lambda list, current : '<li><a href="mailto:' + current + '">' + resolveNick(current) + '</a></li>' + list, event.participants, '')}</p>
+    Attendants: ${reduce(lambda list, current : user(current) + list, event.participants, '')}</p>
         
-        
+    <%def name="gravatar(email)">
+    <img src="${'http://www.gravatar.com/avatar/' + hashlib.md5(email.lower().strip().encode("utf-8")).hexdigest() + '?s=100?d=monsterid'}" />'
+    </%def>
+
+    <%def name="user(email)">
+        <table>
+            <tr><td><a href="mailto:${email}" >${resolveNick(email)}</a></td></tr>
+            <tr><td>${gravatar(email)}</td></tr>
+        </table>
+    </%def>
 % endif
 
