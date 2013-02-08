@@ -12,8 +12,8 @@
 log/app.log
 resource/splitpotDB_DEV.sqlite
 resource/splitpotDB.sqlite
-resource/cherry.conf
-resource/app.conf
+resource/cherry.cfg
+resource/app.cfg
 resource/mail.settings
 
 # Packages
