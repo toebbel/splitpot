@@ -3,6 +3,11 @@ log.screen: False
 tools.sessions.on = True
 tools.auth.on = True
 tools.staticdir.root = "PATH TO SPLITPOT ROOT ON LOCAL FILESYSTEM"
+tools.encode.on = True
+tools.encode.encoding = "utf-8"
+tools.decode.on = True
+tools.devode.encoding = "utf-8"
+tools.gzip.on = True
 
 [/asset]
 tools.staticdir.on = True
