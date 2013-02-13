@@ -176,8 +176,6 @@ class splitpot_controller(object):
             if event.amount < 0:
                 totalDebts += event.amount \
                     / float(len(event.participants) + 1)
-                log.info('add debt ' + str(event))
-                log.info('=>' + str(totalDebts))
             else:
                 totalEarnings += event.amount - event.amount \
                     / float(len(event.participants) + 1)
