@@ -3,8 +3,11 @@
 
 Hi ${nick or ""},
 
-a new event has been created, and you were part of it. The expenses were ${("%.2f" % total).replace('.', ',')}€ in total, divided by ${num_participants}, 
+a new event has been created, and you were part of it. The expenses were ${("%.2f" % total).replace('.', ',')}€ in total, divided by ${num_participants},
 which makes ${("%.2f" % amount).replace('.', ',')}€ for you.
+
+The comment that was added by the event creator:
+${comment or ""}
 
 You can see the details of the event here: ${event_url}
 We've added this expenses to your list. You'll receive another mail on payday.

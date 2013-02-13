@@ -4,7 +4,8 @@
 import cherrypy
 from mako.template import Template
 from mako.lookup import TemplateLookup
-lookup = TemplateLookup(directories=['template/email', 'template'], input_encoding='utf-8')
+lookup = TemplateLookup(directories=['template/email', 'template'],
+                        input_encoding='utf-8')
 
 import string
 import smtplib
@@ -70,7 +71,7 @@ def SettingsWrapper(to, subject, body):
             val = l[l.find(':') + 1:].strip()
             settings[key] = val
     settingsFile.close()
-    msg = MIMEText(body, "plain", "utf-8")
+    msg = MIMEText(body, 'plain', 'utf-8')
     msg['From'] = settings['sender']
     msg['To'] = to
     msg['Subject'] = subject
@@ -177,10 +178,15 @@ def aliasRequest(currentUser, aliasUser, key):
 def participantEmail(userId, event):
     assert isinstance(event, Event)
     num_part = len(event.participants) + 1
-    text = lookup.get_template('add_event_participant.email'
-                               ).render(owner=event.owner,
-            total=event.amount, num_participants=num_part,
-            amount=event.amount / float(num_part), nick = db.resolveNick(userId), event_url = RUNNING_URL + 'event/' + str(event.id))
+    text = lookup.get_template('add_event_participant.email').render(
+        owner=event.owner,
+        total=event.amount,
+        num_participants=num_part,
+        amount=event.amount / float(num_part),
+        comment=event.comment,
+        nick=db.resolveNick(userId),
+        event_url=RUNNING_URL + 'event/' + str(event.id),
+        )
     if not db.userExists(userId, False):
         text += lookup.get_template('ghost_user_link.email'
                                     ).render(activateUrl=RUNNING_URL
@@ -192,10 +198,14 @@ def participantEmail(userId, event):
 def ownerEmail(userId, event):
     assert isinstance(event, Event)
     num_part = len(event.participants) + 1
-    body = lookup.get_template('add_event_owner.email'
-                               ).render(total=event.amount,
-            num_participants=num_part, amount=event.amount
-            / float(num_part), comment=event.comment, nick = db.resolveNick(event.owner), event_url = RUNNING_URL + 'event/' + str(event.id))
+    body = lookup.get_template('add_event_owner.email').render(
+        total=event.amount,
+        num_participants=num_part,
+        amount=event.amount / float(num_part),
+        comment=event.comment,
+        nick=db.resolveNick(event.owner),
+        event_url=RUNNING_URL + 'event/' + str(event.id),
+        )
     SettingsWrapper(userId, 'Your new Splitpot Entry', body)
 
 
