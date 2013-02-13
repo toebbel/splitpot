@@ -10,3 +10,11 @@ If the e-mail is already registered (activated or not, doesn't matter), you can 
     Aliases: <input type="text" name="alias" /><br />
     <input type="submit" value="submit">
 </form>
+
+% if aliases:
+    <ul>
+    % for a in aliases:
+        <li>${a} <a href="${cherrypy.url('doRemoveAlias?email=' + a)}">remove</a></li>
+    % endfor
+    </ul>
+% endif

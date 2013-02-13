@@ -160,7 +160,9 @@ def listAllEventsFor(user):
     """
 
     log.info('list all events for "' + user.lower() + '"')
-    return sorted(listHostingEventsFor(user) + listInvitedEventsFor(user), key = lambda e: e.date, reverse=True)
+    return sorted(listHostingEventsFor(user)
+                  + listInvitedEventsFor(user), key=lambda e: e.date,
+                  reverse=True)
 
 
 def getEvent(id):
@@ -499,11 +501,36 @@ def addAlias(mainUser, alias):
         cur = connection.cursor()
         if userExists(mainUser):
             cur.execute('INSERT INTO splitpot_aliases VALUES(?,?)',
-                        (mainUser.lower(), alias.lower()))
+                        [mainUser.lower(), alias.lower()])
         return True
 
     return False
 
+def removeAlias(mainUser, alias):
+    """
+    Removes an alias from given user. Returns nothing.
+    """
+
+    log.info('remove ' + alias.lower() + ' as alias from '
+             + mainUser.lower())
+
+    with connection:
+        cur = connection.cursor()
+        if userExists(mainUser):
+            cur.execute('DELETE FROM splitpot_aliases WHERE user = ? and alias = ?',
+                        [mainUser.lower(), alias.lower()])
+
+def getAliasesFor(email):
+    """
+    Returns a list of all aliases of a user. The list never contains the userID itself
+    """
+    with connection:
+        cur = connection.cursor()
+        tmp = cur.execute('SELECT alias from splitpot_aliases WHERE user = ?', [email.lower()]).fetchall()
+        result = []
+        for e in tmp:
+            result.append(e[0])
+        return result
 
 def resolveAlias(alias):
     """
