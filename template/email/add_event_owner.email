@@ -3,7 +3,7 @@
 
 Hi ${nick or ""},
 
-you have just added new expenses: ${("%.2f" % total).replace('.', ',')}€ in total, divided by ${num_participants},
+you just added new expenses: ${("%.2f" % total).replace('.', ',')}€ in total, divided by ${num_participants},
 which makes ${("%.2f" % amount).replace('.', ',')}€ for each.
 
 The comment you've entered:
