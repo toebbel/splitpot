@@ -2,19 +2,19 @@
 <%inherit file="base.email" />
 
 It's Payday!
-You know what this means: Everybody pays his debts and hopefully gets a lot of money :)
+You know what this means: Everybody pays his or her debts, and hopefully gets a lot of money :)
 
-Your total debts: ${outDebts}.
-Others owe you: ${inDebts}.
+Your total debts: ${("%.2f" % outDebts).replace('.',',')}€
+Others owe you: ${("%.2f" % inDebts).replace('.',',')}€
 
-% if outDebts != 0:
+% if outDebts > 0:
 Please transfer money to the following people:
 % for c in outPayments:
     * ${c.amount} to ${c.toUser}
 % endfor
 % endif
 
-% if inDebts != 0:
+% if inDebts > 0:
 You will get money from these people:
 % for c in inPayments:
     * ${c.amount} from ${c.fromUser}
@@ -22,6 +22,6 @@ You will get money from these people:
 % endif
 
 You can see all the events from the last month on the website.
-Best whishes,
+Best wishes,
 
 Splitpot
