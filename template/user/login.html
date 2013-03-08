@@ -1,9 +1,9 @@
 <%inherit file="base.html" />
 
 <form method="post" action="doLogin">
-  Email: <input type="text" name="username" value="${username or ""}" /><br />
-  Password: <input type="password" name="password" /><br />
-  <input type="submit" value="Log in" />
+  <input type="text" class="input-block-level" name="username" value="${username or ""}" placeholder="Email address"/><br />
+  <input type="password" class="input-block-level" name="password" placeholder="Password"/><br />
+  <button class="btn btn-large btn-primary" type="submit">Sign in</button>
 </form>
 
 <a href="register">create a new account</a> | <a href="forgot">I am stupid & forgot my pwd</a>
