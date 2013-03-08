@@ -7,3 +7,6 @@ an account merge request has been send to us.
 Please confirm that you really wish to merge ${oldEmail} with ${newEmail}, which will be your new login, by clicking on following link:
 
 ${url}
+
+Cheers,
+Splitpot
