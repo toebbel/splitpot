@@ -10,14 +10,14 @@ Others owe you: ${("%.2f" % inDebts).replace('.',',')}€
 % if outDebts > 0:
 Please transfer money to the following people:
 % for c in outPayments:
-    * ${c.amount} to ${c.toUser}
+    * ${("%.2f" % c.amount).replace('.',',')}€ to ${c.toUser}
 % endfor
 % endif
 
 % if inDebts > 0:
 You will get money from these people:
 % for c in inPayments:
-    * ${c.amount} from ${c.fromUser}
+    * ${("%.2f" % c.amount).replace('.',',')}€ to ${c.fromUser}
 % endfor
 % endif
 
