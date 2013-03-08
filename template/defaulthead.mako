@@ -59,6 +59,13 @@
       .center .navbar-inner {
         text-align:center;
       }
+
+      .navbar .brand {
+        margin-left: auto;
+        margin-right: auto;
+        width: 60px;
+        float: none;
+      }
     </style>
 
     <link rel="shortcut icon" href="${cherrypy.url('/asset/ico/favicon.ico')}">
