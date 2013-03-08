@@ -1,13 +1,12 @@
 <%inherit file="base.html" />
 
-
-<form action="doRegister" method="post">
-  <p>
-  Email: <input type="text" name="email" value="${givenEmail or ""}" readonly /><br />
-    ActivationKey: <input type="text" name="key" value="${givenKey or ""}" readonly /><br />
-    Nick: <input type="text" name="nick" /><br />
-    Pasword: <input type="password" name="pwd1" /><br />
-    aaand again:<input type="password" name="pwd2" /><br />
-    <input type="submit" value="Send" />
-  </p>
+<form class="form-signin" method="post" action="doRegister">
+    <p>
+        <input type="text" name="email" value="${givenEmail or ""}" placeholder="Your email" readonly /><br />
+        <input type="text" name="key" value="${givenKey or ""}" placeholder="Activation key" readonly /><br />
+        <input type="text" name="nick" placeholder="Nickname" /><br />
+        <input type="password" name="pwd1" placeholder="Your password" /><br />
+        <input type="password" name="pwd2" placeholder="Retype your password"/><br />
+        <button class="btn btn-large btn-primary" type="submit">Send</button>
+    </p>
 </form>

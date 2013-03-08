@@ -1,8 +1,8 @@
 <%inherit file="base.html" />
 
-<form action="doResend" method="post">
-  <p>
-  Email: <input type="text" name="email" value="${email}" /><br />
-    <input type="submit" value="Send" />
-  </p>
+<form class="form-signin" action="doResend" method="post">
+    <p>
+        <input type="text" name="email" value="${email}" placeholder="Email" /><br />
+        <button class="btn btn-large btn-primary" type="submit">Send</button>
+    </p>
 </form>

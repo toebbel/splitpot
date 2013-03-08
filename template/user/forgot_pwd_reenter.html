@@ -2,15 +2,11 @@
 
 
 <form action="forgot_doReenter" method="post">
-  <p>
-    <label for="email">Email:</label>
-    <input type="text" name="email" value="${email or ''}" /><br />
-    <label for="resetKey"/>Resetkey</label>
-    <input type=text" name="resetKey" value="${resetKey or ''}" />
-    <label for="pwd1">Password:</label>
-    <input type="password" name="pwd1" />
-    <label for="pwd2">Repeat:</label>
-    <input type="password" name="pwd2" />
-    <input type="submit" value="Send" />
-  </p>
+    <p>
+        <input type="text" name="email" value="${email or ''}" placeholder="Email" /><br />
+        <input type=text" name="resetKey" value="${resetKey or ''}" placeholder="Reset key" />
+        <input type="password" name="pwd1" placeholder="Password" />
+        <input type="password" name="pwd2" placeholder="Retype password" />
+        <button class="btn btn-large btn-primary" type="submit">Send</button>
+    </p>
 </form>
