@@ -26,7 +26,7 @@
           }
       }
 
-     .form-signin {
+      .form-signin {
         max-width: 300px;
         padding: 19px 29px 29px;
         margin: 0 auto 20px;
@@ -47,6 +47,18 @@
         margin-bottom: 15px;
         padding: 7px 9px;
       } 
+
+      /* center the navbar */
+      .center.navbar .nav,
+      .center.navbar .nav > li {
+        float:none;
+        display:inline-block;
+        vertical-align: top;
+      }
+
+      .center .navbar-inner {
+        text-align:center;
+      }
     </style>
 
     <link rel="shortcut icon" href="${cherrypy.url('/asset/ico/favicon.ico')}">
