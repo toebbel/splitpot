@@ -136,14 +136,14 @@ def payday(
     outDebt,
     ):
     """
-    Sends a mail with all paiments of specific user. No changes on database/payments. This is only the helper for the template-retrieval
+    Sends a mail with all payments of specific user. No changes on database/payments. This is only the helper for the template-retrieval
     """
 
     tmpl = lookup.get_template('payday.email')
 
     # SettingsWrapper(email, "Payday!", tmpl.render(InPayments,outPayments, inDebt, outDebt)) #TODO enough data or more?
 
-    print tmpl.render(inPayments=inPayments, outPayments=outPayments,
+    return tmpl.render(inPayments=inPayments, outPayments=outPayments,
                       inDebts=inDebt, outDebts=outDebt)
 
 
