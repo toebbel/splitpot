@@ -15,6 +15,7 @@
     <style>
       body {
         padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+        background-color: #f5f5f5;
       }
       @media (max-width: 767px) {
           /* Remove any padding from the body */
