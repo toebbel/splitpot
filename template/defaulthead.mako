@@ -57,6 +57,14 @@
         vertical-align: top;
       }
       .navbar-inner > .container { text-align:center; }
+
+      @media (max-width: 970px) {
+        .navbar .brand,
+        .nav-collapse {
+            display: block;
+        }
+      }
+
     </style>
 
     <link rel="shortcut icon" href="${cherrypy.url('/asset/ico/favicon.ico')}">
