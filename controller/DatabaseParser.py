@@ -430,7 +430,7 @@ def mergeUser(newUser, oldUser):
             events = listInvitedEventsFor(oldUser)
 
             for event in events:
-                oldParticipants = event.participants
+                oldParticipants = json.dumps(event.participants)
                 newParticipants = \
                     oldParticipants.replace(str(oldUser.lower()),
                         str(newUser.lower()))
@@ -506,6 +506,7 @@ def addAlias(mainUser, alias):
 
     return False
 
+
 def removeAlias(mainUser, alias):
     """
     Removes an alias from given user. Returns nothing.
@@ -517,20 +518,25 @@ def removeAlias(mainUser, alias):
     with connection:
         cur = connection.cursor()
         if userExists(mainUser):
-            cur.execute('DELETE FROM splitpot_aliases WHERE user = ? and alias = ?',
-                        [mainUser.lower(), alias.lower()])
+            cur.execute('DELETE FROM splitpot_aliases WHERE user = ? and alias = ?'
+                        , [mainUser.lower(), alias.lower()])
+
 
 def getAliasesFor(email):
     """
     Returns a list of all aliases of a user. The list never contains the userID itself
     """
+
     with connection:
         cur = connection.cursor()
-        tmp = cur.execute('SELECT alias from splitpot_aliases WHERE user = ?', [email.lower()]).fetchall()
+        tmp = \
+            cur.execute('SELECT alias from splitpot_aliases WHERE user = ?'
+                        , [email.lower()]).fetchall()
         result = []
         for e in tmp:
             result.append(e[0])
         return result
+
 
 def resolveAlias(alias):
     """
