@@ -160,7 +160,7 @@ def mergeRequest(newEmail, oldEmail, key):
     tmpl = lookup.get_template('merge_request.email')
     SettingsWrapper(oldEmail, 'Account Merge Request',
                     tmpl.render(newEmail=newEmail, oldEmail=oldEmail,
-                    url=RUNNING_URL + 'user/doMerge?key=' + key))
+                    url=RUNNING_URL + 'doMerge?key=' + key))
 
 
 def aliasRequest(currentUser, aliasUser, key):
