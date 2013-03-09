@@ -48,24 +48,15 @@
         padding: 7px 9px;
       } 
 
-      /* center the navbar */
-      .center.navbar .nav,
-      .center.navbar .nav > li {
+      .navbar .brand,
+      .nav-collapse {
         float:none;
         display:inline-block;
+        *display:inline; /* ie7 fix */
+        *zoom:1; /* hasLayout ie7 trigger */
         vertical-align: top;
       }
-
-      .center .navbar-inner {
-        text-align:center;
-      }
-
-      .navbar .brand {
-        margin-left: auto;
-        margin-right: auto;
-        width: 60px;
-        float: none;
-      }
+      .navbar-inner > .container { text-align:center; }
     </style>
 
     <link rel="shortcut icon" href="${cherrypy.url('/asset/ico/favicon.ico')}">
