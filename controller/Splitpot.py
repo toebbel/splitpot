@@ -299,6 +299,10 @@ class splitpot_controller(object):
                                     + email.lower()
                                    + '" for further information',
                                    newUser=getCurrentUserName())
+        else:
+            tmpl = lookup.get_template('index.html')
+            return tmpl.render(bad_news="Something went wrong, merge wasn't successful (maybe you already merged?)")
+
 
     @cherrypy.expose
     @require()
