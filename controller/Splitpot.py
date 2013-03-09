@@ -1,4 +1,4 @@
-#!/usr/bin/python
+g!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 import cherrypy
@@ -252,13 +252,14 @@ class splitpot_controller(object):
             log.info('valid merging key, merging "' + newMail
                      + '" and "' + oldMail + '" now')
             if mergeUser(newMail, oldMail):
-                return self.index()
+                tmpl = lookup.get_template('index.html')
+                return tmpl.render(good_news='Merge was successful!')
             else:
                 log.warning('couldn\'t merge "' + newMail + '" and "'
                             + oldMail + '" for some unexpected reason')
                 return tmpl.render(feedback='Oh no! Something went wrong. Please try again later.'
                                    , newUser=getCurrentUserName())
-        else:
+        else if email is not None:
 
             log.info('merge "' + email.lower() + '" with "'
                      + getCurrentUserName() + '"')
@@ -306,7 +307,8 @@ class splitpot_controller(object):
         Return the template for adding alias.
         """
 
-        return lookup.get_template('alias.html').render(aliases = getAliasesFor(getCurrentUserName()))
+        return lookup.get_template('alias.html'
+                                   ).render(aliases=getAliasesFor(getCurrentUserName()))
 
     @cherrypy.expose
     @require()
@@ -314,6 +316,7 @@ class splitpot_controller(object):
         """
         Removes an alias from the current user
         """
+
         tmpl = lookup.get_template('alias.html')
         if not emailRegex.match(email):
             return tmpl.render(bad_news='The given email is invalid')
@@ -344,14 +347,16 @@ class splitpot_controller(object):
 
             if mergeUser(mainMail, alias):
                 addAlias(mainMail, alias)
-                return tmpl.render(good_news='Your alias has been added',
-                        aliases = getAliasesFor(getCurrentUserName()))
+                return tmpl.render(good_news='Your alias has been added'
+                                   ,
+                                   aliases=getAliasesFor(getCurrentUserName()))
             else:
                 log.warning('couldn\'t alias/merge "' + newUser
                             + '" and "' + oldUser
                             + '" for some unexpected reason')
                 return tmpl.render(bad_news='Oh no! Something went wrong. Please try again later.'
-                                   , newUser=getCurrentUserName(), aliases = getAliasesFor(getCurrentUserName()))
+                                   , newUser=getCurrentUserName(),
+                                   aliases=getAliasesFor(getCurrentUserName()))
         elif alias is not None:
             log.info('alias is not not')
 
@@ -369,7 +374,8 @@ class splitpot_controller(object):
                             + ' is already an alias for someone else</li>'
 
             if not errors == '':
-                return tmpl.render(bad_news='<ul>' + errors + '</ul>', aliases = getAliasesFor(getCurrentUserName()))
+                return tmpl.render(bad_news='<ul>' + errors + '</ul>',
+                                   aliases=getAliasesFor(getCurrentUserName()))
             else:
 
                 info = ''
@@ -388,7 +394,8 @@ class splitpot_controller(object):
                             + user.lower() \
                             + '" for further information</li>'
 
-                return tmpl.render(good_news=info, aliases = getAliasesFor(getCurrentUserName()))
+                return tmpl.render(good_news=info,
+                                   aliases=getAliasesFor(getCurrentUserName()))
         else:
 
             return tmpl.render(good_news='Nothing to add to aliases list'
