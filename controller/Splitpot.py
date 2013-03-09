@@ -259,7 +259,7 @@ class splitpot_controller(object):
                             + oldMail + '" for some unexpected reason')
                 return tmpl.render(feedback='Oh no! Something went wrong. Please try again later.'
                                    , newUser=getCurrentUserName())
-        else if email is not None:
+        elif email is not None:
 
             log.info('merge "' + email.lower() + '" with "'
                      + getCurrentUserName() + '"')
