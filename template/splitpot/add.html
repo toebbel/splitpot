@@ -6,7 +6,10 @@ Add your expenses that you made for others.
 <form name="doAdd" action= "doAdd" method="post">
     <table>
         <tr>
-            <td>Amount</td>
+            <td>Date:</td>
+            <td><input type="text" value="01-01-1990" data-date-format="dd-mm-yyyy" class="datepicker" /></td> 
+        <tr>
+            <td>Amount:</td>
             <td><input type="text" name="amount" value="${amount or ""}" /></td>
         </tr>
         <tr>
@@ -26,6 +29,8 @@ Add your expenses that you made for others.
 
 <script>
         $(document).ready(function() {
+        $('.datepicker').datepicker(today);
+        
         function split( val ) {
           return val.split( /,\s*/ );
         }
