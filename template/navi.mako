@@ -9,6 +9,21 @@
       <span class="icon-bar"></span>
       </a>
       <a class="brand" href="${cherrypy.url('/')}">Splitpot</a>
+      % if getCurrentUserName() != '':
+      <div class="btn-group pull-right">
+          <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-user"></i> User <span class="caret"></span></a>
+          <!-- if we should ever need two separate buttons
+              <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
+          -->
+          <ul class="dropdown-menu" data-no-collapse="true">
+              <li style="text-align:left;"><a href="${cherrypy.url('/merge')}"><i class="icon-resize-small"></i> merge</a></li>
+              <li style="text-align:left;"><a href="${cherrypy.url('/alias')}"><i class="icon-plus"></i> add alias</a></li>
+              <li style="text-align:left;"><a href="${cherrypy.url('/user/forgot')}"><i class="icon-pencil"></i> change password</a></li>
+              <li class="divider"></li>
+              <li style="text-align:left;"><a href="${cherrypy.url('/user/logout')}"><i class="icon-off"></i> logout</a></li>
+          </ul>
+      </div>
+      % endif
       <div class="nav-collapse">
         <ul class="nav">
             % if getCurrentUserName() != '':
@@ -19,21 +34,6 @@
                 <li><a href="${cherrypy.url('/user/login')}">Login</a></li>
             % endif
         </ul>
-        % if getCurrentUserName() != '':
-        <div class="btn-group">
-            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-user"></i> User <span class="caret"></span></a>
-            <!-- if we should ever need two separate buttons
-                <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
-            -->
-            <ul class="dropdown-menu" data-no-collapse="true">
-                <li style="text-align:left;"><a href="${cherrypy.url('/merge')}"><i class="icon-resize-small"></i> Merge</a></li>
-                <li style="text-align:left;"><a href="${cherrypy.url('/alias')}"><i class="icon-plus"></i> Add Alias</a></li>
-                <li style="text-align:left;"><a href="${cherrypy.url('/user/forgot')}"><i class="icon-pencil"></i> Change Password</a></li>
-                <li class="divider"></li>
-                <li style="text-align:left;"><a href="${cherrypy.url('/user/logout')}"><i class="icon-off"></i> Logout</a></li>
-            </ul>
-        </div>
-        % endif
       </div><!--/.nav-collapse -->
     </div>
   </div>

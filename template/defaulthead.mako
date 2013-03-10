@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="${cherrypy.url('/asset/css/bootstrap.css')}" media="screen" />
     <link rel="stylesheet" href="${cherrypy.url('/asset/css/custom.css')}" media="screen" />
     <link rel="stylesheet" href="${cherrypy.url('/asset/css/datepicker.css')}" media="screen" />
+    <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet">
+
     <link rel="stylesheet" href="${cherrypy.url('/asset/css/modified-bootstrap-responsive.min.css')}" media="screen" />
     
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" type="text/css">
