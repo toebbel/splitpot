@@ -7,12 +7,14 @@
     <meta name="description" content="" />
     <link rel="stylesheet" href="${cherrypy.url('/asset/css/bootstrap.css')}" media="screen"/>
     <link rel="stylesheet" href="${cherrypy.url('/asset/css/custom.css')}" media="screen"/>
+    <link rel="stylesheet" href="${cherrypy.url('/asset/css/datepicker.css')}" media="screen"/>
     
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" type="text/css">
     <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet">
     <script src="http://code.jquery.com/jquery-1.8.3.js" type="text/javascript"></script>
     <script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js" type="text/javascript"></script>
     <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
+    <script src="${cherrypy.url('/asset/js/bootstrap-datepicker.js')}"></script>
     <style>
       body {
         padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
