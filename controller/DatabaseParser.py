@@ -430,7 +430,7 @@ def mergeUser(newUser, oldUser):
             events = listInvitedEventsFor(oldUser)
 
             for event in events:
-                oldParticipants = event.participants
+                oldParticipants = json.dumps(event.participants)
                 newParticipants = \
                     oldParticipants.replace(str(oldUser.lower()),
                         str(newUser.lower()))
@@ -461,6 +461,10 @@ def mergeUser(newUser, oldUser):
 
             log.info('removing all autocomplete entries that are pointing to "'
                       + oldUser.lower() + '"')  # TODO maybe leave this entries as they are (references to an alias)
+
+            log.info('add  ' + oldUser.lower() + ' as an alias for '
+                     + newUser.lower())
+            addAlias(newUser, oldUser)
 
             cur.execute('DELETE FROM splitpot_autocomplete WHERE [to] = ?'
                         , [oldUser.lower()])
@@ -506,6 +510,7 @@ def addAlias(mainUser, alias):
 
     return False
 
+
 def removeAlias(mainUser, alias):
     """
     Removes an alias from given user. Returns nothing.
@@ -517,79 +522,25 @@ def removeAlias(mainUser, alias):
     with connection:
         cur = connection.cursor()
         if userExists(mainUser):
-            cur.execute('DELETE FROM splitpot_aliases WHERE user = ? and alias = ?',
-                        [mainUser.lower(), alias.lower()])
+            cur.execute('DELETE FROM splitpot_aliases WHERE user = ? and alias = ?'
+                        , [mainUser.lower(), alias.lower()])
+
 
 def getAliasesFor(email):
     """
     Returns a list of all aliases of a user. The list never contains the userID itself
     """
+
     with connection:
         cur = connection.cursor()
-        tmp = cur.execute('SELECT alias from splitpot_aliases WHERE user = ?', [email.lower()]).fetchall()
+        tmp = \
+            cur.execute('SELECT alias from splitpot_aliases WHERE user = ?'
+                        , [email.lower()]).fetchall()
         result = []
         for e in tmp:
             result.append(e[0])
         return result
 
-def resolveAlias(alias):
-    """
-    Get main user from alias.
-    """
-
-    log.info('get main user for ' + alias.lower())
-
-    with connection:
-        cur = connection.cursor()
-        cur.execute('SELECT user FROM splitpot_aliases WHERE alias = ?'
-                    , [alias.lower()])
-
-        result = cur.fetchone()
-        if result != None:
-            if len(result) > 0:
-                return result[0]
-
-    return None
-
-
-def aliasUserExists(alias, mainMail=None):
-    """
-    Checks if an alias already exists.
-    """
-
-    log.info('checks if ' + alias.lower() + ' exists as an alias')
-    exists = ''
-    with connection:
-        cur = connection.cursor()
-        if mainMail != None:
-            cur.execute('SELECT COUNT(*) FROM splitpot_aliases WHERE alias = ? AND user = ?'
-                        , [alias.lower(), mainMail.lower()])
-            exists = cur.fetchone()[0]
-        else:
-            cur.execute('SELECT COUNT(*) FROM splitpot_aliases WHERE alias = ?'
-                        , [alias.lower()])
-            exists = cur.fetchone()[0]
-
-    return (False if exists == 0 else True)
-
-
-def addAlias(mainUser, alias):
-    """
-    Add alias to given user.
-    """
-
-    log.info('add ' + alias.lower() + ' as alias to '
-             + mainUser.lower())
-
-    with connection:
-        cur = connection.cursor()
-        if userExists(mainUser):
-            cur.execute('INSERT INTO splitpot_aliases VALUES(?,?)',
-                        (mainUser.lower(), alias.lower()))
-        return True
-
-    return False
-
 
 def resolveAlias(alias):
     """
@@ -630,21 +581,6 @@ def aliasUserExists(alias, mainMail=None):
             exists = cur.fetchone()[0]
 
     return (False if exists == 0 else True)
-
-
-def resolveNick(userId):
-    log.info('resolve nick ' + str(userId))
-    if userExists(userId, True):
-        result = userId
-        if userExists(userId, False):
-            with connection:
-                cur = connection.cursor()
-                cur.execute("SELECT name from splitpot_users where email = '"
-                             + userId + "';")
-                result = cur.fetchone()[0]
-        return result
-    else:
-        return 'unknown user'
 
 
 def buildTransactionTree():

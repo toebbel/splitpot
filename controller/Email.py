@@ -74,7 +74,7 @@ def SettingsWrapper(to, subject, body):
     msg = MIMEText(body, 'plain', 'utf-8')
     msg['From'] = settings['sender']
     msg['To'] = to
-    msg['Subject'] = subject
+    msg['Subject'] = "[Splitpot] " + subject
 
     log.info('sending mail to "' + to + '" with subject: "' + subject
              + '" and body "' + body + '" via "' + settings['host']
@@ -141,9 +141,13 @@ def payday(
 
     tmpl = lookup.get_template('payday.email')
 
-    SettingsWrapper(email, 'Payday!', tmpl.render(inPayments=inPayments, outPayments=outPayments, inDebts=inDebt, outDebts=outDebt))  # TODO enough data or more?
+    SettingsWrapper(email, 'Payday!',
+                    tmpl.render(inPayments=inPayments,
+                    outPayments=outPayments, inDebts=inDebt,
+                    outDebts=outDebt))  # TODO enough data or more?
 
-    #return tmpl.render(inPayments=inPayments, outPayments=outPayments, inDebts=inDebt, outDebts=outDebt)
+
+    # return tmpl.render(inPayments=inPayments, outPayments=outPayments, inDebts=inDebt, outDebts=outDebt)
 
 def mergeRequest(newEmail, oldEmail, key):
     """
@@ -156,7 +160,7 @@ def mergeRequest(newEmail, oldEmail, key):
     tmpl = lookup.get_template('merge_request.email')
     SettingsWrapper(oldEmail, 'Account Merge Request',
                     tmpl.render(newEmail=newEmail, oldEmail=oldEmail,
-                    url=RUNNING_URL + 'user/doMerge?key=' + key))
+                    url=RUNNING_URL + 'doMerge?key=' + key))
 
 
 def aliasRequest(currentUser, aliasUser, key):
