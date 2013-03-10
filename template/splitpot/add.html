@@ -7,7 +7,7 @@ Add your expenses that you made for others.
     <table>
         <tr>
             <td>Date:</td>
-            <td><input type="text" data-date-format="dd-mm-yyyy" class="datepicker" /></td> 
+            <td><input type="text" data-date-format="dd-mm-yyyy" class="datepicker" id="datepicker" /></td> 
         <tr>
             <td>Amount:</td>
             <td><input type="text" name="amount" value="${amount or ""}" /></td>
@@ -30,38 +30,39 @@ Add your expenses that you made for others.
 <script>
         $(document).ready(function() {
             var eventDate = $('.datepicker').datepicker().on('changeDate', function(ev) {eventDate.hide()}).data('datepicker');
-        
-        function split( val ) {
-          return val.split( /,\s*/ );
-        }
- 
-        function extractLast( term ) {
-          return split( term ).pop();
-        }
-        $( "#others" ).autocomplete({
-          source: function( request, response ) {
-                    console.log("source");
-                    $.getJSON( "${cherrypy.url('/autocomplete')}", {
-                      term: extractLast( request.term )
-                    }, response );
-                  },
-          select: function( event, ui ) {
-                    console.log("select");
-                    // Add the selected term appending to the current values with a comma
-                    var terms = split( this.value );
-                    // remove the current input
-                    terms.pop();
-                    // add the selected item
-                    terms.push( ui.item.value );
-                    // join all terms with a comma
-                    this.value = terms.join( ", " );
-                    return false;
-                  },
-          focus: function() {
-                    console.log("focus");
-                   // prevent value inserted on focus when navigating the drop down list
-                   return false;
-                 }
-        });
+            document.getElementById('datepicker').value = (new Date()).format("dd-mm-yyyy");
+
+            function split( val ) {
+              return val.split( /,\s*/ );
+            }
+     
+            function extractLast( term ) {
+              return split( term ).pop();
+            }
+            $( "#others" ).autocomplete({
+              source: function( request, response ) {
+                        console.log("source");
+                        $.getJSON( "${cherrypy.url('/autocomplete')}", {
+                          term: extractLast( request.term )
+                        }, response );
+                      },
+              select: function( event, ui ) {
+                        console.log("select");
+                        // Add the selected term appending to the current values with a comma
+                        var terms = split( this.value );
+                        // remove the current input
+                        terms.pop();
+                        // add the selected item
+                        terms.push( ui.item.value );
+                        // join all terms with a comma
+                        this.value = terms.join( ", " );
+                        return false;
+                      },
+              focus: function() {
+                        console.log("focus");
+                       // prevent value inserted on focus when navigating the drop down list
+                       return false;
+                     }
+            });
       });
 </script>
