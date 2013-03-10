@@ -7,7 +7,7 @@ Add your expenses that you made for others.
     <table>
         <tr>
             <td>Date:</td>
-            <td><input type="text" data-date-format="dd-mm-yyyy" class="datepicker" id="datepicker" /></td> 
+            <td><input type="text" data-date-format="dd-mm-yyyy" class="datepicker" /></td> 
         <tr>
             <td>Amount:</td>
             <td><input type="text" name="amount" value="${amount or ""}" /></td>
@@ -30,7 +30,15 @@ Add your expenses that you made for others.
 <script>
         $(document).ready(function() {
             var eventDate = $('.datepicker').datepicker().on('changeDate', function(ev) {eventDate.hide()}).data('datepicker');
-            document.getElementById('datepicker').value = (new Date()).format("dd-mm-yyyy");
+
+            var curDate = new Date();
+            var d = curDate.getDate();
+            var m = curDate.getMonth() + 1; // months start at zero, for some reason
+            var y = curDate.getFullYear();
+
+            var today = (d <= 9 ? '0' + d : d) + '-' + (m<=9 ? '0' + m : m) + '-' + y;
+
+            $('.datepicker').attr("value", today);
 
             function split( val ) {
               return val.split( /,\s*/ );
