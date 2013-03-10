@@ -29,7 +29,7 @@ Add your expenses that you made for others.
 
 <script>
         $(document).ready(function() {
-        $('.datepicker').datepicker();
+            var eventDate = $('.datepicker').datepicker().on('changeDate', function(ev) {eventDate.hide()}).data('datepicker');
         
         function split( val ) {
           return val.split( /,\s*/ );
