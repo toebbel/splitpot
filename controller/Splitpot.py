@@ -15,8 +15,8 @@ from datetime import date
 from TransactionGraph import *
 from Regex import *
 import Email
+import re
 
-from datetime import date
 import logging
 log = logging.getLogger('appLog')
 
@@ -76,6 +76,7 @@ class splitpot_controller(object):
     @require()
     def doAdd(
         self,
+        curDate,
         amount,
         others,
         comment,
@@ -95,9 +96,13 @@ class splitpot_controller(object):
                       and not duplicates_add(x)]
 
         tmpl = lookup.get_template('add.html')
+        if not dateRegex.match(curDate):
+            log.info('date is malformed')
+            return tmpl.render(bad_news='Date is malformed. Just use the datepicker', comment=comment, others=others)
+
         if not amountRegex.match(amount):
-            log.info('mal formed amount')
-            return tmpl.render(bad_news='Amount is mal formed. Please correct & try again'
+            log.info('malformed amount')
+            return tmpl.render(bad_news='Amount is malformed. Maybe you used "," instead of "."? Please correct & try again'
                                , comment=comment, others=others)
 
         if float(amount) <= 0:
@@ -109,7 +114,7 @@ class splitpot_controller(object):
             if not emailRegex.match(other):
                 log.info('Email: ' + str(other) + ' is malformed.')
                 return tmpl.render(bad_news='Email ' + other
-                                   + ' is mal formed. Please correct',
+                                   + ' is malformed. Please correct',
                                    comment=comment, others=others,
                                    amount=amount)
             if other == getCurrentUserName() or resolveAlias(other) \
@@ -121,7 +126,7 @@ class splitpot_controller(object):
 
         if not entryCommentRegex.match(comment):
             log.info('Comment is malformed.')
-            return tmpl.render(bad_news='Comment is malformed. Plase correct & try again'
+            return tmpl.render(bad_news='Comment is malformed. Please correct & try again'
                                , comment=comment, others=others,
                                amount=amount)
 
@@ -148,7 +153,11 @@ class splitpot_controller(object):
 
         log.info('Add ' + amount + ' Euro to ' + str(othersList)
                  + ', comment: ' + comment)
-        eventId = insertEvent(getCurrentUserName(), date.today(),
+
+        splitDate = re.findall(r"[\d]+", curDate)
+        splitDate = [int(x) for x in splitDate]
+        today = datetime.date(splitDate[2], splitDate[1], splitDate[0])
+        eventId = insertEvent(getCurrentUserName(), today,
                               amount, othersList, comment)
         event = getEvent(eventId)
 
@@ -157,7 +166,7 @@ class splitpot_controller(object):
         Email.ownerEmail(getCurrentUserName(), event)
 
         tmpl = lookup.get_template('index.html')
-        return tmpl.render(good_news='created event :)')
+        return tmpl.render(good_news='successfully created event :)')
 
     @cherrypy.expose
     @require()
@@ -301,8 +310,8 @@ class splitpot_controller(object):
                                    newUser=getCurrentUserName())
         else:
             tmpl = lookup.get_template('index.html')
-            return tmpl.render(bad_news="Something went wrong, merge wasn't successful (maybe you already merged?)")
-
+            return tmpl.render(bad_news="Something went wrong, merge wasn't successful (maybe you already merged?)"
+                               )
 
     @cherrypy.expose
     @require()
