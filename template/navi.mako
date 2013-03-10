@@ -17,13 +17,13 @@
         <!-- <li><a href="${cherrypy.url('/user/logout')}">Logout</a></li> -->
         <li>
             <div class="btn-group">
-                <a class="btn btn-small" href="#"><i class="icon-user icon-white"></i> User</a>
-                <a class="btn btn-small dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
+                <a class="btn" href="#"><i class="icon-user"></i> User</a>
+                <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
                 <ul class="dropdown-menu">
                     <li style="float:left;"><a href="${cherrypy.url('/merge')}"><i class="icon-resize-small"></i> Merge</a></li><br />
                     <li style="float:left;"><a href="${cherrypy.url('/alias')}"><i class="icon-plus"></i> Add Alias</a></li><br />
                     <li style="float:left;"><a href="${cherrypy.url('/user/forgot')}"><i class="icon-pencil"></i> Change Password</a></li><br />
-                    <li class="divider"></li><br />
+                    <li class="divider"></li>
                     <li style="float:left;"><a href="${cherrypy.url('/user/logout')}"><i class="icon-off"></i> Logout</a></li>
                 </ul>
             </div>
