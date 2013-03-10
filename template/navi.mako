@@ -24,7 +24,7 @@
                     <li><a href="${cherrypy.url('/alias')}"><i class="icon-plus"></i> Add Alias</a></li>
                     <li><a href="${cherrypy.url('/user/forgot')}"><i class="icon-pencil"></i> Change Password</a></li>
                     <li class="divider"></li>
-                    <li><a href="${cherrpy.url('/user/logout')}"><i class="icon-off"></i> Logout</a></li>
+                    <li><a href="${cherrypy.url('/user/logout')}"><i class="icon-off"></i> Logout</a></li>
                 </ul>
             </div>
         </li>
