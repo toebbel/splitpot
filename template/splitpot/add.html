@@ -7,7 +7,7 @@ Add your expenses that you made for others.
     <table>
         <tr>
             <td>Date:</td>
-            <td><input type="text" value="01-01-1990" data-date-format="dd-mm-yyyy" class="datepicker" /></td> 
+            <td><input type="text" data-date-format="dd-mm-yyyy" class="datepicker" /></td> 
         <tr>
             <td>Amount:</td>
             <td><input type="text" name="amount" value="${amount or ""}" /></td>
@@ -29,7 +29,7 @@ Add your expenses that you made for others.
 
 <script>
         $(document).ready(function() {
-        $('.datepicker').datepicker(today);
+        $('.datepicker').datepicker();
         
         function split( val ) {
           return val.split( /,\s*/ );
