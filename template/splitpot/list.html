@@ -6,32 +6,35 @@
 Your debts: ${("%.2f" % debts).replace('.', ',')}€ <br />
 Others owe you: ${("%.2f" % others_debts).replace('.',',')}€ <br />
 <hr />
-<table>
-  <tr>
-      <td>Date</td>
-      <td>Host</td>
-      <td>Amount</td>
-      <td>Details</td>
-  </tr>
-  % for x in entries:
-    <tr>
-      <td>
-          ${x.date.strftime("%d %b")}
-      </td>
-      <td>
-          % if x.owner == getCurrentUserName():
-              ${"you"} 
-          % else:
-              ${resolveNick(x.owner)}
-          % endif
-      </td>
-      <td>
-        ${x.amount}€
-      </td>
-      <td>
-	      <a href="${cherrypy.url('event/' + str(x.id))}">more</a>
-      </td>
-    </tr>
-  % endfor
-
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+          <th>Date</th>
+          <th>Host</th>
+          <th>Amount</th>
+          <th>Details</th>
+        </tr>
+    </thead>
+    <tbody>
+        % for x in entries:
+        <tr>
+          <td>
+              ${x.date.strftime("%d %b")}
+          </td>
+          <td>
+              % if x.owner == getCurrentUserName():
+                  ${"you"} 
+              % else:
+                  ${resolveNick(x.owner)}
+              % endif
+          </td>
+          <td>
+            ${x.amount}€
+          </td>
+          <td>
+              <a href="${cherrypy.url('event/' + str(x.id))}">more</a>
+          </td>
+        </tr>
+        % endfor
+    </tbody>
 </table>
