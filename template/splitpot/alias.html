@@ -14,7 +14,7 @@ If the e-mail is already registered (activated or not, doesn't matter), you can 
 % if aliases:
     <ul>
     % for a in aliases:
-        <li>${a} <a href="${cherrypy.url('doRemoveAlias?email=' + a)}">remove</a></li>
+        <li>${a} <a href="${cherrypy.url('doRemoveAlias?email=' + a)}"><i class="icon-trash"></i></a></li>
     % endfor
     </ul>
 % endif

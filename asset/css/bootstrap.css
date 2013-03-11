@@ -2296,6 +2296,13 @@ input[type="submit"].btn.btn-mini {
 .dropdown-submenu:hover > a > [class*=" icon-"] {
   background-image: url("../img/glyphicons-halflings-white.png");
 }
+/*
+ * Here are some custom added Glyphicon
+ */
+.icon-user-add {
+  background-image: url("../img/glyphicons/glyphicons_006_user_add.png");
+}
+
 .icon-glass {
   background-position: 0      0;
 }
