@@ -4,7 +4,7 @@
 Which other account would you like to merge with this account?<br />
 
 <form name="merge" action="doMerge" method="post">
-    New account: <input type="text" readonly="readonly" value=${newUser} /><br />
-    Other account: <input type="text" name="email" /><br />
-    <input type="submit" value="submit">
+    <input type="text" readonly="readonly" value=${newUser} /><br />
+    <input type="text" name="email" placeholder="Other account" /><br />
+    <button class="btn btn-primary" type="submit">Submit</button>
 </form>
