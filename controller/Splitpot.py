@@ -87,7 +87,8 @@ class splitpot_controller(object):
     """
 
         # in case a comma was used, instead of a dot
-        amount = amount.replace(',','.')
+
+        amount = amount.replace(',', '.')
 
         othersList = [x.strip() for x in str(others).split(',')]
 
@@ -363,7 +364,6 @@ class splitpot_controller(object):
                      + '" as alias to "' + mainMail)
 
             if mergeUser(mainMail, alias):
-                addAlias(mainMail, alias)
                 return tmpl.render(good_news='Your alias has been added'
                                    ,
                                    aliases=getAliasesFor(getCurrentUserName()))
