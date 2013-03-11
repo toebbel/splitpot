@@ -1,7 +1,7 @@
 ## This file contains settings for sending mails
 
 host: localhost
-sender: splitpot@0xabc.de
+sender: admin@localhost.org 
 port: 25
 
 ##timeout is in seconds
