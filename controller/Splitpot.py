@@ -86,6 +86,9 @@ class splitpot_controller(object):
     If one of the given emails in other is not a known user, an invitation email will be sent.
     """
 
+        # in case a comma was used, instead of a dot
+        amount = amount.replace(',','.')
+
         othersList = [x.strip() for x in str(others).split(',')]
 
         log.info('removing duplicates from others list, if there are any.'
@@ -98,11 +101,12 @@ class splitpot_controller(object):
         tmpl = lookup.get_template('add.html')
         if not dateRegex.match(curDate):
             log.info('date is malformed')
-            return tmpl.render(bad_news='Date is malformed. Just use the datepicker', comment=comment, others=others)
+            return tmpl.render(bad_news='Date is malformed. Just use the datepicker.'
+                               , comment=comment, others=others)
 
         if not amountRegex.match(amount):
             log.info('malformed amount')
-            return tmpl.render(bad_news='Amount is malformed. Maybe you used "," instead of "."? Please correct & try again'
+            return tmpl.render(bad_news='Amount is malformed. Please correct & try again.'
                                , comment=comment, others=others)
 
         if float(amount) <= 0:
@@ -157,8 +161,8 @@ class splitpot_controller(object):
         splitDate = re.findall(r"[\d]+", curDate)
         splitDate = [int(x) for x in splitDate]
         today = datetime.date(splitDate[2], splitDate[1], splitDate[0])
-        eventId = insertEvent(getCurrentUserName(), today,
-                              amount, othersList, comment)
+        eventId = insertEvent(getCurrentUserName(), today, amount,
+                              othersList, comment)
         event = getEvent(eventId)
 
         for participant in othersList:
