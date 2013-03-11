@@ -1,20 +1,23 @@
-splitpot
+Splitpot
 ========
 # Usage
-use 'python App.py' from root dir, to start the server wit the default configuration
+Use 'python App.py' from root dir, to start the server with the default configuration
 
 # Installation
-Prequesites:
+Prerequisites:
 - Running Apache
 - Git installed
 
-**1. Instal python**
+**1. Install python**
+
 ```sudo apt-get install python python-dev python-setuptools```
 
 **2. Install sqlite3**
+
 ```sudo apt-get install sqlite3```
 
-**3. Instal lmako**
+**3. Install mako**
+
 ```sudo apt-get install python-mako```
 
 **4. Install Cherrypy**
@@ -25,16 +28,19 @@ cd CherryPy-3.2.2
 python setup.py install
 ```
 
-**5. Checkout the latest splitpot source from git**
-let's say you're in /var/www/ run ```sudo git clone git@github.com:toebbel/splitpot.git```
-/var/www/splitpot is now your local splitpot root.
+**5. Checkout the latest Splitpot source from GitHub**
+
+Let's say you're in /var/www/ run ```sudo git clone git@github.com:toebbel/splitpot.git```
+/var/www/splitpot is now your local Splitpot root.
 
 **6. Config Splitpot to run behind proxy-mode of apache**
-enable mod_proxy for apache 2
+
+Enable mod_proxy for apache 2
+
 ```sudo a2enmod proxy_http```
 
-edit '/etc/apache2/sites-enabled/000-default'
-add the following:
+Edit ```/etc/apache2/sites-enabled/000-default```
+and add the following:
 ```
 ProxyPreserveHost on
 <Proxy *>
@@ -44,12 +50,19 @@ ProxyPreserveHost on
 ProxyPass /webapp/ http://127.0.0.1:8080/splitpot/
 ProxyPassReverse /webapp/ http://127.0.0.1:8080/splitpot/
 ```
-restart your apache
+Restart your apache
+
 ```sudo /etc/init.d/apache2 restart```
+
+**7. Config mail settings**
+
+```cp resource/mail.settings.template resource/mail.settings```
+
+Then fill ```resource/mail.settings``` with the appropriate mail settings.
 
 To fill/reset the database with test data:
 * run ```script/reset_database.sh``` from splitpot's root directory
-* Database contains nothin except one user: Use login awesome@0xabc.de : awesome
+* Database contains nothing except for one user: Use login awesome@0xabc.de : awesome
 * 
 * //TODO setup user and cron jobs
 
