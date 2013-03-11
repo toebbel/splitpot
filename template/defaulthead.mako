@@ -6,6 +6,7 @@
 
     <meta name="description" content="" />
     <link rel="stylesheet" href="${cherrypy.url('/asset/css/bootstrap.css')}" media="screen" />
+    <link rel="stylesheet" href="${cherrypy.url('/asset/css/glyphicons.css')}" media="screen" />
     <link rel="stylesheet" href="${cherrypy.url('/asset/css/custom.css')}" media="screen" />
     <link rel="stylesheet" href="${cherrypy.url('/asset/css/datepicker.css')}" media="screen" />
     <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet">
