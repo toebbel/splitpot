@@ -29,7 +29,7 @@ Others owe you: ${("%.2f" % others_debts).replace('.',',')}€ <br />
               % endif
           </td>
           <td>
-            ${x.amount}€
+            ${("%.2f" % (x.amount / float(len(x.participants) + 1))).replace('.',',')}€
           </td>
           <td>
               <a href="${cherrypy.url('event/' + str(x.id))}">more</a>
