@@ -23,6 +23,10 @@
               <li style="text-align:left;"><a href="${cherrypy.url('/user/logout')}"><i class="icon-off"></i> logout</a></li>
           </ul>
       </div>
+      % else:
+      <div class="pull-right">
+          <a class="btn" href="${cherrypy.url('/user/login')}">Log In</a>
+      </div>
       % endif
       <div class="nav-collapse">
         <ul class="nav">
@@ -31,7 +35,6 @@
                 <li><a href="${cherrypy.url('/add')}">Add</a></li>
             % else:
                 <li><a href="${cherrypy.url('/about')}">About</a></li>
-                <li><a href="${cherrypy.url('/user/login')}">Login</a></li>
             % endif
         </ul>
       </div><!--/.nav-collapse -->
