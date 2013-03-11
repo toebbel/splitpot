@@ -397,6 +397,12 @@ def isValidMergeUrlKey(key):
     return False
 
 
+def isValidAliasUrlKey(key):
+    """
+    Checks if a given key is a valid key to add an alias. Uses the isValidMergeUrlKey method
+    """
+    return isValidMergeUrlKey(key)
+
 def getUserFromPassword(pwd):
     """
     Return the user to which the pwd is part of the whole password.

@@ -356,7 +356,7 @@ class splitpot_controller(object):
         tmpl = lookup.get_template('alias.html')
         errors = ''
 
-        if key is not None and isValidMergeUrlKey(key):
+        if key is not None and isValidAliasUrlKey(key):
             mainMail = getUserFromPassword(key[:8])
             alias = getUserFromPassword(key[8:])
 
