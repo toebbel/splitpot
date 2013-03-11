@@ -23,7 +23,7 @@
         background-color: #f5f5f5;
       }
       
-      @media (max-width: 767px) {
+      @media (max-width: 979px) {
           /* Remove any padding from the body */
           body {
             padding-top: 0;
