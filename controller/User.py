@@ -87,7 +87,7 @@ def doRegister(
     errors = ''
     escapeRegex = False  # Quick checking some values against the DB
     if email is None:
-        errors += '<li>You have to provide an email adress</li>'
+        errors += '<li>You have to provide an email address</li>'
     if key is None:
         errors += \
             "<li>You have to provide a registration key(<a href='resend?email=" \
@@ -105,7 +105,7 @@ def doRegister(
     if str(pwd1).__len__() < 6:
         errors += '<li>Your password is too short</li>'
     if not pwd1 == pwd2:
-        errors += '<li>Passwort repition incorrect</li>'
+        errors += '<li>Passwort repetion incorrect</li>'
     if not escapeRegex and db.userExists(email, False):
         errors += '<li>User already exists</li>'
     if not errors == '':
@@ -256,7 +256,7 @@ def doMerge(email=None, key=None):
 Merge two accounts together. Will send a confirmation mail to the to-be-merged email.
 """
 
-    tmpl = lookup.get_template('merge.html')
+    tmpl = lookup.get_template('profile.html')
 
     errors = ''
     if key is not None and isValidMergeUrlKey(key):
@@ -273,13 +273,11 @@ Merge two accounts together. Will send a confirmation mail to the to-be-merged e
             log.warning('couldn\'t merge "' + newMail + '" and "'
                         + oldMail + '" for some unexpected reason')
             return tmpl.render(feedback='Oh no! Something went wrong. Please try again later.'
-                               , newUser=getCurrentUserName())
+                               )
     elif email is not None:
 
         log.info('merge "' + email.lower() + '" with "'
                  + getCurrentUserName() + '"')
-        if email is None:
-            errors += '<li>You have to provide an email address</li>'
         if emailRegex.match(email) == None:
             errors += '<li>Your email is invalid</li>'
         elif not userExists(email, True):
@@ -300,16 +298,14 @@ Merge two accounts together. Will send a confirmation mail to the to-be-merged e
                              )
                     errors = '<li>Can\'t merge two same accounts.</li>'
         if not errors == '':
-            return tmpl.render(bad_news='<ul>' + errors + '</ul>',
-                               newUser=getCurrentUserName())
+            return tmpl.render(bad_news='<ul>' + errors + '</ul>')
         else:
             mergeKey = getMergeUrlKey(getCurrentUserName(), email)
             Email.mergeRequest(getCurrentUserName(), email, mergeKey)
 
             return tmpl.render(good_news='An email has be sent to "'
                                + email.lower()
-                               + '" for further information',
-                               newUser=getCurrentUserName())
+                               + '" for further information')
     else:
         tmpl = lookup.get_template('index.html')
         return tmpl.render(bad_news="Something went wrong, merge wasn't successful (maybe you already merged?)"
@@ -334,26 +330,22 @@ def doRemoveAlias(email):
     Removes an alias from the current user
     """
 
-    tmpl = lookup.get_template('alias.html')
+    tmpl = lookup.get_template('profile.html')
+    log.info('remove alias ' + email.lower())
     if not emailRegex.match(email):
         return tmpl.render(bad_news='The given email is invalid')
     removeAlias(getCurrentUserName(), email)
-    raise cherrypy.HTTPRedirect(cherrypy.url('alias'))
+    raise cherrypy.HTTPRedirect(cherrypy.url('profile#alias'))
 
 
 @cherrypy.expose
 @require()
-def doAddAlias(
-    self,
-    alias=None,
-    mainMail=None,
-    key=None,
-    ):
+def doAddAlias(alias=None, mainMail=None, key=None):
     """
     Add an alias to this account.
     """
 
-    tmpl = lookup.get_template('alias.html')
+    tmpl = lookup.get_template('profile.html')
     errors = ''
 
     if key is not None and isValidAliasUrlKey(key):
@@ -364,14 +356,13 @@ def doAddAlias(
                  + mainMail)
 
         if mergeUser(mainMail, alias):
-            return tmpl.render(good_news='Your alias has been added',
-                               aliases=getAliasesFor(getCurrentUserName()))
+            return tmpl.render(good_news='Your alias has been added')
         else:
-            log.warning('couldn\'t alias/merge "' + newUser + '" and "'
-                        + oldUser + '" for some unexpected reason')
+            log.warning('couldn\'t alias/merge "' + currentUser
+                        + '" and "' + oldUser
+                        + '" for some unexpected reason')
             return tmpl.render(bad_news='Oh no! Something went wrong. Please try again later.'
-                               , newUser=getCurrentUserName(),
-                               aliases=getAliasesFor(getCurrentUserName()))
+                               )
     elif alias is not None:
         log.info('alias is not not')
 
@@ -389,8 +380,7 @@ def doAddAlias(
                         + ' is already an alias for someone else</li>'
 
         if not errors == '':
-            return tmpl.render(bad_news='<ul>' + errors + '</ul>',
-                               aliases=getAliasesFor(getCurrentUserName()))
+            return tmpl.render(bad_news='<ul>' + errors + '</ul>')
         else:
 
             info = ''
@@ -408,24 +398,63 @@ def doAddAlias(
                         + user.lower() \
                         + '" for further information</li>'
 
-            return tmpl.render(good_news=info,
-                               aliases=getAliasesFor(getCurrentUserName()))
+            return tmpl.render(good_news=info)
     else:
 
         return tmpl.render(good_news='Nothing to add to aliases list')
 
+
 @cherrypy.expose
-def profile(self):
+@require()
+def profile():
     """
     Delivers the profile page for the current logged in user, where he then can change his username and password
     """
 
-    return lookup.get_template('profile.html'
-                               ).render(currentUser=resolveNick(getCurrentUserName()))
+    return lookup.get_template('profile.html').render()
 
-# @require()
 
 @cherrypy.expose
-def updateProfile(self):
-    return None
+@require()
+def updateProfile(nickname=None):
+    """
+    Updates the nickname of the user
+    """
+    tmpl = lookup.get_template('profile.html')
 
+    errors = ''
+
+    if nickname is None or str(nickname).__len__() < 3:
+        errors += '<li>Please enter a nickname longer than 3 characters</li>'
+
+    if not errors == '':
+        return tmpl.render(bad_news='<ul>' + errors + '</ul>')
+    else:
+        changeNick(getCurrentUserName(), nickname)
+        return tmpl.render(good_news='Your nickname has been updated')
+
+
+@cherrypy.expose
+@require()
+def changePassword(oldPwd=None, newPwd=None, repeatPwd=None):
+    """
+    Update the user's password
+    """
+    tmpl = lookup.get_template('profile.html')
+
+    errors = ''
+
+    if oldPwd is None:
+        errors += '<li>You have to provide your current password</li>'
+    if oldPwd is not None and not verifyLogin(getCurrentUserName(), oldPwd):
+        errors += '<li>Your old password is not correct</li>'
+    if newPwd != repeatPwd:
+        errors += '<li>Your new passwords don\'t match</li>'
+
+    if not errors == '':
+        return tmpl.render(bad_news='<ul>' + errors + '</ul>')
+    else:
+        updateLogin(getCurrentUserName(), newPwd)
+        return tmpl.render(good_news='Your password has been successfully updated!')
+
+    return None

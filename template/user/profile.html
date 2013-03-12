@@ -1,0 +1,112 @@
+## -*- coding: utf-8 -*-
+<%inherit file="base.html" />
+<%! import cherrypy %>
+<%! from Auth import getCurrentUserName %>
+<%! from DatabaseParser import resolveNick %>
+<%! from DatabaseParser import getAliasesFor %>
+
+<div class="well">
+    <ul class="nav nav-tabs" id="tabContainer">
+        <li class="active"><a href="#profile" data-toggle="tab"><i class="icon-user"></i> Profile</a></li>
+        <li><a href="#password" data-toggle="tab"><i class="icon-pencil"></i> Password</a></li>
+        <li><a href="#merge" data-toggle="tab"><i class="icon-resize-small"></i> Merge</a></li>
+        <li><a href="#alias" data-toggle="tab"><i class="glyphicon-user-add"></i> Alias</a></li>
+    </ul>
+    <div id="myTabContent" class="tab-content">
+        <div class="tab-pane active in" id="profile">
+            <form name="updateProfile" action="updateProfile" method="post">
+                <label>Username:</label>
+                <input type="text" name="nickname" value="${resolveNick(getCurrentUserName())}" class="input-xlarge">
+                <div>
+                    <button class="btn btn-primary">Update</button>
+                </div>
+            </form>
+        </div>
+        <div class="tab-pane fade" id="password">
+            <form name"changePassword" action="changePassword" method="post">
+                <input type="password" name="oldPwd" placeholder="Old password" /><br /><br />
+                <input type="password" name="newPwd" placeholder="New password" /><br />
+                <input type="password" name="repeatPwd" placeholder="Repeat password" />
+                <div>
+                    <button class="btn btn-primary">Update</button>
+                </div>
+            </form>
+        </div>
+        <div class="tab-pane fade" id="merge">
+            <form name"merge" action="doMerge" method="post">
+                Which other account would you like to merge with this account?<br />
+                <br />
+                <input type="text" readonly="readonly" value=${getCurrentUserName()} /><br />
+                <input type="text" name="email" placeholder="Other account" /><br />
+                <button class="btn btn-primary" type="submit">Submit</button>
+            </form>
+        </div>
+        <div class="tab-pane fade" id="alias">
+            Which e-mail-addresses would you like to add as an alias (separate several aliases with a comma)?<br />
+            If the e-mail is already registered (activated or not, doesn't matter), you can also <a href="#" id="gotoMerge" > merge</a> your e-mail.<br />
+            <br />
+
+            <form name="alias" action="doAddAlias" method="post">
+                <input type="text" name="alias" placeholder="Aliases" /><br />
+                <button class="btn btn-primary" type="submit">Submit</button>
+            </form>
+
+            % if getAliasesFor(getCurrentUserName()):
+                <ul>
+                % for a in getAliasesFor(getCurrentUserName()):
+                <li>${a} <a class="confirm-delete" data-id=${a} role="button"><i class="icon-trash"></i></a></li>
+                % endfor
+                </ul>
+            % endif
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal small hide fade" id="deleteConfirmation" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3>Delete Confirmation</h3>
+    </div>
+    <div class="modal-body">
+        <p class="error-text">Are you sure you want to delete the alias?</p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+        <a href="${cherrypy.url('doRemoveAlias?email=')}" class="btn btn-danger">Delete</a>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        // Javascript to enable link to tab
+        var url = document.location.toString();
+        if (url.match('#')) {
+            $('.nav-tabs a[href=#'+url.split('#')[1]+']').tab('show') ;
+        }
+
+        // Change hash for page-reload
+        $('.nav-tabs a').on('shown', function (e) {
+            window.location.hash = e.target.hash;
+        })
+
+        $('#gotoMerge').click(function () {
+            $('#tabContainer a[href="#merge"]').tab('show');
+        });
+
+        $('#deleteConfirmation').bind('show', function() {
+            var id = $(this).data('id');
+            removeBtn = $(this).find('.btn-danger');
+            href = removeBtn.attr('href');
+
+            removeBtn.attr('href', href.replace(/email=(\w|\@|\.)*/, 'email=' + id));
+        });
+
+        $('.confirm-delete').click(function(e) {
+            e.preventDefault();
+
+            var id = $(this).data('id');
+            $('#deleteConfirmation').data('id', id).modal('show');
+        });
+    });
+</script>

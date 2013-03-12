@@ -401,7 +401,9 @@ def isValidAliasUrlKey(key):
     """
     Checks if a given key is a valid key to add an alias. Uses the isValidMergeUrlKey method
     """
+
     return isValidMergeUrlKey(key)
+
 
 def getUserFromPassword(pwd):
     """
@@ -688,3 +690,13 @@ def getAutocompleteUser(fromUser, term):
     return json.dumps(reply)
 
 
+def changeNick(mainMail, newNick):
+    """
+    Changes a nickname of a given user
+    """
+
+    with connection:
+        cur = connection.cursor()
+        cur.execute('UPDATE splitpot_users SET name = ? WHERE email = ?', [newNick, mainMail.lower()])
+
+    return True
