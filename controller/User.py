@@ -92,7 +92,7 @@ def doRegister(
             "<li>You have to provide a registration key(<a href='resend?email=" \
             + str(email) + "'>resend</a>)</li>"
     if emailRegex.match(email) == None:
-        errors += "<li>Your email is invalid</li>"
+        errors += '<li>Your email is invalid</li>'
         escapeRegex = True
     if not escapeRegex and not db.isValidResetUrlKey(email, key, True):
         errors += \
@@ -102,7 +102,7 @@ def doRegister(
         errors += \
             '<li>Please enter a nick, with a minimum length of 3</li>'
     if str(pwd1).__len__() < 6:
-        errors += "<li>Your password is too short</li>"
+        errors += '<li>Your password is too short</li>'
     if not pwd1 == pwd2:
         errors += '<li>Passwort repition incorrect</li>'
     if not escapeRegex and db.userExists(email, False):
@@ -162,6 +162,7 @@ def forgot_doReenter(
     pwd1=None,
     pwd2=None,
     ):
+
     tmpl = lookup.get_template('forgot_pwd_reenter.html')
 
     if not emailRegex.match(email):
@@ -237,3 +238,4 @@ def logout():
     if username:
         cherrypy.request.login = None
     raise cherrypy.HTTPRedirect(cherrypy.url('/about'))
+

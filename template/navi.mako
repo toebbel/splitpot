@@ -16,11 +16,9 @@
               <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
           -->
           <ul class="dropdown-menu" data-no-collapse="true">
-              <li style="text-align:left;"><a href="${cherrypy.url('/merge')}"><i class="icon-resize-small"></i> merge</a></li>
-              <li style="text-align:left;"><a href="${cherrypy.url('/alias')}"><i class="glyphicon-user-add"></i> manage aliases</a></li>
-              <li style="text-align:left;"><a href="${cherrypy.url('/user/forgot')}"><i class="icon-pencil"></i> change password</a></li>
+              <li style="text-align:left;"><a href="${cherrypy.url('/profile')}"><i class="icon-wrench"></i> Preferences</a></li>
               <li class="divider"></li>
-              <li style="text-align:left;"><a href="${cherrypy.url('/user/logout')}"><i class="icon-off"></i> logout</a></li>
+              <li style="text-align:left;"><a href="${cherrypy.url('/user/logout')}"><i class="icon-off"></i> Log Out</a></li>
           </ul>
       </div>
       % else:

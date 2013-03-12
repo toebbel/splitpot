@@ -4,7 +4,8 @@
 import cherrypy
 from mako.template import Template
 from mako.lookup import TemplateLookup
-lookup = TemplateLookup(directories=['template/', 'template/splitpot/'])
+lookup = TemplateLookup(directories=['template/', 'template/splitpot/',
+                        'template/user/'])
 import sys
 sys.path.append('utils')
 
@@ -417,5 +418,22 @@ class splitpot_controller(object):
 
             return tmpl.render(good_news='Nothing to add to aliases list'
                                )
+
+    # @require()
+
+    @cherrypy.expose
+    def profile(self):
+        """
+        Delivers the profile page for the current logged in user, where he then can change his username and password
+        """
+
+        return lookup.get_template('profile.html'
+                                   ).render(currentUser=resolveNick(getCurrentUserName()))
+
+    # @require()
+
+    @cherrypy.expose
+    def updateProfile(self):
+        return None
 
 
