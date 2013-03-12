@@ -14,6 +14,7 @@ sys.path.append('utils/')
 import Encryption
 from Auth import *
 
+from DatabaseParser import *
 import DatabaseParser
 db = DatabaseParser
 import Splitpot
@@ -92,7 +93,7 @@ def doRegister(
             "<li>You have to provide a registration key(<a href='resend?email=" \
             + str(email) + "'>resend</a>)</li>"
     if emailRegex.match(email) == None:
-        errors += "<li>Your email is invalid</li>"
+        errors += '<li>Your email is invalid</li>'
         escapeRegex = True
     if not escapeRegex and not db.isValidResetUrlKey(email, key, True):
         errors += \
@@ -102,7 +103,7 @@ def doRegister(
         errors += \
             '<li>Please enter a nick, with a minimum length of 3</li>'
     if str(pwd1).__len__() < 6:
-        errors += "<li>Your password is too short</li>"
+        errors += '<li>Your password is too short</li>'
     if not pwd1 == pwd2:
         errors += '<li>Passwort repition incorrect</li>'
     if not escapeRegex and db.userExists(email, False):
@@ -162,6 +163,7 @@ def forgot_doReenter(
     pwd1=None,
     pwd2=None,
     ):
+
     tmpl = lookup.get_template('forgot_pwd_reenter.html')
 
     if not emailRegex.match(email):
@@ -237,3 +239,178 @@ def logout():
     if username:
         cherrypy.request.login = None
     raise cherrypy.HTTPRedirect(cherrypy.url('/about'))
+
+
+@cherrypy.expose
+@require()
+def merge():
+    tmpl = lookup.get_template('merge.html')
+
+    return tmpl.render(newUser=getCurrentUserName())
+
+
+@cherrypy.expose
+@require()
+def doMerge(email=None, key=None):
+    """
+Merge two accounts together. Will send a confirmation mail to the to-be-merged email.
+"""
+
+    tmpl = lookup.get_template('merge.html')
+
+    errors = ''
+    if key is not None and isValidMergeUrlKey(key):
+
+        newMail = getUserFromPassword(key[:8])
+        oldMail = getUserFromPassword(key[8:])
+
+        log.info('valid merging key, merging "' + newMail + '" and "'
+                 + oldMail + '" now')
+        if mergeUser(newMail, oldMail):
+            tmpl = lookup.get_template('index.html')
+            return tmpl.render(good_news='Merge was successful!')
+        else:
+            log.warning('couldn\'t merge "' + newMail + '" and "'
+                        + oldMail + '" for some unexpected reason')
+            return tmpl.render(feedback='Oh no! Something went wrong. Please try again later.'
+                               , newUser=getCurrentUserName())
+    elif email is not None:
+
+        log.info('merge "' + email.lower() + '" with "'
+                 + getCurrentUserName() + '"')
+        if email is None:
+            errors += '<li>You have to provide an email address</li>'
+        if emailRegex.match(email) == None:
+            errors += '<li>Your email is invalid</li>'
+        elif not userExists(email, True):
+            errors += '<li>' + str(email.lower()) \
+                + ' doesn\'t exist</li>'
+        if userExists(getCurrentUserName()):
+            events = listAllEventsFor(getCurrentUserName())
+            for event in events:
+                if str(event.participants).find(email) != -1:
+                    log.info('found instance where "' + email.lower()
+                             + '" and "' + getCurrentUserName().lower()
+                             + '" are listed as hoster and participant. Can\'t merge'
+                             )
+                    errors = \
+                        '<li>Can\'t merge these two accounts, because there are events, where host and participant are the same person.</li>'
+                if str(event.owner).find(email) != -1:
+                    log.info('found instance where owner and to-be-merged user are the same'
+                             )
+                    errors = '<li>Can\'t merge two same accounts.</li>'
+        if not errors == '':
+            return tmpl.render(bad_news='<ul>' + errors + '</ul>',
+                               newUser=getCurrentUserName())
+        else:
+            mergeKey = getMergeUrlKey(getCurrentUserName(), email)
+            Email.mergeRequest(getCurrentUserName(), email, mergeKey)
+
+            return tmpl.render(good_news='An email has be sent to "'
+                               + email.lower()
+                               + '" for further information',
+                               newUser=getCurrentUserName())
+    else:
+        tmpl = lookup.get_template('index.html')
+        return tmpl.render(bad_news="Something went wrong, merge wasn't successful (maybe you already merged?)"
+                           )
+
+
+@cherrypy.expose
+@require()
+def alias():
+    """
+    Return the template for adding alias.
+    """
+
+    return lookup.get_template('alias.html'
+                               ).render(aliases=getAliasesFor(getCurrentUserName()))
+
+
+@cherrypy.expose
+@require()
+def doRemoveAlias(email):
+    """
+    Removes an alias from the current user
+    """
+
+    tmpl = lookup.get_template('alias.html')
+    if not emailRegex.match(email):
+        return tmpl.render(bad_news='The given email is invalid')
+    removeAlias(getCurrentUserName(), email)
+    raise cherrypy.HTTPRedirect(cherrypy.url('alias'))
+
+
+@cherrypy.expose
+@require()
+def doAddAlias(
+    self,
+    alias=None,
+    mainMail=None,
+    key=None,
+    ):
+    """
+    Add an alias to this account.
+    """
+
+    tmpl = lookup.get_template('alias.html')
+    errors = ''
+
+    if key is not None and isValidAliasUrlKey(key):
+        mainMail = getUserFromPassword(key[:8])
+        alias = getUserFromPassword(key[8:])
+
+        log.info('valid alias key, add "' + alias + '" as alias to "'
+                 + mainMail)
+
+        if mergeUser(mainMail, alias):
+            return tmpl.render(good_news='Your alias has been added',
+                               aliases=getAliasesFor(getCurrentUserName()))
+        else:
+            log.warning('couldn\'t alias/merge "' + newUser + '" and "'
+                        + oldUser + '" for some unexpected reason')
+            return tmpl.render(bad_news='Oh no! Something went wrong. Please try again later.'
+                               , newUser=getCurrentUserName(),
+                               aliases=getAliasesFor(getCurrentUserName()))
+    elif alias is not None:
+        log.info('alias is not not')
+
+        alias = [x.strip() for x in alias.split(',')]
+        for user in alias:
+            if emailRegex.match(user) == None:
+                errors += '<li>' + user + ' is invalid</li>'
+            else:
+
+                if userExists(user, True):
+                    errors += '<li>' + user \
+                        + ' already exists, use <a href="../merge">Merge E-Mails</a> instead</li>'
+                elif aliasUserExists(user):
+                    errors += '<li>' + user \
+                        + ' is already an alias for someone else</li>'
+
+        if not errors == '':
+            return tmpl.render(bad_news='<ul>' + errors + '</ul>',
+                               aliases=getAliasesFor(getCurrentUserName()))
+        else:
+
+            info = ''
+            for user in alias:
+                if activateUser(user, 'Alias for ' + user, 'random',
+                                True):
+                    log.info('register ' + user
+                             + ' for the purpose of adding as alias')
+                    aliasKey = getMergeUrlKey(getCurrentUserName(),
+                            user)
+
+                    Email.aliasRequest(getCurrentUserName(), user,
+                            aliasKey)
+                    info += '<li>An email has been sent to "' \
+                        + user.lower() \
+                        + '" for further information</li>'
+
+            return tmpl.render(good_news=info,
+                               aliases=getAliasesFor(getCurrentUserName()))
+    else:
+
+        return tmpl.render(good_news='Nothing to add to aliases list')
+
