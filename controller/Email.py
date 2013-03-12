@@ -74,7 +74,7 @@ def SettingsWrapper(to, subject, body):
     msg = MIMEText(body, 'plain', 'utf-8')
     msg['From'] = settings['sender']
     msg['To'] = to
-    msg['Subject'] = "[Splitpot] " + subject
+    msg['Subject'] = '[Splitpot] ' + subject
 
     log.info('sending mail to "' + to + '" with subject: "' + subject
              + '" and body "' + body + '" via "' + settings['host']
@@ -160,7 +160,7 @@ def mergeRequest(newEmail, oldEmail, key):
     tmpl = lookup.get_template('merge_request.email')
     SettingsWrapper(oldEmail, 'Account Merge Request',
                     tmpl.render(newEmail=newEmail, oldEmail=oldEmail,
-                    url=RUNNING_URL + 'doMerge?key=' + key))
+                    url=RUNNING_URL + 'user/doMerge?key=' + key))
 
 
 def aliasRequest(currentUser, aliasUser, key):
@@ -174,7 +174,7 @@ def aliasRequest(currentUser, aliasUser, key):
     tmpl = lookup.get_template('alias_request.email')
     SettingsWrapper(aliasUser, 'Add Alias Request',
                     tmpl.render(oldEmail=currentUser, url=RUNNING_URL
-                    + 'doAddAlias?key=' + key))
+                    + 'user/doAddAlias?key=' + key))
 
 
 def participantEmail(userId, event):
