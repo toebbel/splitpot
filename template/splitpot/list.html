@@ -32,9 +32,9 @@ Others owe you: ${("%.2f" % others_debts).replace('.',',')}€ <br />
             ${("%.2f" % (x.amount / float(len(x.participants) + 1))).replace('.',',')}€
           </td>
           <td>
-            <a href="${cherrypy.url('event/' + str(x.id))}">more</a>
+              <a href="${cherrypy.url('event/' + str(x.id))}"><i class="icon-eye-open"></i></a>
             % if x.owner == getCurrentUserName():
-                &nbsp;&nbsp;&nbsp;<a href="#"><i class="icon-pencil"></i></a>
+                <a href="#"><i class="icon-pencil"></i></a>
                 <!-- <a class="confirm-delete" data-id=${str(x.id)} role="button" data-toggle="modal"><i class="icon-trash"></i></a> -->
                 <a class="#"><i class="icon-trash"></i></a>
                 <a class="#"><i class="icon-ok"></i></a>
