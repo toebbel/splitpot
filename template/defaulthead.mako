@@ -10,15 +10,17 @@
     <link rel="stylesheet" href="${cherrypy.url('/asset/css/custom.css')}" media="screen" />
     <link rel="stylesheet" href="${cherrypy.url('/asset/css/datepicker.css')}" media="screen" />
     <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet">
-
     <link rel="stylesheet" href="${cherrypy.url('/asset/css/modified-bootstrap-responsive.min.css')}" media="screen" />
-    
-    <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" type="text/css">
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" type="text/css" />
+    <link rel="stylesheet" href="${cherrypy.url('/asset/css/DT_bootstrap.css')}" type="text/css" />
+
     <script src="http://code.jquery.com/jquery-1.8.3.js" type="text/javascript"></script>
     <script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js" type="text/javascript"></script>
     <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
     <script src="${cherrypy.url('/asset/js/bootstrap-datepicker.js')}"></script>
-    <style>
+    <script src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
+    <script src="${cherrypy.url('/asset/js/DT_bootstrap.js')}" type="text/javascript"></script>
+    <style type="text/css">
       body {
         padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
         background-color: #f5f5f5;
@@ -52,25 +54,10 @@
         margin-bottom: 15px;
         padding: 7px 9px;
       } 
-
-      /*
-      .navbar .brand,
-      .nav-collapse {
-        float:none;
-        display:inline-block;
-        *display:inline; /* ie7 fix */
-        *zoom:1; /* hasLayout ie7 trigger */
-        vertical-align: top;
-      }
-      .navbar-inner > .container { text-align:center; }
-
-      @media (max-width: 970px) {
-        .navbar .brand,
-        .nav-collapse {
-            display: block;
-        }
-      }
-      */ 
+    
+      
+      /* change layout of search bar of data tables */
+      .dataTables_filter input { width:100px }
 
     </style>
 
