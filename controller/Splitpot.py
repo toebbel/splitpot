@@ -4,7 +4,7 @@
 import cherrypy
 from mako.template import Template
 from mako.lookup import TemplateLookup
-lookup = TemplateLookup(directories=['template/', 'template/splitpot/'])
+lookup = TemplateLookup(directories=['template/', 'template/splitpot/', 'template/error/'])
 import sys
 sys.path.append('utils')
 
@@ -33,6 +33,12 @@ class splitpot_controller(object):
         log.info('deliver index')
         tmpl = lookup.get_template('index.html')
         return tmpl.render()
+
+    @cherrypy.expose
+    def error_page_404(status, message, traceback, version):
+        tmpl = lookup.get_template('404.html')
+        return tmpl.render()
+    cherrypy.config.update({'error_page.404': error_page_404})
 
     @cherrypy.expose
     @require()

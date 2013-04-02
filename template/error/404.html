@@ -1,0 +1,36 @@
+<%! import cherrypy %>
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type="text/javascript">
+            var pkBaseURL = (("https:" == document.location.protocol) ? "https://0xabc.de/analytics/" : "http://0xabc.de/analytics/");
+            document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
+        </script>
+        <!-- Piwik -->
+        <script type="text/javascript">
+            try {
+                var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 1);
+                piwikTracker.trackPageView();
+                piwikTracker.enableLinkTracking();
+            } catch( err ) {}
+        </script>
+        <noscript><p><img src="http://0xabc.de/analytics/piwik.php?idsite=1" style="border:0" alt="" /></p></noscript>
+        <!-- End Piwik Tracking Code -->
+        <style>
+            .center {
+                width: 500px;
+                height: 348px;
+                position: absolute;
+                left: 50%;
+                top: 50%; 
+                display:inline-block;
+                margin-left: -250px;
+                margin-top: -174px;
+            }
+        </style>
+        <title>Splitpot | 404 Error</title>
+    </head>
+    <body>
+        <img src="${cherrypy.url('/asset/img/404.png')}" alt="404 error" class="center" />
+    </body>
+</html>
