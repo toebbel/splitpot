@@ -141,10 +141,14 @@ def payday(
 
     tmpl = lookup.get_template('payday.email')
 
-    SettingsWrapper(email, 'Payday!',
-                    tmpl.render(inPayments=inPayments,
-                    outPayments=outPayments, inDebts=inDebt,
-                    outDebts=outDebt))  # TODO enough data or more?
+    if inDebt != 0 or outDebt != 0:
+        SettingsWrapper(email, 'Payday!',
+                        tmpl.render(inPayments=inPayments,
+                        outPayments=outPayments, inDebts=inDebt,
+                        outDebts=outDebt))  # TODO enough data or more?
+    else:
+        tmpl = lookup.get_template('zero_debt.email')
+        SettingsWrapper(email, 'Payday!', tmpl.render()) 
 
 
     # return tmpl.render(inPayments=inPayments, outPayments=outPayments, inDebts=inDebt, outDebts=outDebt)

@@ -1,0 +1,13 @@
+## -*- coding: utf-8 -*-
+<%inherit file="base.email" />
+
+Congratulations!
+You are officially debt free! However, that means that you are not getting any money either.
+
+Well you get a reward from us*:
+http://goo.gl/Znyku
+
+Best wishes,
+Splitpot
+
+*: visit http://pusheen.com for more awesome cat gifs!
