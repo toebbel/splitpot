@@ -1,6 +1,5 @@
 ## -*- coding: utf-8 -*-
 <%inherit file="base.email" />
-
 It's Payday!
 You know what this means: Everybody pays his or her debts, and hopefully gets a lot of money :)
 
@@ -17,7 +16,7 @@ Please transfer money to the following people:
 % if inDebts > 0:
 You will get money from these people:
 % for c in inPayments:
-    * ${("%.2f" % c.amount).replace('.',',')}€ to ${c.fromUser}
+    * ${("%.2f" % c.amount).replace('.',',')}€ from ${c.fromUser}
 % endfor
 % endif
 
