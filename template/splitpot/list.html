@@ -3,10 +3,9 @@
 <%! import cherrypy %>
 <%! from Auth import getCurrentUserName %>
 <%! from DatabaseParser import resolveNick %>
-<div id="config-header">
 Your debts: ${("%.2f" % debts).replace('.', ',')}€ <br />
-Others owe you: ${("%.2f" % others_debts).replace('.',',')}€ <br />
-</div>
+Others owe you: ${("%.2f" % others_debts).replace('.',',')}€
+<hr />
 
 <div class="expensesList">
     <% 
