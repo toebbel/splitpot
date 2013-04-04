@@ -1,0 +1,70 @@
+#config-header {
+    background-attachment: scroll;
+    background-clip: border-box;
+    background-image: none;
+    background-origin: padding-box;
+    background-position: 0 0;
+    background-repeat: repeat;
+    background-size: auto auto;
+    min-height: 80px;
+    position: fixed;
+    top: 80px;
+    width: 650px;
+    z-index: 4;
+}
+.expensesList {
+    -moz-box-sizing: border-box;
+    cursor: pointer;
+    position: relative;
+    max-width: 650px;
+    margin: 0 auto; 
+}
+
+.monthSeparator {
+    background: none repeat scroll 0 0 #626262;
+    border-bottom: 1px solid #ccc;
+    border-top: 0px solid #f6f6f6;
+    font-size: 11px;
+    padding: 3px 10px;
+}
+
+.monthSeparator span {
+    color: #fff; 
+    text-transform: uppercase;
+}
+
+a.eventAnchor {
+    text-decoration: none;
+    color: #000;
+}
+
+.expenseEntry {
+    border-bottom: 1px solid #ccc;
+    padding:15px;
+}
+
+.expenseEntry:hover {
+  background: #e0e0e0;
+}
+
+.expenseEntry div.date {
+    float: left;
+    color: #999;
+    font-size: 12pt;
+    font-weight: 400;
+    height: 40px;
+    width: 40px;
+    padding: 0 15px 5px 0;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.expenseEntry div.amount {
+    float: right;
+    font-size: 15pt;
+}
+
+.expenseEntry div.title {
+    font-size: 16pt;
+    color: #4e8cde;
+}

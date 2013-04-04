@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="${cherrypy.url('/asset/css/modified-bootstrap-responsive.min.css')}" media="screen" />
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" type="text/css" />
     <link rel="stylesheet" href="${cherrypy.url('/asset/css/DT_bootstrap.css')}" type="text/css" />
+    <link rel="stylesheet" href="${cherrypy.url('/asset/css/expenses.css')}" type="text/css" />
 
     <script src="http://code.jquery.com/jquery-1.8.3.js" type="text/javascript"></script>
     <script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js" type="text/javascript"></script>
