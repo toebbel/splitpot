@@ -493,8 +493,8 @@ def resolveNick(userId):
         if userExists(userId, False):
             with connection:
                 cur = connection.cursor()
-                cur.execute("SELECT name from splitpot_users where email = '"
-                             + userId + "';")
+                cur.execute('SELECT name from splitpot_users where email = ?'
+                            , [userId.lower()])
                 result = cur.fetchone()[0]
         return result
     else:
