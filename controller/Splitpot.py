@@ -12,6 +12,7 @@ from DatabaseParser import *
 import User
 from Auth import *
 from datetime import date
+from time import gmtime, strftime
 from TransactionGraph import *
 from Regex import *
 import Email
@@ -76,8 +77,6 @@ class splitpot_controller(object):
         log.info('deliver about page')
         return lookup.get_template('about.html').render()
 
-  # signature of insertEvent: insertEvent(owner, date, amount, participants, comment)
-
     @cherrypy.expose
     @require()
     def doAdd(
@@ -93,7 +92,6 @@ class splitpot_controller(object):
     """
 
         # in case a comma was used, instead of a dot
-
         amount = amount.replace(',', '.')
 
         othersList = [x.strip() for x in str(others).split(',')]
@@ -169,7 +167,7 @@ class splitpot_controller(object):
         splitDate = [int(x) for x in splitDate]
         today = datetime.date(splitDate[2], splitDate[1], splitDate[0])
         eventId = insertEvent(getCurrentUserName(), today, amount,
-                              othersList, comment)
+                              othersList, comment, 'new')
         event = getEvent(eventId)
 
         for participant in othersList:
@@ -220,7 +218,7 @@ class splitpot_controller(object):
                     minimizePath(c[0])
         log.info('Finished optimization')
 
-    # Generate emails from Tree
+        # Generate emails from Tree
 
         for userId in graphNodes.keys():
             incoming = 0
@@ -242,9 +240,34 @@ class splitpot_controller(object):
                     outgoingTransactions.append(edge)
                     print str(edge)
 
-            Email.payday(userId, incomingTransactions,
-                         outgoingTransactions, incoming, outgoing)
+            self.createOptimizedPaydayEvents(userId, outgoingTransactions, outgoing)
+
+            Email.payday(userId, incomingTransactions, outgoingTransactions, incoming, outgoing)
         log.info('writing graphBack')
         TransactionGraphWriteback(keys)
+        archiveAllNewEvents();
+
+    def createOptimizedPaydayEvents(self, userId=None, outgoingTransactions=None, outgoing=None):
+        """
+        Create Payday events, to be displayed on the web interface.
+        """
+
+        today = strftime("%d-%m-%Y", gmtime())
+        comment = "Payday!"
+
+        if outgoing > 0:
+            for tmpOut in outgoingTransactions:
+                insertEvent(tmpOut.toUser, today, (tmpOut.amount*2.0), [userId], comment, 'payday')
+
+        return None
+
+    @cherrypy.expose
+    @require()
+    def doRemoveEvent(id=None):
+        """
+        Remove a given event
+        """
+
+        return None
 
 

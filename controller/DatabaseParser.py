@@ -88,20 +88,6 @@ def verifyLogin(email, password):
             == hashedPw else False)
 
 
-def listEvents():
-    """
-    List all events that are in the database.
-    """
-
-    log.info('list all events in database')
-    with connection:
-        cur = connection.cursor()
-        cur.execute('SELECT * FROM splitpot_events')
-        events = cur.fetchall()
-
-    return events
-
-
 def listHostingEventsFor(user):
     """
     List all events of a given user, where the user was the host.
@@ -111,7 +97,7 @@ def listHostingEventsFor(user):
     with connection:
         log.info("list all hosting events for '" + user.lower() + "'")
         cur = connection.cursor()
-        cur.execute('SELECT ID, date, amount, participants, comment FROM splitpot_events WHERE splitpot_events.owner = ?'
+        cur.execute('SELECT ID, date, amount, participants, comment, status FROM splitpot_events WHERE splitpot_events.owner = ?'
                     , [user.lower()])
         result = cur.fetchall()
         for curEvent in result:
@@ -123,6 +109,7 @@ def listHostingEventsFor(user):
                 amount=curEvent[2],
                 participants=json.loads(curEvent[3]),
                 comment=curEvent[4],
+                status=curEvent[5],
                 ))
     return events
 
@@ -137,8 +124,7 @@ def listInvitedEventsFor(user):
         log.info("list all invited to events for '" + user.lower() + "'"
                  )
         cur = connection.cursor()
-        cur.execute('SELECT splitpot_events.ID, owner, date, amount, splitpot_events.participants, comment FROM splitpot_events, splitpot_participants WHERE splitpot_participants.event = splitpot_events.ID AND splitpot_participants.user = ?'
-                    , [user.lower()])
+        cur.execute('SELECT splitpot_events.ID, owner, date, amount, splitpot_events.participants, comment, splitpot_participants.status FROM splitpot_events, splitpot_participants WHERE splitpot_participants.event = splitpot_events.ID AND splitpot_participants.user = ?', [user.lower()])
         result = cur.fetchall()
         for curEvent in result:
             events.append(Event(
@@ -149,6 +135,7 @@ def listInvitedEventsFor(user):
                 amount=-curEvent[3],
                 participants=json.loads(curEvent[4]),
                 comment=curEvent[5],
+                status=curEvent[6],
                 ))
 
     return events
@@ -161,8 +148,8 @@ def listAllEventsFor(user):
 
     log.info('list all events for "' + user.lower() + '"')
     return sorted(listHostingEventsFor(user)
-                  + listInvitedEventsFor(user), key=lambda e: e.date,
-                  reverse=True)
+                  + listInvitedEventsFor(user), key=lambda e: \
+                  e.date, reverse=True)
 
 
 def getEvent(id):
@@ -173,7 +160,7 @@ def getEvent(id):
     log.info('retrieve event ' + str(id))
     with connection:
         cur = connection.cursor()
-        cur.execute('SELECT owner, date, amount, participants, comment FROM splitpot_events where id = ?'
+        cur.execute('SELECT owner, date, amount, participants, comment, status FROM splitpot_events where id = ?'
                     , [id])
         e = cur.fetchone()
         if e:
@@ -184,6 +171,7 @@ def getEvent(id):
                 amount=e[2],
                 participants=json.loads(e[3]),
                 comment=e[4],
+                status=e[5],
                 )
         return None
 
@@ -194,6 +182,7 @@ def insertEvent(
     amount,
     participants,
     comment,
+    status='new',
     ):
     """
     Insert a new event with the given parameters and return the event ID.
@@ -216,7 +205,7 @@ def insertEvent(
                      + ' is not registered yet, registering now.')
             registerUser(owner, 'Not Registered', tmpPassword)  # TODO I don't think we should allow this
 
-        cur.execute('INSERT INTO splitpot_events VALUES (?,?,?,?,?,?)',
+        cur.execute('INSERT INTO splitpot_events VALUES (?,?,?,?,?,?,?)',
                     (
             None,
             owner,
@@ -224,12 +213,13 @@ def insertEvent(
             amount,
             json.dumps(participants),
             comment,
+            status,
             ))
 
         cur.execute('SELECT * FROM splitpot_events ORDER BY ID DESC limit 1'
                     )
         eventID = cur.fetchone()[0]
-        updateParticipantTable(participants, eventID, 'new')
+        updateParticipantTable(participants, eventID, status)
     return eventID
 
 
@@ -600,14 +590,14 @@ def buildTransactionTree():
     clearTransactionGraph()
     with connection:
         cur = connection.cursor()
-        cur.execute("select id, amount, owner, user, tmp.num_parts FROM splitpot_participants, splitpot_events, (SELECT event, count(event) as 'num_parts' FROM splitpot_participants group by event) tmp WHERE splitpot_participants.event = splitpot_events.id AND tmp.event = splitpot_participants.event AND splitpot_participants.status != 'payday';"
+        cur.execute("select id, amount, owner, user, tmp.num_parts FROM splitpot_participants, splitpot_events, (SELECT event, count(event) as 'num_parts' FROM splitpot_participants group by event) tmp WHERE splitpot_participants.event = splitpot_events.id AND tmp.event = splitpot_participants.event AND splitpot_participants.status = 'new';"
                     )
         data = cur.fetchall()
         keys = []
         for entry in data:
             keys.append((entry[0], entry[3]))
             e = TransactionEdge(entry[3], entry[2], entry[1]
-                                / (entry[4] + 1))
+                                / (entry[4] + 1.0))
             print 'insert ' + str(e)
             insertEdge(e)
     return keys
@@ -615,7 +605,7 @@ def buildTransactionTree():
 
 def TransactionGraphWriteback(keys):
     """
-    Bulk update for participant table. Sets all tuples <eventId, userId> in the participants table to status = 'payday'
+    Bulk update for participant table. Sets all tuples <eventId, userId> in the participants table to status = 'archive'
     """
 
     update = ''
@@ -626,13 +616,21 @@ def TransactionGraphWriteback(keys):
         log.info('empty transaction graph - no write back')
         return
     update = \
-        "UPDATE splitpot_participants SET status = 'payday' WHERE " \
-        + update[3:] + ';'
+        "UPDATE splitpot_participants SET status = 'archive' WHERE " \
+        + update[3:] + 'AND status != "payday";'
     log.info('transactiongraph Writeback: ' + update)
     with connection:
         cur = connection.cursor()
         cur.execute(update)
 
+def archiveAllNewEvents():
+    """
+    Bulk update for events. Set status of all 'new' events to 'archive'.
+    """
+
+    with connection:
+        cur = connection.cursor()
+        cur.execute("UPDATE splitpot_events SET status = 'archive' WHERE status = 'new'")
 
 def isUserInEvent(email, event):
     """
@@ -697,6 +695,9 @@ def changeNick(mainMail, newNick):
 
     with connection:
         cur = connection.cursor()
-        cur.execute('UPDATE splitpot_users SET name = ? WHERE email = ?', [newNick, mainMail.lower()])
+        cur.execute('UPDATE splitpot_users SET name = ? WHERE email = ?'
+                    , [newNick, mainMail.lower()])
 
     return True
+
+

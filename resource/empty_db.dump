@@ -5,8 +5,9 @@ CREATE TABLE "splitpot_events" (
 "owner" TEXT NOT NULL,
 "date" TEXT NOT NULL,
 "amount" INTEGER NOT NULL,
-"participants" TEXT,
-"comment" TEXT
+"participants" TEXT NOT NULL,
+"comment" TEXT NOT NULL,
+"status" TEXT NOT NULL
 );
 CREATE TABLE "splitpot_participants" (
 "user" TEXT REFERENCES "splitpot_users"("email") NOT NULL,

@@ -3,8 +3,33 @@
 <%! import cherrypy %>
 <%! from Auth import getCurrentUserName %>
 <%! from DatabaseParser import resolveNick %>
-Your debts: ${("%.2f" % debts).replace('.', ',')}€ <br />
-Others owe you: ${("%.2f" % others_debts).replace('.',',')}€
+
+<script>
+    $(function() {
+        $('#listSpecificEvents').change(function() {
+            var val = $(this).val();
+            if (val == 'all') {
+                $('div').show();
+            } else {
+                $('div[class="expenseEntry"]').hide();
+                $('div[status$="' + val + '"]').show();
+            }
+        });
+    });
+</script>
+
+Your debts: ${("%.2f" % debts).replace('.', ',')}€<br />
+Others owe you: ${("%.2f" % others_debts).replace('.',',')}€<br />
+
+<br />
+
+<select name="listSpecificEvents" id="listSpecificEvents">
+    <option value="all">All Events</option>
+    <option value="payday">Show Payday</option>
+    <option value="new">Show New Events</option>
+    <option value="archive">Archive</option>
+</select>
+
 <hr />
 
 <div class="expensesList">
@@ -15,12 +40,12 @@ Others owe you: ${("%.2f" % others_debts).replace('.',',')}€
     % for x in entries:
         % if curMonth != x.date.strftime("%B"):
         <div class="monthSeparator">
-                <span>${x.date.strftime("%B %Y")}</span>
-            </div>
+            <span>${x.date.strftime("%B %Y")}</span>
+        </div>
         % endif
         <% curMonth = x.date.strftime("%B") %>
         <a class="eventAnchor" href="${cherrypy.url('event/' + str(x.id))}">
-            <div class="expenseEntry">
+            <div class="expenseEntry" status="${x.status}">
                 % if x.amount > 0:
                 <div class="amount" style="color: #069a1e">
                 % else:
@@ -46,3 +71,4 @@ Others owe you: ${("%.2f" % others_debts).replace('.',',')}€
             </div>
         </a>
     % endfor
+

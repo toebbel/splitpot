@@ -60,25 +60,6 @@ class TestDatabaseParser(unittest.TestCase):
 
         self.assertTrue(userExists('ghost@test.de'))  # User should be found in "normal" users
 
-    def testListEvents(self):
-        activateUser('a', 'alpha', '1', True)
-        activateUser('b', 'beta', '2', True)
-        activateUser('c', 'charlie', '3', True)
-        date_a = datetime.datetime.now
-        id_a = insertEvent('a', '1.4.2013', 10, ['b'], 'Event1')
-        print listEvents()
-        self.assertEqual(listEvents(), [(
-            id_a,
-            u'a',
-            '1.4.2013',
-            10,
-            u'["b"]',
-            u'Event1',
-            )])
-
-    def testListEvents_emptyDB(self):
-        listEvents()
-
     def testGetPassword_NonexistentUser(self):
         getPassword('martin@0xabc.de')
 

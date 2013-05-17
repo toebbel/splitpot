@@ -14,6 +14,7 @@ class Event:
         amount=None,
         participants=None,
         comment=None,
+        status=None
         ):
         self.id = id
         self.owner = owner
@@ -21,6 +22,7 @@ class Event:
         self.amount = amount
         self.participants = participants
         self.comment = comment
+        self.status = status
 
     def __str__(self):
         date_str = self.date
@@ -28,6 +30,6 @@ class Event:
             date_str = date_str.strftime(DATEFORMAT)
         return 'Event ' + str(self.id) + ', owned by ' + self.owner \
             + '(' + date_str + ') over ' + str(self.amount) + ' with ' \
-            + json.dumps(self.participants) + ' | ' + self.comment
+            + json.dumps(self.participants) + ' | ' + self.comment + ' | ' + self.status
 
 
