@@ -12,6 +12,13 @@
     margin-top: -40px;
     z-index: 4;
 }
+
+.debtSummary {
+    font-size: 13pt;
+    color: #626262;
+    width: 200px;
+}
+
 .expensesList {
     -moz-box-sizing: border-box;
     cursor: pointer;

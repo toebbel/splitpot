@@ -191,10 +191,10 @@ class splitpot_controller(object):
         totalEarnings = 0
         events = listAllEventsFor(getCurrentUserName())
         for event in events:
-            if event.amount < 0:
+            if event.amount < 0 and event.status != 'archive':
                 totalDebts += event.amount \
                     / float(len(event.participants) + 1)
-            else:
+            elif event.status != 'archive':
                 totalEarnings += event.amount - event.amount \
                     / float(len(event.participants) + 1)
         return tmpl.render(debts=totalDebts,

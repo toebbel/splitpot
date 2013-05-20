@@ -18,8 +18,10 @@
     });
 </script>
 
-Your debts: ${("%.2f" % debts).replace('.', ',')}€<br />
-Others owe you: ${("%.2f" % others_debts).replace('.',',')}€<br />
+<div class="debtSummary">
+    Your debts: <span style="color: #a30303; float: right">${("%.2f" % debts).replace('.', ',')}€</span><br />
+    Others owe you: <span style="color: #069a1e; float: right">${("%.2f" % others_debts).replace('.',',')}€</span><br />
+</div>
 
 <br />
 
