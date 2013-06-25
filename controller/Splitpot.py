@@ -179,7 +179,7 @@ class splitpot_controller(object):
 
     @cherrypy.expose
     @require()
-    def list(self):
+    def list(self, bad_news=None, good_news=None):
         """
       Lists all events of a user, which he is participating/is owner
       """
@@ -198,7 +198,8 @@ class splitpot_controller(object):
                 totalEarnings += event.amount - event.amount \
                     / float(len(event.participants) + 1)
         return tmpl.render(debts=totalDebts,
-                           others_debts=totalEarnings, entries=events)
+                           others_debts=totalEarnings,
+                           entries=events, bad_news=bad_news, good_news=good_news)
 
     def payday(self):
         log.info('PayDay! Build Transactiongraph')
@@ -261,13 +262,25 @@ class splitpot_controller(object):
 
         return None
 
+
     @cherrypy.expose
     @require()
-    def doRemoveEvent(id=None):
+    def doArchiveEvent(self, eventId):
         """
-        Remove a given event
+        Archives a given event.
         """
 
-        return None
+        tmpl = lookup.get_template('list.html')
+        log.info('archive event ' + str(eventId))
+        if not eventIdRegex.match(eventId):
+            return self.list(bad_news='The provided event id is not correct')
+        elif getEvent(eventId) == None:
+            return self.list(bad_news='There is no event with such id')
+        elif not isUserHostOfEvent(getCurrentUserName(), eventId):
+            return self.list(bad_news='You are not allowed to delete this event')
+        if (archiveEvent(eventId)):
+            return self.list(good_news='Event successfully archived')
+        else:
+            return self.list(bad_news='Something went wrong. Please try again later')
 
 

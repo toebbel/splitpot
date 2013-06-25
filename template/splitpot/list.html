@@ -69,8 +69,45 @@
                     % else:
                         by ${resolveNick(x.owner)}
                     % endif
+                    % if x.owner == getCurrentUserName() and x.status == 'payday':
+                    <a class="confirm-archive" role="button" style="float:right" data-id=${x.id}><i class="icon-ok"></i></a>
+                    % endif
                 </div>
             </div>
         </a>
     % endfor
+</div>
 
+<div class="modal hide fade" id="archiveConfirmation" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3>Archive Confirmation</h3>
+    </div>
+    <div class="modal-body">
+        <p class="error-text">Are you sure you want to archive the event?</p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+        <a href="${cherrypy.url('doArchiveEvent?eventId=')}" class="btn btn-success">Archive</a>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function() {
+        $('#archiveConfirmation').bind('show', function() {
+            var id = $(this).data('id');
+            archiveBtn = $(this).find('.btn-success');
+            href = archiveBtn.attr('href');
+
+            archiveBtn.attr('href', href.replace(/eventId=*/, 'eventId=' + id));
+        });
+
+        $('.confirm-archive').click(function(e) {
+            e.preventDefault();
+
+            var id = $(this).data('id');
+            $('#archiveConfirmation').data('id', id).modal('show');
+        });
+    });
+</script>

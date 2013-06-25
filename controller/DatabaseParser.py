@@ -632,6 +632,21 @@ def archiveAllNewEvents():
         cur = connection.cursor()
         cur.execute("UPDATE splitpot_events SET status = 'archive' WHERE status = 'new'")
 
+
+def archiveEvent(eventId):
+    """
+    Archive a given event.
+    """
+
+    log.info('archive event with id: ' + str(eventId))
+    with connection:
+        cur = connection.cursor()
+        cur.execute('UPDATE splitpot_events SET status = "archive" WHERE status = "payday" AND ID = ?', [eventId])
+        cur.execute('UPDATE splitpot_participants SET status = "archive" WHERE status = "payday" AND event = ?', [eventId])
+        return True
+    return False
+    
+
 def isUserInEvent(email, event):
     """
     Check is a given user is in a given event.
@@ -646,6 +661,19 @@ def isUserInEvent(email, event):
                 if str(curEvent.id) == str(event):
                     return True
             return
+
+def isUserHostOfEvent(email, event):
+    """
+    Check if a given user is a host of a given event.
+    """
+    log.info('check if "' + email.lower() + '" is host of event: "' + str(event) + '"')
+    with connection:
+        if userExists(email) and getEvent(event) != None:
+            events = listHostingEventsFor(email)
+            for curEvent in events:
+                if str(curEvent.id) == str(event):
+                    return True
+            return False
 
 
 def addAutocompleteEntry(fromUser, toUser):
