@@ -47,8 +47,8 @@ ProxyPreserveHost on
   Order allow,deny
   Allow from all
 </Proxy>
-ProxyPass /webapp/ http://127.0.0.1:8080/splitpot/
-ProxyPassReverse /webapp/ http://127.0.0.1:8080/splitpot/
+ProxyPass /splitpot/ http://127.0.0.1:8080/splitpot/
+ProxyPassReverse /splitpot/ http://127.0.0.1:8080/splitpot/
 ```
 Restart your apache
 
