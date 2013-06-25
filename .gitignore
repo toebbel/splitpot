@@ -15,6 +15,7 @@ resource/splitpotDB.sqlite
 resource/cherry.cfg
 resource/app.cfg
 resource/mail.settings
+backup/*
 
 # Packages
 *.egg
