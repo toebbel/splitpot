@@ -254,10 +254,10 @@ class splitpot_controller(object):
         """
 
         today = strftime("%d-%m-%Y", gmtime())
-        comment = "Payday!"
 
         if outgoing > 0:
             for tmpOut in outgoingTransactions:
+                comment = "Payday: Get money from " + str(resolveNick(userId)) + "!"
                 insertEvent(tmpOut.toUser, today, (tmpOut.amount*2.0), [userId], comment, 'payday')
 
         return None
