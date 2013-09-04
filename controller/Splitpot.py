@@ -257,7 +257,7 @@ class splitpot_controller(object):
 
         if outgoing > 0:
             for tmpOut in outgoingTransactions:
-                comment = "Payday: Between you and " + str(resolveNick(userId)) + "!"
+                comment = "Payday: [" + str(resolveNick(tmpOut.toUser)) + " - " + str(resolveNick(userId)) + "]"
                 insertEvent(tmpOut.toUser, today, (tmpOut.amount*2.0), [userId], comment, 'payday')
 
         return None
