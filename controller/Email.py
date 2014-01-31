@@ -21,7 +21,7 @@ import Splitpot
 import logging
 log = logging.getLogger('appLog')
 
-RUNNING_URL = 'http://0xabc.de/splitpot/'
+RUNNING_URL = 'http://staubablage.de/splitpot/'
 
 
 def sendMail(
@@ -61,7 +61,7 @@ def SettingsWrapper(to, subject, body):
     settingsFile = open('resource/mail.settings')
     settings = {
         'host': 'localhost',
-        'sender': 'splitpot@0xabc.de',
+        'sender': 'splitpot@staubablage.de',
         'port': 25,
         'timeout': 1,
         }
