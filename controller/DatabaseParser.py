@@ -690,7 +690,7 @@ def addAutocompleteEntry(fromUser, toUser):
         if num == 0:
             log.info('create autocomplete entry from ' + fromUser
                      + ' to ' + toUser)
-            cur.execute("INSERT INTO splitpot_autocomplete VALUES('"
+            cur.execute("INSERT INTO splitpot_autocomplete VALUES(NULL, '"
                         + fromUser.lower() + "', '" + toUser.lower()
                         + "');")
             return True

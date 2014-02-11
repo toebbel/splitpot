@@ -70,7 +70,9 @@
                         by ${resolveNick(x.owner)}
                     % endif
                     % if x.owner == getCurrentUserName() and x.status == 'payday':
-                    <a class="confirm-archive" role="button" style="float:right" data-id=${x.id}><i class="icon-ok"></i></a>
+                    <a class="confirm-archive" role="button" style="float:right" data-id=${x.id}>
+                        <i class="icon-ok"></i>
+                    </a>
                     % endif
                 </div>
             </div>

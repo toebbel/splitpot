@@ -27,6 +27,7 @@ Add your expenses that you made for others.
             $("#others").tokenInput(
                 "${cherrypy.url('/autocomplete/')}",
                 {
+                    tokenValue: "value",
                     propertyToSearch: "value",
                     preventDuplicates: true,
                     animateDropdown: false,
