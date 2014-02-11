@@ -18,12 +18,12 @@ import json
 
 @cherrypy.expose
 @require()
-def autocomplete(term=''):
+def autocomplete(q=''):
     """
     Returns all visible users, that start with the given term (email or nick).
     """
-    if emailAutocompleteRegex.match(term):
-        return getAutocompleteUser(getCurrentUserName(), term)
+    if emailAutocompleteRegex.match(q):
+        return getAutocompleteUser(getCurrentUserName(), q)
     else:
-        log.info("caugth illegal search term " + term)
+        log.info("caugth illegal search term " + q)
         return json.dumps([])

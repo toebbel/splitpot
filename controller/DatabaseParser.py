@@ -705,14 +705,13 @@ def getAutocompleteUser(fromUser, term):
     reply = []
     with connection:
         cur = connection.cursor()
-        cur.execute("select [to] as 'value', name from splitpot_autocomplete, splitpot_users where splitpot_users.email = splitpot_autocomplete.[to] AND ([to] LIKE '"
+        cur.execute("select [to] as 'value', name, id from splitpot_autocomplete, splitpot_users where splitpot_users.email = splitpot_autocomplete.[to] AND ([to] LIKE '"
                      + term + "%' OR name LIKE '" + term
                     + "%') and [from] = '" + fromUser + "';")
-
         data = cur.fetchall()
         for r in data:
-            reply.append({'value': r[0], 'name': r[1] + ' (' + r[0]
-                         + ')'})
+            url = 'http://www.gravatar.com/avatar/' + hashlib.md5(r[0].lower().strip().encode("utf-8")).hexdigest() + '?s=100?d=monsterid'
+            reply.append({'id': r[2], 'value': r[0], 'url': url})
     return json.dumps(reply)
 
 
